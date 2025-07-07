@@ -1,0 +1,40 @@
+{
+  "name": "@sabron/i18n",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist .turbo",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "i18next": "^23.12.2",
+    "react-i18next": "^13.5.0",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-http-backend": "^2.5.2"
+  },
+  "peerDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@sabron/typescript-config": "workspace:*",
+    "@sabron/eslint-config": "workspace:*",
+    "typescript": "^5.8.3",
+    "tsup": "^8.4.0",
+    "eslint": "^8.57.0"
+  }
+}

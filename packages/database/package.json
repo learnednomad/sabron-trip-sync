@@ -1,0 +1,46 @@
+{
+  "name": "@sabron/database",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist .turbo",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "prisma migrate deploy",
+    "db:seed": "tsx src/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@sabron/types": "workspace:*",
+    "@sabron/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "@sabron/eslint-config": "workspace:*",
+    "@sabron/typescript-config": "workspace:*",
+    "eslint": "^8.57.0",
+    "prisma": "^6.11.1",
+    "tsup": "^8.4.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

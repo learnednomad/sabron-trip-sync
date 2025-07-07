@@ -1,0 +1,111 @@
+{
+"$schema": "https://turbo.build/schema.json",
+"globalDependencies": ["**/.env.*local", "**/.env", "tsconfig.json"],
+"globalEnv": [
+"NODE_ENV",
+"VERCEL_URL",
+"PORT",
+"ANALYZE",
+"SENTRY_DSN",
+"NEXT_PUBLIC_SENTRY_DSN",
+"EXPO_PUBLIC_SENTRY_DSN",
+"SUPABASE_URL",
+"SUPABASE_ANON_KEY",
+"SUPABASE_SERVICE_KEY",
+"DATABASE_URL",
+"REDIS_URL",
+"MONGODB_URI",
+"ALLOWED_ORIGINS",
+"NEXT_PUBLIC_API_URL",
+"EXPO_PUBLIC_API_URL"
+],
+"tasks": {
+"build": {
+"dependsOn": ["^build"],
+"outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
+"env": [
+"NODE_ENV",
+"DATABASE_URL",
+"NEXT_PUBLIC_*",
+"EXPO_PUBLIC_*",
+"SENTRY_*"
+]
+},
+"dev": {
+"cache": false,
+"persistent": true,
+"dependsOn": ["^build"]
+},
+"test": {
+"outputs": ["coverage/**"],
+"dependsOn": ["build"],
+"env": ["NODE_ENV"]
+},
+"test:watch": {
+"cache": false,
+"persistent": true
+},
+"test:ci": {
+"outputs": ["coverage/**"],
+"dependsOn": ["build"],
+"env": ["NODE_ENV", "CI"]
+},
+"test:e2e": {
+"outputs": ["playwright-report/**", "test-results/**"],
+"dependsOn": ["build"],
+"env": ["NODE_ENV", "CI", "PLAYWRIGHT_*"]
+},
+"lint": {
+"outputs": [],
+"dependsOn": ["^build"]
+},
+"lint:fix": {
+"outputs": [],
+"dependsOn": ["^build"]
+},
+"typecheck": {
+"outputs": [],
+"dependsOn": ["^build"]
+},
+"clean": {
+"cache": false
+},
+"db:generate": {
+"cache": false,
+"inputs": ["**/prisma/schema.prisma"],
+"outputs": ["**/node_modules/.prisma/**", "**/generated/prisma/**"]
+},
+"@sabron/database#build": {
+"dependsOn": ["db:generate"]
+},
+"@sabron/api#build": {
+"dependsOn": ["^build", "db:generate"]
+},
+"@sabron/api#dev": {
+"dependsOn": ["^build", "db:generate"]
+},
+"db:migrate": {
+"cache": false,
+"inputs": ["**/prisma/schema.prisma", "**/prisma/migrations/**"]
+},
+"db:seed": {
+"cache": false,
+"dependsOn": ["db:generate"]
+},
+"db:studio": {
+"cache": false,
+"persistent": true
+},
+"analyze": {
+"dependsOn": ["build"],
+"env": ["ANALYZE"]
+},
+"storybook": {
+"cache": false,
+"persistent": true
+},
+"build-storybook": {
+"outputs": ["storybook-static/**"]
+}
+}
+}

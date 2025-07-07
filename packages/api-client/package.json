@@ -1,0 +1,48 @@
+{
+  "name": "@sabron/api-client",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js",
+      "require": "./dist/hooks.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist .turbo",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.81.5",
+    "axios": "^1.7.2",
+    "@sabron/types": "workspace:*",
+    "@sabron/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@sabron/typescript-config": "workspace:*",
+    "@sabron/eslint-config": "workspace:*",
+    "typescript": "^5.8.3",
+    "tsup": "^8.4.0",
+    "eslint": "^8.57.0",
+    "vitest": "^2.1.8",
+    "@testing-library/react": "^16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

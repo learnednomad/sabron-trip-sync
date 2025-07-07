@@ -1,0 +1,57 @@
+{
+  "name": "@sabron/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ci": "vitest run --coverage",
+    "analyze": "ANALYZE=true next build"
+  },
+  "dependencies": {
+    "@sabron/api-client": "workspace:*",
+    "@sabron/i18n": "workspace:*",
+    "@sabron/types": "workspace:*",
+    "@sabron/ui": "workspace:*",
+    "@sabron/validation": "workspace:*",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.47.22",
+    "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-query-devtools": "^5.81.5",
+    "@tanstack/react-query-next-experimental": "^5.81.5",
+    "lucide-react": "^0.453.0",
+    "next": "15.3.5",
+    "next-themes": "^0.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "sonner": "^1.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.5",
+    "@sabron/eslint-config": "workspace:*",
+    "@sabron/typescript-config": "workspace:*",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.30.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@10.12.3",
+  "engines": {
+    "node": ">=22.17.0"
+  }
+}

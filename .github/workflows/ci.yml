@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Approve build scripts
+        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test:ci
+      - name: Build
+        run: pnpm build
+      - name: Build Docker images
+        run: docker-compose build
+
+  build-mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Approve build scripts
+        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build Android
+        run: pnpm build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-app
+          path: apps/mobile/*.apk
+
+  deploy:
+    needs: [build, build-mobile]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Approve build scripts
+        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
+      - name: Build and push to Coolify
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          docker-compose push
+          curl -X POST \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"projectId": "your-project-id"}' \
+            https://api.coolify.io/v1/projects/deploy

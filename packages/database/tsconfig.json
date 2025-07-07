@@ -1,0 +1,10 @@
+{
+  "extends": "@sabron/typescript-config/node.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "incremental": false
+  },
+  "include": ["src/**/*", "prisma/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

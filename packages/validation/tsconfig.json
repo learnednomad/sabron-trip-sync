@@ -1,0 +1,10 @@
+{
+  "extends": "@sabron/typescript-config/library.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "incremental": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
+}

@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build:*)",
+      "mcp__filesystem__read_file",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__edit_file",
+      "Bash(grep:*)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__write_file",
+      "Bash(rg:*)",
+      "Bash(pnpm run:*)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(lsof:*)",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_evaluate",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "mcp__filesystem__list_directory",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(npx eslint:*)",
+      "Bash(pgrep:*)",
+      "Bash(curl:*)",
+      "Bash(pnpm ls:*)",
+      "Bash(pnpm why:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npm view:*)",
+      "Bash(git checkout:*)",
+      "Bash(sed:*)",
+      "Bash(git add:*)",
+      "Bash(touch:*)",
+      "Bash(git reset:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@sabron/eslint-config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "files": ["*.js", "*.json"],
+  "scripts": {
+    "build": "echo 'ESLint config - no build needed'",
+    "clean": "echo 'ESLint config - no clean needed'"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-testing-library": "^6.2.2",
+    "eslint-plugin-jest-dom": "^5.4.0",
+    "eslint-plugin-vitest": "^0.5.4",
+    "eslint-plugin-playwright": "^1.6.2",
+    "eslint-plugin-storybook": "^0.8.0",
+    "eslint-plugin-tailwindcss": "^3.17.4",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-sonarjs": "^1.0.3",
+    "eslint-plugin-unicorn": "^54.0.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@sabron/typescript-config",
+  "version": "1.0.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "library.json",
+    "nextjs.json",
+    "react-native.json",
+    "node.json"
+  ],
+  "scripts": {
+    "build": "echo 'TypeScript config - no build needed'",
+    "clean": "echo 'TypeScript config - no clean needed'"
+  }
+}
