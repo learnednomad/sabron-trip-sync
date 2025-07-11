@@ -35,7 +35,18 @@
       "Bash(sed:*)",
       "Bash(git add:*)",
       "Bash(touch:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(git remote add:*)",
+      "mcp__magic__21st_magic_component_builder",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(pnpm lint:*)",
+      "Bash(mv:*)",
+      "Bash(timeout 15 pnpm dev)",
+      "Bash(timeout 10 pnpm dev)",
+      "mcp__filesystem__create_directory",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": []
   }

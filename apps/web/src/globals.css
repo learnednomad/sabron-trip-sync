@@ -4,48 +4,96 @@
 
 @layer base {
   :root {
+    /* Backgrounds */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222.2 47.4% 11.2%;
+    
+    /* Cards */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    
+    /* Primary - Ocean Blue */
+    --primary: 201 96% 32%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
+    
+    /* Secondary - Sunset Orange */
+    --secondary: 21 90% 48%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Accent - Mint Green */
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Muted */
+    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Destructive */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    
+    /* Borders and Inputs */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --ring: 201 96% 32%;
+    
+    /* Border Radius */
+    --radius: 0.75rem;
+    
+    /* Travel-specific colors */
+    --travel-sky: 199 95% 74%;
+    --travel-sand: 34 44% 69%;
+    --travel-forest: 155 49% 24%;
+    --travel-coral: 11 85% 62%;
   }
 
   .dark {
+    /* Backgrounds */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    
+    /* Cards */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
+    
+    /* Popover */
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
+    
+    /* Primary - Ocean Blue (lighter for dark mode) */
+    --primary: 199 95% 74%;
     --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    
+    /* Secondary - Sunset Orange (adjusted for dark mode) */
+    --secondary: 20 85% 60%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    
+    /* Accent - Mint Green (adjusted for dark mode) */
+    --accent: 158 64% 52%;
+    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Muted */
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    
+    /* Destructive */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+    
+    /* Borders and Inputs */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    --ring: 199 95% 74%;
+    
+    /* Travel-specific colors for dark mode */
+    --travel-sky: 199 95% 74%;
+    --travel-sand: 34 44% 69%;
+    --travel-forest: 155 49% 44%;
+    --travel-coral: 11 85% 62%;
   }
 }
 
@@ -55,5 +103,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+  .animation-delay-800 {
+    animation-delay: 800ms;
   }
 }

@@ -8,7 +8,7 @@ interface QueuedRequest {
   timestamp: string;
 }
 
-const QUEUE_FILE = \`\${FileSystem.documentDirectory}offline-queue.json\`;
+const QUEUE_FILE = `${FileSystem.documentDirectory}offline-queue.json`;
 
 export async function addToOfflineQueue(config: ApiRequestConfig): Promise<void> {
   try {

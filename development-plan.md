@@ -87,7 +87,7 @@ Sabron-Trip-Sync is a comprehensive travel planning SaaS platform that combines 
 - Load testing for 100,000 concurrent users
 - Marketing website and landing pages
 - App Store and Google Play store setup
-- Monitoring and alerting setup
+- Monitoring and alerting setup with Grafana + Loki + Dozzle
 - Documentation and user guides
 - Launch preparation and go-to-market strategy
 
@@ -166,16 +166,17 @@ Sabron-Trip-Sync is a comprehensive travel planning SaaS platform that combines 
 ## 5. Deployment and Maintenance
 
 ### 5.1 Deployment Strategy
-- **Mobile**: App Store Connect and Google Play Console with CodePush for OTA updates
+- **Mobile**: App Store Connect and Google Play Console with EAS Update for OTA updates
 - **Web**: Coolify with automatic deployments from main branch
-- **API**: Docker containers on AWS ECS with auto-scaling
+- **API**: Docker containers on Coolify + Docker Swarm w
+- ith auto-scaling
 - **Database**: Supabase managed PostgreSQL with automated backups
-- **Infrastructure**: Terraform for infrastructure as code
+- **Infrastructure**: Coolify API + Docker Compose for infrastructure as code
 
 ### 5.2 Monitoring and Observability
 - **Error Tracking**: Sentry for error monitoring across all platforms
-- **Performance Monitoring**: New Relic for APM and infrastructure monitoring
-- **Logging**: Centralized logging with ELK stack
+- **Performance Monitoring**: Grafana for APM and infrastructure monitoring
+- **Logging**: Centralized logging with Grafana + Loki + Dozzle
 - **Uptime Monitoring**: StatusPage for service status tracking
 - **Analytics**: PostHog for user behavior analytics
 
@@ -224,6 +225,13 @@ Sabron-Trip-Sync is a comprehensive travel planning SaaS platform that combines 
 - **NEXT_PUBLIC_SUPABASE_URL**: Public Supabase URL for web
 - **NEXT_PUBLIC_SUPABASE_ANON_KEY**: Public Supabase anonymous key
 - **NEXT_PUBLIC_SENTRY_DSN**: Sentry DSN for error tracking
+
+### 6.7 Coolify & Infrastructure Configuration
+- **COOLIFY_API_URL**: Coolify API URL for deployment automation
+- **COOLIFY_API_TOKEN**: Coolify API token for infrastructure management
+- **COOLIFY_WEBHOOK_SECRET**: Coolify webhook secret for deployment webhooks
+- **GRAFANA_PASSWORD**: Grafana admin password for monitoring dashboard
+- **LOKI_URL**: Loki URL for centralized logging backend
 
 ## 7. Proposed Improvements
 

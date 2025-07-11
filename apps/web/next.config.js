@@ -1,4 +1,4 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
+const bundleAnalyzer = require('@next/bundle-analyzer');
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -12,7 +12,7 @@ const nextConfig = {
     optimizePackageImports: ['@sabron/ui'],
   },
   images: {
-    domains: ['localhost', 'res.cloudinary.com'],
+    domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com'],
   },
   async headers() {
     return [
@@ -28,4 +28,4 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+module.exports = withBundleAnalyzer(nextConfig);

@@ -1,0 +1,26 @@
+{
+  "name": "sabron-trip-sync-scripts",
+  "version": "1.0.0",
+  "description": "Setup scripts for Sabron-Trip-Sync project",
+  "main": "setup-github-project.js",
+  "scripts": {
+    "setup-github": "node setup-github-project.js",
+    "setup:dev": "node setup-github-project.js",
+    "setup:prod": "node setup-github-project.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  },
+  "keywords": [
+    "github",
+    "project-setup",
+    "automation",
+    "sabron-trip-sync"
+  ],
+  "author": "Sabron-Trip-Sync Team",
+  "license": "MIT"
+}
