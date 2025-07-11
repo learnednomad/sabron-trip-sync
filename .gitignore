@@ -85,3 +85,4 @@ desktop.ini
 # Claude Code internal
 .claude/sessions/
 .claude/logs/
+.claude/mcp.json

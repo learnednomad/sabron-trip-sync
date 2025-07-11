@@ -46,7 +46,15 @@
       "Bash(timeout 15 pnpm dev)",
       "Bash(timeout 10 pnpm dev)",
       "mcp__filesystem__create_directory",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(git commit:*)",
+      "Bash(gh label create:*)",
+      "Bash(gh api:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh issue edit:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

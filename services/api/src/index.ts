@@ -3,7 +3,7 @@ import type { Variables } from './types';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
 import { zValidator } from '@hono/zod-validator';
-import { prisma } from '@sabron/database';
+import { prisma, dualWriteManager, prismaBackup, SyncVerifier } from '@sabron/database';
 import {
   CreateItinerarySchema,
   UpdateItinerarySchema,
@@ -36,6 +36,44 @@ app.use('*', rateLimiter({
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok' }));
+
+// Database sync health check
+app.get('/health/database', async (c) => {
+  const syncVerifier = new SyncVerifier(prisma, prismaBackup);
+  
+  try {
+    const healthCheck = await syncVerifier.performHealthCheck();
+    const syncStatus = await syncVerifier.verifySyncStatus();
+    
+    return c.json({
+      databases: {
+        primary: {
+          healthy: healthCheck.primary.healthy,
+          latency: `${healthCheck.latency.primary}ms`,
+          error: healthCheck.primary.error,
+        },
+        backup: {
+          healthy: healthCheck.backup.healthy,
+          latency: `${healthCheck.latency.backup}ms`,
+          error: healthCheck.backup.error,
+        },
+      },
+      sync: {
+        overall: syncStatus.overall,
+        totalTables: syncStatus.reports.length,
+        inSync: syncStatus.reports.filter(r => r.inSync).length,
+        outOfSync: syncStatus.reports.filter(r => !r.inSync).length,
+        errors: syncStatus.errors.length,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    return c.json({
+      error: 'Failed to check database health',
+      message: error.message,
+    }, 500);
+  }
+});
 
 // OpenAPI Documentation
 app.get('/api-docs', (c) => c.json(openApiSpec));
@@ -104,14 +142,22 @@ app.post(
       );
     }
 
-    await prisma.user.create({
-      data: {
-        id: authData.user!.id,
-        email: data.email,
-        name: data.name,
-        username: data.username,
-      },
-    });
+    const userData = {
+      id: authData.user!.id,
+      email: data.email,
+      name: data.name,
+      username: data.username,
+    };
+
+    const result = await dualWriteManager.create('user', userData);
+    
+    if (!result.primarySuccess) {
+      throw new Error('Failed to create user in primary database');
+    }
+    
+    if (!result.backupSuccess && result.errors.backup) {
+      console.error('User creation failed in backup database:', result.errors.backup);
+    }
 
     return c.json({
       success: true,
@@ -152,28 +198,38 @@ protectedRoutes.post(
   zValidator('json', CreateItinerarySchema),
   async (c) => {
     const data = c.req.valid('json');
-    const itinerary = await prisma.itinerary.create({
-      data: {
-        userId: c.get('userId'),
-        title: data.title,
-        description: data.description,
-        destinations: data.destinations,
-        startDate: new Date(data.dateRange.start),
-        endDate: new Date(data.dateRange.end),
-        duration: Math.ceil(
-          (new Date(data.dateRange.end).getTime() - new Date(data.dateRange.start).getTime()) /
-          (1000 * 60 * 60 * 24)
-        ),
-        status: data.status,
-        visibility: data.visibility,
-        tags: data.tags,
-        budget: data.budget,
-        notes: data.notes,
-        sharing: data.sharing,
-        isTemplate: data.isTemplate,
-        templateCategory: data.templateCategory,
-      },
-    });
+    const itineraryData = {
+      userId: c.get('userId'),
+      title: data.title,
+      description: data.description,
+      destinations: data.destinations,
+      startDate: new Date(data.dateRange.start),
+      endDate: new Date(data.dateRange.end),
+      duration: Math.ceil(
+        (new Date(data.dateRange.end).getTime() - new Date(data.dateRange.start).getTime()) /
+        (1000 * 60 * 60 * 24)
+      ),
+      status: data.status,
+      visibility: data.visibility,
+      tags: data.tags,
+      budget: data.budget,
+      notes: data.notes,
+      sharing: data.sharing,
+      isTemplate: data.isTemplate,
+      templateCategory: data.templateCategory,
+    };
+
+    const result = await dualWriteManager.create('itinerary', itineraryData);
+    
+    if (!result.primarySuccess) {
+      throw new Error('Failed to create itinerary');
+    }
+
+    if (!result.backupSuccess && result.errors.backup) {
+      console.error('Itinerary creation failed in backup database:', result.errors.backup);
+    }
+
+    const itinerary = result.primaryResult;
     return c.json({ success: true, data: itinerary }, 201);
   }
 );
@@ -343,6 +399,79 @@ protectedRoutes.patch(
     return c.json({ success: true, data: updatedActivity });
   }
 );
+
+// Travel Log Entries (inspired by travel-log-github-project-creator)
+protectedRoutes.get('/travel-logs', async (c) => {
+  const travelLogs = await prisma.travelLogEntry.findMany({
+    where: { 
+      userId: c.get('userId'),
+      publiclyVisible: true
+    },
+    include: {
+      activity: {
+        select: {
+          id: true,
+          title: true,
+          locationName: true,
+          latitude: true,
+          longitude: true
+        }
+      }
+    },
+    take: 20,
+    orderBy: { visitDate: 'desc' },
+  });
+  
+  return c.json({
+    success: true,
+    items: travelLogs,
+    pagination: {
+      page: 1,
+      limit: 20,
+      total: travelLogs.length,
+      totalPages: 1,
+      hasMore: false,
+    },
+  });
+});
+
+// Locations API (inspired by travel-log location management)
+protectedRoutes.get('/locations/search', async (c) => {
+  const query = c.req.query('q');
+  const country = c.req.query('country');
+  const limit = Math.min(parseInt(c.req.query('limit') || '10'), 50);
+  
+  if (!query) {
+    return c.json({ success: false, error: { code: 'MISSING_QUERY', message: 'Search query is required' } }, 400);
+  }
+
+  const where: any = {
+    isActive: true,
+    OR: [
+      { name: { contains: query, mode: 'insensitive' } },
+      { address: { contains: query, mode: 'insensitive' } },
+      { city: { contains: query, mode: 'insensitive' } }
+    ]
+  };
+
+  if (country) {
+    where.country = { equals: country, mode: 'insensitive' };
+  }
+
+  const locations = await prisma.location.findMany({
+    where,
+    take: limit,
+    orderBy: [
+      { totalVisits: 'desc' },
+      { averageRating: 'desc' }
+    ]
+  });
+
+  return c.json({
+    success: true,
+    items: locations,
+  });
+});
 
 // Bookings
 protectedRoutes.post(

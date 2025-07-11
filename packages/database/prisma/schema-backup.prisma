@@ -1,10 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../node_modules/@prisma/client-backup"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("BACKUP_DATABASE_URL")
 }
 
 // User model
@@ -47,7 +48,6 @@ model User {
   reports         Report[]         @relation("Reporter")
   reportedContent Report[]         @relation("ReportedUser")
   resolvedReports Report[]         @relation("ReportResolver")
-  travelLogEntries TravelLogEntry[]
 
   @@index([email])
   @@index([username])
@@ -206,16 +206,6 @@ model Activity {
   customFields    Json?
   linkedActivities String[]
   source          Json?
-  // Enhanced location fields inspired by travel-log
-  latitude        Float?
-  longitude       Float?
-  locationName    String?
-  address         String?
-  placeId         String?
-  visitDate       DateTime?
-  rating          Float?
-  visitNotes      String?
-  travelLogEntry  TravelLogEntry?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -224,8 +214,6 @@ model Activity {
 
   @@index([itineraryId])
   @@index([startTime])
-  @@index([latitude, longitude])
-  @@index([locationName])
 }
 
 // Collaborator
@@ -453,85 +441,4 @@ model Report {
 
   @@index([reporterId])
   @@index([reportedUserId])
-}
-
-// Travel Log Entry (inspired by travel-log-github-project-creator)
-model TravelLogEntry {
-  id              String          @id @default(cuid())
-  activityId      String          @unique
-  userId          String
-  title           String
-  description     String?
-  visitDate       DateTime
-  rating          Float?          @db.Real
-  photos          Json[]          @default("[]")
-  memories        String?
-  highlights      String[]        @default("{}")
-  recommendations String?
-  wouldReturn     Boolean?
-  publiclyVisible Boolean         @default(true)
-  tags            String[]        @default("{}")
-  weather         Json?
-  companions      String[]        @default("{}")
-  expenses        Json?
-  tips            String?
-  warningsAdvice  String?
-  bestTimeToVisit Json?
-  accessibility   Json?
-  language        String?
-  culturalNotes   String?
-  transportation  Json?
-  nearbyPlaces    Json[]          @default("[]")
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  activity        Activity        @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([visitDate])
-  @@index([rating])
-  @@index([publiclyVisible])
-  @@map("travel_log_entries")
-}
-
-// Location (enhanced location management inspired by travel-log)
-model Location {
-  id              String          @id @default(cuid())
-  name            String
-  description     String?
-  latitude        Float           @db.Real
-  longitude       Float           @db.Real
-  address         String?
-  city            String?
-  state           String?
-  country         String
-  countryCode     String          @db.Char(2)
-  placeId         String?         @unique
-  placeType       String?
-  category        String?
-  subcategory     String?
-  photos          Json[]          @default("[]")
-  averageRating   Float?          @db.Real
-  totalVisits     Int             @default(0)
-  isActive        Boolean         @default(true)
-  timezone        String?
-  bestTimeToVisit Json?
-  averageCost     Json?
-  accessibility   Json?
-  amenities       String[]        @default("{}")
-  openingHours    Json?
-  contactInfo     Json?
-  officialWebsite String?
-  socialMedia     Json?
-  lastUpdated     DateTime        @default(now())
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  @@index([latitude, longitude])
-  @@index([country, city])
-  @@index([category, subcategory])
-  @@index([averageRating])
-  @@index([isActive])
-  @@map("locations")
 }

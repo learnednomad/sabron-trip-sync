@@ -129,3 +129,6 @@ Apps and packages reference each other using `workspace:*` protocol. Always chec
 - Use `pnpm db:migrate` for development migrations
 - Production migrations use `prisma migrate deploy`
 - Database schema located at `packages/database/prisma/schema.prisma`
+
+## Memories
+- Always use pnpm first
