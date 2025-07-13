@@ -4,6 +4,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator backup {
+  provider = "prisma-client-js"
+  output   = "./generated/backup-client"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -551,8 +556,8 @@ model Like {
   createdAt       DateTime        @default(now())
 
   user            User            @relation(fields: [userId], references: [id])
-  post            Post?           @relation(fields: [entityId], references: [id], onDelete: Cascade, map: "likes_post_fkey")
-  comment         Comment?        @relation(fields: [entityId], references: [id], onDelete: Cascade, map: "likes_comment_fkey")
+  post            Post?           @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  comment         Comment?        @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@unique([userId, entityId, entityType])
   @@index([entityId, entityType])
@@ -629,330 +634,7 @@ model Message {
 }
 
 // =============================================================================
-// ADDITIONAL MODELS (Existing models from current schema)
-// =============================================================================
-
-// Collaborator (existing model - keeping as is)
-model Collaborator {
-  id              String          @id @default(cuid())
-  itineraryId     String
-  userId          String
-  role            String
-  permissions     String[]
-  invitedBy       String
-  joinedAt        DateTime        @default(now())
-  lastActiveAt    DateTime?
-
-  itinerary       Itinerary       @relation(fields: [itineraryId], references: [id])
-  user            User            @relation("CollaboratorUser", fields: [userId], references: [id])
-  invitedByUser   User            @relation("CollaboratorInvitedBy", fields: [invitedBy], references: [id])
-
-  @@index([itineraryId, userId])
-  @@map("collaborators")
-}
-
-// Traveler (existing model - keeping as is)
-model Traveler {
-  id              String          @id @default(cuid())
-  itineraryId     String
-  userId          String?
-  name            String
-  email           String?
-  role            String
-  status          String          @default("invited")
-  joinedAt        DateTime        @default(now())
-  preferences     Json?
-
-  itinerary       Itinerary       @relation(fields: [itineraryId], references: [id])
-  user            User?           @relation(fields: [userId], references: [id])
-
-  @@index([itineraryId])
-  @@map("travelers")
-}
-
-// Transportation (existing model - keeping as is)
-model Transportation {
-  id              String          @id @default(cuid())
-  itineraryId     String
-  type            String
-  from            String
-  to              String
-  departure       DateTime
-  arrival         DateTime
-  carrier         String?
-  bookingReference String?
-  cost            Json?
-  notes           String?
-  documents       Json?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  itinerary       Itinerary       @relation(fields: [itineraryId], references: [id])
-
-  @@index([itineraryId])
-  @@map("transportation")
-}
-
-// Accommodation (existing model - keeping as is)
-model Accommodation {
-  id              String          @id @default(cuid())
-  itineraryId     String
-  name            String
-  type            String
-  address         String
-  checkIn         DateTime
-  checkOut        DateTime
-  confirmationNumber String?
-  cost            Json?
-  amenities       String[]
-  notes           String?
-  contact         Json?
-  documents       Json?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  itinerary       Itinerary       @relation(fields: [itineraryId], references: [id])
-
-  @@index([itineraryId])
-  @@map("accommodations")
-}
-
-// Booking (existing model - keeping as is)
-model Booking {
-  id              String          @id @default(cuid())
-  userId          String
-  type            String
-  status          String          @default("pending")
-  referenceNumber String
-  provider        Json
-  details         Json
-  travelers       Json[]
-  pricing         Json
-  payment         Json?
-  policies        Json
-  documents       Json[]
-  timeline        Json
-  contact         Json
-  notes           String?
-  metadata        Json?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId, status])
-  @@map("bookings")
-}
-
-// Payment (existing model - keeping as is)
-model Payment {
-  id              String          @id @default(cuid())
-  userId          String
-  type            String
-  method          String
-  amount          Json
-  status          String
-  reference       Json
-  paymentDetails  Json
-  metadata        Json?
-  processedAt     DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId, status])
-  @@map("payments")
-}
-
-// Review (existing model - keeping as is)
-model Review {
-  id              String          @id @default(cuid())
-  userId          String
-  entityId        String
-  entityType      String
-  rating          Float
-  title           String?
-  content         String
-  pros            String[]
-  cons            String[]
-  visitedAt       DateTime
-  images          Json[]
-  helpful         Int             @default(0)
-  verified        Boolean         @default(false)
-  response        Json?
-  status          String          @default("pending")
-  tags            String[]
-  helpfulUsers    String[]
-  reportedCount   Int             @default(0)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([entityId, entityType])
-  @@map("reviews")
-}
-
-// Notification (existing model - keeping as is)
-model Notification {
-  id              String          @id @default(cuid())
-  userId          String
-  type            String
-  channel         String
-  status          String
-  priority        String
-  title           String
-  message         String
-  entity          Json?
-  actions         Json[]
-  readAt          DateTime?
-  sentAt          DateTime?
-  deliveredAt     DateTime?
-  metadata        Json?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId, status])
-  @@map("notifications")
-}
-
-// Follow (existing model - keeping as is)
-model Follow {
-  id              String          @id @default(cuid())
-  followerId      String
-  followingId     String
-  createdAt       DateTime        @default(now())
-
-  follower        User            @relation("Followers", fields: [followerId], references: [id])
-  following       User            @relation("Following", fields: [followingId], references: [id])
-
-  @@unique([followerId, followingId])
-  @@map("follows")
-}
-
-// Block (existing model - keeping as is)
-model Block {
-  id              String          @id @default(cuid())
-  blockerId       String
-  blockedId       String
-  reason          String?
-  createdAt       DateTime        @default(now())
-
-  blocker         User            @relation("Blocker", fields: [blockerId], references: [id])
-  blocked         User            @relation("Blocked", fields: [blockedId], references: [id])
-
-  @@unique([blockerId, blockedId])
-  @@map("blocks")
-}
-
-// Report (existing model - keeping as is)
-model Report {
-  id              String          @id @default(cuid())
-  reporterId      String
-  reportedUserId  String
-  reason          String
-  description     String
-  status          String          @default("pending")
-  evidence        Json?
-  createdAt       DateTime        @default(now())
-  resolvedAt      DateTime?
-  resolvedById    String?
-
-  reporter        User            @relation("Reporter", fields: [reporterId], references: [id])
-  reportedUser    User            @relation("ReportedUser", fields: [reportedUserId], references: [id])
-  resolvedBy      User?           @relation("ReportResolver", fields: [resolvedById], references: [id])
-
-  @@index([reporterId])
-  @@index([reportedUserId])
-  @@map("reports")
-}
-
-// Travel Log Entry (existing model - keeping as is)
-model TravelLogEntry {
-  id              String          @id @default(cuid())
-  activityId      String          @unique
-  userId          String
-  title           String
-  description     String?
-  visitDate       DateTime
-  rating          Float?          @db.Real
-  photos          Json[]          @default([])
-  memories        String?
-  highlights      String[]        @default([])
-  recommendations String?
-  wouldReturn     Boolean?
-  publiclyVisible Boolean         @default(true)
-  tags            String[]        @default([])
-  weather         Json?
-  companions      String[]        @default([])
-  expenses        Json?
-  tips            String?
-  warningsAdvice  String?
-  bestTimeToVisit Json?
-  accessibility   Json?
-  language        String?
-  culturalNotes   String?
-  transportation  Json?
-  nearbyPlaces    Json[]          @default([])
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  activity        Activity        @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([visitDate])
-  @@index([rating])
-  @@index([publiclyVisible])
-  @@map("travel_log_entries")
-}
-
-// Location (existing model - keeping as is)
-model Location {
-  id              String          @id @default(cuid())
-  name            String
-  description     String?
-  latitude        Float           @db.Real
-  longitude       Float           @db.Real
-  address         String?
-  city            String?
-  state           String?
-  country         String
-  countryCode     String          @db.Char(2)
-  placeId         String?         @unique
-  placeType       String?
-  category        String?
-  subcategory     String?
-  photos          Json[]          @default([])
-  averageRating   Float?          @db.Real
-  totalVisits     Int             @default(0)
-  isActive        Boolean         @default(true)
-  timezone        String?
-  bestTimeToVisit Json?
-  averageCost     Json?
-  accessibility   Json?
-  amenities       String[]        @default([])
-  openingHours    Json?
-  contactInfo     Json?
-  officialWebsite String?
-  socialMedia     Json?
-  lastUpdated     DateTime        @default(now())
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  @@index([latitude, longitude])
-  @@index([country, city])
-  @@index([category, subcategory])
-  @@index([averageRating])
-  @@index([isActive])
-  @@map("locations")
-}
-
-// =============================================================================
-// PLACEHOLDER MODELS FOR PHASE 3+ (will be implemented in next iterations)
+// PHASE 3: VISA & CULTURAL CONTENT SYSTEMS
 // =============================================================================
 
 // Country information
@@ -1131,29 +813,443 @@ model Translation {
   @@map("translations")
 }
 
-// Emergency contacts management
-model EmergencyContact {
+// Content moderation queue
+model ContentModerationQueue {
   id              String          @id @default(cuid())
-  userId          String
-  name            String
-  relationship    String          // family, friend, colleague, etc.
-  phoneNumber     String
-  email           String?
-  address         Json?
-  notes           String?
+  entityId        String
+  entityType      String          // post, comment, cultural_tip, etc.
+  contentType     String          // text, image, video
+  reportedBy      String?
+  reportReason    String?
+  priority        String          @default("normal") // low, normal, high, urgent
+  status          String          @default("pending") // pending, approved, rejected
+  moderatedBy     String?
+  moderatedAt     DateTime?
+  moderationNotes String?
   
-  // Contact preferences
-  isPrimary       Boolean         @default(false)
-  allowedToContact Boolean        @default(true)
-  preferredContactMethod String   @default("phone") // phone, email, both
+  createdAt       DateTime        @default(now())
+
+  @@index([status, priority])
+  @@index([entityType, status])
+  @@map("content_moderation_queue")
+}
+
+// =============================================================================
+// REMAINING MODELS CONTINUE IN NEXT PART...
+// =============================================================================// =============================================================================
+// PHASE 4: MAPS & BOOKING INTEGRATION
+// =============================================================================
+
+// Offline map data management
+model OfflineMap {
+  id              String          @id @default(cuid())
+  region          String          // Geographic region identifier
+  boundingBox     Json            // Geographic boundaries
+  zoomLevel       Int
+  tileData        Json?           // Compressed tile data or storage reference
+  fileSize        BigInt?         // Size in bytes
+  version         String
+  provider        String          @default("mapbox") // mapbox, google, osm
+  
+  downloadedBy    String[]        @default([])
+  downloadCount   Int             @default(0)
+  isActive        Boolean         @default(true)
+  expiresAt       DateTime?       // Cache expiration
   
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([region, zoomLevel])
+  @@index([expiresAt])
+  @@map("offline_maps")
+}
 
-  @@index([userId, isPrimary])
-  @@map("emergency_contacts")
+// Navigation routes
+model Route {
+  id              String          @id @default(cuid())
+  fromLocation    Json            // Start point coordinates
+  toLocation      Json            // End point coordinates
+  transportMode   String          // walking, driving, transit, cycling
+  routeData       Json            // Full route information
+  distance        Float?          // In meters
+  duration        Int?            // In seconds
+  estimatedCost   Json?           // Cost estimate
+  
+  // Route optimization
+  waypoints       Json[]          @default([])
+  avoidTolls      Boolean         @default(false)
+  avoidHighways   Boolean         @default(false)
+  accessibility   Boolean         @default(false)
+  
+  provider        String          @default("mapbox")
+  isActive        Boolean         @default(true)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([transportMode])
+  @@map("routes")
+}
+
+// Public transit information
+model Transit {
+  id              String          @id @default(cuid())
+  routeId         String?
+  provider        String          // Local transit authority
+  type            String          // bus, train, metro, tram, ferry
+  lineName        String
+  direction       String?
+  
+  // Schedule information
+  schedule        Json            // Timetable data
+  realTimeUpdates Json?           // Live updates
+  frequency       Int?            // Average frequency in minutes
+  operatingHours  Json?
+  
+  // Route details
+  stops           Json[]          @default([])
+  serviceArea     Json?           // Geographic coverage
+  accessibility   Json?           // Wheelchair, audio announcements, etc.
+  
+  isActive        Boolean         @default(true)
+  lastUpdated     DateTime        @default(now())
+
+  route           Route?          @relation(fields: [routeId], references: [id])
+
+  @@index([provider, type])
+  @@index([lineName])
+  @@map("transit")
+}
+
+// Points of Interest database
+model PointOfInterest {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  category        String          // restaurant, attraction, hotel, shop, etc.
+  subcategory     String?
+  
+  // Location
+  latitude        Float
+  longitude       Float
+  address         String?
+  city            String?
+  country         String
+  placeId         String?         @unique // Google Places ID or similar
+  
+  // Business information
+  website         String?
+  phone           String?
+  email           String?
+  openingHours    Json?
+  priceLevel      String?         // free, $, $$, $$$, $$$$
+  
+  // User engagement
+  rating          Float?
+  ratingCount     Int             @default(0)
+  photos          Json[]          @default([])
+  reviews         Json[]          @default([])
+  
+  // Features and amenities
+  amenities       String[]        @default([])
+  accessibility   Json?
+  paymentMethods  String[]        @default([])
+  
+  // Administrative
+  isVerified      Boolean         @default(false)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  isActive        Boolean         @default(true)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([latitude, longitude])
+  @@index([category, subcategory])
+  @@index([city, country])
+  @@index([rating])
+  @@map("points_of_interest")
+}
+
+// Service provider partners
+model Partner {
+  id              String          @id @default(cuid())
+  name            String
+  type            String          // booking_platform, tour_operator, insurance, etc.
+  description     String?
+  logo            String?
+  website         String?
+  
+  // Integration details
+  apiCredentials  Json?           // Encrypted API keys
+  apiEndpoints    Json?
+  commissionRate  Float?          // Percentage
+  paymentTerms    Json?
+  
+  // Business information
+  contactInfo     Json?
+  address         Json?
+  businessLicense String?
+  
+  // Partnership details
+  status          String          @default("active") // active, inactive, suspended
+  contractStart   DateTime?
+  contractEnd     DateTime?
+  serviceTypes    String[]        @default([])
+  
+  // Performance metrics
+  totalBookings   Int             @default(0)
+  totalRevenue    Float           @default(0)
+  averageRating   Float?
+  
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  bookingProviders BookingProvider[]
+  deals           Deal[]
+
+  @@index([type, status])
+  @@index([status])
+  @@map("partners")
+}
+
+// Booking integration providers
+model BookingProvider {
+  id              String          @id @default(cuid())
+  partnerId       String
+  serviceType     String          // flights, hotels, activities, insurance
+  providerName    String
+  
+  // Integration configuration
+  integrationDetails Json          @default("{}")
+  endpoints       Json            @default("{}")
+  rateLimits      Json?
+  
+  // Booking flow
+  searchCapability Boolean        @default(true)
+  bookingCapability Boolean       @default(true)
+  cancellationSupport Boolean     @default(false)
+  
+  // Performance
+  averageResponseTime Int?         // milliseconds
+  successRate     Float?          // Percentage
+  lastHealthCheck DateTime?
+  
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  partner         Partner         @relation(fields: [partnerId], references: [id])
+
+  @@index([serviceType, isActive])
+  @@index([partnerId])
+  @@map("booking_providers")
+}
+
+// Price monitoring and alerts
+model PriceAlert {
+  id              String          @id @default(cuid())
+  userId          String
+  searchCriteria  Json            // Flight/hotel search parameters
+  targetPrice     Float
+  currency        String          @default("USD")
+  alertFrequency  String          @default("daily") // immediate, daily, weekly
+  
+  // Alert configuration
+  isActive        Boolean         @default(true)
+  expiresAt       DateTime?
+  lastChecked     DateTime?
+  
+  // Price tracking
+  currentPrice    Float?
+  priceHistory    Json[]          @default([])
+  lowestPrice     Float?
+  lowestPriceDate DateTime?
+  
+  // Notifications
+  lastAlertSent   DateTime?
+  alertsSent      Int             @default(0)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  user            User            @relation(fields: [userId], references: [id])
+
+  @@index([userId, isActive])
+  @@index([expiresAt])
+  @@map("price_alerts")
+}
+
+// Special deals and offers
+model Deal {
+  id              String          @id @default(cuid())
+  partnerId       String
+  title           String
+  description     String
+  serviceType     String          // flights, hotels, activities, packages
+  
+  // Deal details
+  discountType    String          // percentage, fixed_amount, bogo
+  discountValue   Float
+  originalPrice   Float?
+  discountedPrice Float?
+  currency        String          @default("USD")
+  
+  // Availability
+  validFrom       DateTime
+  validUntil      DateTime
+  maxRedemptions  Int?
+  currentRedemptions Int          @default(0)
+  
+  // Targeting
+  targetAudience  Json?           // Geographic, demographic filters
+  minimumSpend    Float?
+  
+  // Terms and conditions
+  terms           String?
+  restrictions    Json[]          @default([])
+  
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  partner         Partner         @relation(fields: [partnerId], references: [id])
+
+  @@index([serviceType, validFrom, validUntil])
+  @@index([isActive, validUntil])
+  @@map("deals")
+}
+
+// =============================================================================
+// PHASE 5: ANALYTICS & ADMINISTRATION
+// =============================================================================
+
+// User behavior analytics
+model UserAnalytics {
+  id              String          @id @default(cuid())
+  userId          String
+  sessionId       String?
+  eventType       String          // page_view, click, booking, search, etc.
+  eventCategory   String          // navigation, engagement, conversion
+  eventAction     String
+  eventLabel      String?
+  
+  // Event context
+  page            String?
+  referrer        String?
+  device          Json?
+  location        Json?
+  userAgent       String?
+  
+  // Custom properties
+  properties      Json            @default("{}")
+  
+  // Performance metrics
+  loadTime        Int?            // milliseconds
+  timeOnPage      Int?            // seconds
+  
+  timestamp       DateTime        @default(now())
+
+  user            User            @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([timestamp]) // For time-series queries
+  @@map("user_analytics")
+}
+
+// System event logging
+model EventLog {
+  id              String          @id @default(cuid())
+  eventType       String          // system, user_action, error, security
+  severity        String          @default("info") // debug, info, warning, error, critical
+  source          String          // api, web, mobile, system
+  
+  // Event details
+  message         String
+  details         Json?
+  
+  // Context
+  userId          String?
+  sessionId       String?
+  ipAddress       String?
+  userAgent       String?
+  endpoint        String?
+  httpMethod      String?
+  responseCode    Int?
+  
+  // Performance
+  executionTime   Int?            // milliseconds
+  memoryUsage     Int?            // bytes
+  
+  timestamp       DateTime        @default(now())
+
+  @@index([eventType, timestamp])
+  @@index([severity, timestamp])
+  @@index([userId, timestamp])
+  @@index([timestamp]) // For time-series queries
+  @@map("event_logs")
+}
+
+// Performance metrics tracking
+model PerformanceMetric {
+  id              String          @id @default(cuid())
+  metricName      String          // api_response_time, db_query_time, etc.
+  metricType      String          // gauge, counter, histogram
+  value           Float
+  unit            String?         // ms, bytes, count, percentage
+  
+  // Context
+  service         String?         // api, web, mobile, database
+  endpoint        String?
+  operation       String?
+  
+  // Additional metadata
+  tags            Json            @default("{}")
+  
+  timestamp       DateTime        @default(now())
+
+  @@index([metricName, timestamp])
+  @@index([service, timestamp])
+  @@index([timestamp])
+  @@map("performance_metrics")
+}
+
+// Comprehensive audit logging
+model AuditLog {
+  id              String          @id @default(cuid())
+  userId          String?
+  action          String          // create, update, delete, login, etc.
+  entityType      String          // user, itinerary, booking, etc.
+  entityId        String?
+  
+  // Change tracking
+  oldValues       Json?
+  newValues       Json?
+  changedFields   String[]        @default([])
+  
+  // Request context
+  ipAddress       String?
+  userAgent       String?
+  sessionId       String?
+  endpoint        String?
+  httpMethod      String?
+  
+  // Administrative
+  reason          String?         // For admin actions
+  success         Boolean         @default(true)
+  errorMessage    String?
+  
+  timestamp       DateTime        @default(now())
+
+  user            User?           @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+  @@index([entityType, entityId])
+  @@index([action, timestamp])
+  @@index([timestamp])
+  @@map("audit_logs")
 }
 
 // Customer support system
@@ -1213,108 +1309,59 @@ model SupportMessage {
   @@map("support_messages")
 }
 
-// Price monitoring and alerts
-model PriceAlert {
+// Emergency contacts management
+model EmergencyContact {
   id              String          @id @default(cuid())
   userId          String
-  searchCriteria  Json            // Flight/hotel search parameters
-  targetPrice     Float
-  currency        String          @default("USD")
-  alertFrequency  String          @default("daily") // immediate, daily, weekly
+  name            String
+  relationship    String          // family, friend, colleague, etc.
+  phoneNumber     String
+  email           String?
+  address         Json?
+  notes           String?
   
-  // Alert configuration
-  isActive        Boolean         @default(true)
-  expiresAt       DateTime?
-  lastChecked     DateTime?
-  
-  // Price tracking
-  currentPrice    Float?
-  priceHistory    Json[]          @default([])
-  lowestPrice     Float?
-  lowestPriceDate DateTime?
-  
-  // Notifications
-  lastAlertSent   DateTime?
-  alertsSent      Int             @default(0)
+  // Contact preferences
+  isPrimary       Boolean         @default(false)
+  allowedToContact Boolean        @default(true)
+  preferredContactMethod String   @default("phone") // phone, email, both
   
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  user            User            @relation(fields: [userId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, isActive])
+  @@index([userId, isPrimary])
+  @@map("emergency_contacts")
+}
+
+// Weather data caching
+model WeatherData {
+  id              String          @id @default(cuid())
+  locationId      String?
+  latitude        Float
+  longitude       Float
+  
+  // Current weather
+  current         Json?
+  
+  // Forecast data
+  hourlyForecast  Json[]          @default([])
+  dailyForecast   Json[]          @default([])
+  
+  // Weather alerts
+  alerts          Json[]          @default([])
+  warnings        Json[]          @default([])
+  
+  // Data source
+  provider        String          @default("openweather")
+  
+  lastUpdated     DateTime        @default(now())
+  expiresAt       DateTime
+
+  @@index([latitude, longitude])
+  @@index([locationId])
   @@index([expiresAt])
-  @@map("price_alerts")
-}
-
-// User behavior analytics
-model UserAnalytics {
-  id              String          @id @default(cuid())
-  userId          String
-  sessionId       String?
-  eventType       String          // page_view, click, booking, search, etc.
-  eventCategory   String          // navigation, engagement, conversion
-  eventAction     String
-  eventLabel      String?
-  
-  // Event context
-  page            String?
-  referrer        String?
-  device          Json?
-  location        Json?
-  userAgent       String?
-  
-  // Custom properties
-  properties      Json            @default("{}")
-  
-  // Performance metrics
-  loadTime        Int?            // milliseconds
-  timeOnPage      Int?            // seconds
-  
-  timestamp       DateTime        @default(now())
-
-  user            User            @relation(fields: [userId], references: [id])
-
-  @@index([userId, timestamp])
-  @@index([eventType, timestamp])
-  @@index([timestamp]) // For time-series queries
-  @@map("user_analytics")
-}
-
-// Comprehensive audit logging
-model AuditLog {
-  id              String          @id @default(cuid())
-  userId          String?
-  action          String          // create, update, delete, login, etc.
-  entityType      String          // user, itinerary, booking, etc.
-  entityId        String?
-  
-  // Change tracking
-  oldValues       Json?
-  newValues       Json?
-  changedFields   String[]        @default([])
-  
-  // Request context
-  ipAddress       String?
-  userAgent       String?
-  sessionId       String?
-  endpoint        String?
-  httpMethod      String?
-  
-  // Administrative
-  reason          String?         // For admin actions
-  success         Boolean         @default(true)
-  errorMessage    String?
-  
-  timestamp       DateTime        @default(now())
-
-  user            User?           @relation(fields: [userId], references: [id])
-
-  @@index([userId, timestamp])
-  @@index([entityType, entityId])
-  @@index([action, timestamp])
-  @@index([timestamp])
-  @@map("audit_logs")
+  @@map("weather_data")
 }
 
 // Government travel advisories
@@ -1348,4 +1395,93 @@ model TravelAdvisory {
   @@index([issuingCountry])
   @@index([lastUpdated])
   @@map("travel_advisories")
+}
+
+// =============================================================================
+// EXISTING MODELS (Enhanced versions)
+// =============================================================================
+
+// Keep existing models with enhancements already defined above
+// (Collaborator, Traveler, Transportation, Accommodation, Booking, Payment, Review, Notification, Follow, Block, Report, TravelLogEntry, Location)
+
+// =============================================================================
+// ADDITIONAL SYSTEM MODELS
+// =============================================================================
+
+// System configuration
+model SystemSetting {
+  id              String          @id @default(cuid())
+  key             String          @unique
+  value           Json
+  description     String?
+  category        String          @default("general")
+  isPublic        Boolean         @default(false)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([category])
+  @@map("system_settings")
+}
+
+// Feature flags
+model FeatureFlag {
+  id              String          @id @default(cuid())
+  name            String          @unique
+  description     String?
+  isEnabled       Boolean         @default(false)
+  
+  // Targeting
+  userPercentage  Float?          // Percentage of users to enable for
+  targetUsers     String[]        @default([])
+  targetGroups    String[]        @default([])
+  
+  // Environment
+  environment     String[]        @default(["production"])
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([isEnabled])
+  @@map("feature_flags")
+}
+
+// File storage metadata
+model MediaFile {
+  id              String          @id @default(cuid())
+  userId          String?
+  filename        String
+  originalName    String
+  mimeType        String
+  size            BigInt
+  
+  // Storage information
+  storageProvider String          @default("s3") // s3, cloudinary, local
+  storagePath     String
+  storageUrl      String?
+  
+  // Image-specific metadata
+  width           Int?
+  height          Int?
+  
+  // Processing
+  isProcessed     Boolean         @default(true)
+  processingStatus String?        // pending, processing, completed, failed
+  thumbnails      Json[]          @default([])
+  
+  // Security
+  isPublic        Boolean         @default(false)
+  accessToken     String?
+  
+  // Context
+  entityType      String?         // post, profile, activity, etc.
+  entityId        String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([storageProvider])
+  @@map("media_files")
 }
