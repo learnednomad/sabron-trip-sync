@@ -16,9 +16,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Approve build scripts
@@ -46,9 +56,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Approve build scripts
@@ -80,9 +100,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Approve build scripts
