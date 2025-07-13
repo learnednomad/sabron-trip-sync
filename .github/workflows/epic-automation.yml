@@ -1,0 +1,165 @@
+name: Epic Progress Automation
+
+on:
+  issues:
+    types: [closed, reopened]
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-epic-progress:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+      projects: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Epic Progress
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { context } = require('@actions/github');
+            
+            // Only process issues with parent EPIC references
+            const issueBody = context.payload.issue?.body || '';
+            const epicMatch = issueBody.match(/\*\*Parent EPIC\*\*:\s*#(\d+)/);
+            
+            if (!epicMatch) {
+              console.log('No parent EPIC found in issue body');
+              return;
+            }
+            
+            const epicNumber = parseInt(epicMatch[1]);
+            const childIssueNumber = context.payload.issue.number;
+            const isClosed = context.payload.issue.state === 'closed';
+            
+            console.log(`Processing child issue #${childIssueNumber} for epic #${epicNumber}`);
+            
+            try {
+              // Get the epic issue
+              const { data: epic } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber
+              });
+              
+              // Find and update checkbox for this issue
+              let updatedBody = epic.body;
+              
+              // Pattern to match checkbox items that reference this issue
+              const checkboxPattern = new RegExp(
+                `(- \\[[ x]\\].*?#${childIssueNumber}(?:\\s|$|\\)))`,
+                'gim'
+              );
+              
+              if (checkboxPattern.test(updatedBody)) {
+                // Update existing checkbox
+                updatedBody = updatedBody.replace(checkboxPattern, (match) => {
+                  return match.replace(/- \[[ x]\]/, isClosed ? '- [x]' : '- [ ]');
+                });
+                
+                console.log(`Updated checkbox for issue #${childIssueNumber} in epic #${epicNumber}`);
+              } else {
+                console.log(`No matching checkbox found for issue #${childIssueNumber} in epic #${epicNumber}`);
+              }
+              
+              // Update the epic issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber,
+                body: updatedBody
+              });
+              
+              // Add comment to epic about the progress update
+              const action = isClosed ? 'completed' : 'reopened';
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber,
+                body: `🤖 **Automated Progress Update**\n\nChild issue #${childIssueNumber} has been ${action}. Epic progress updated automatically.`
+              });
+              
+            } catch (error) {
+              console.error('Error updating epic progress:', error);
+              
+              // Create a comment on the child issue if epic update fails
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: childIssueNumber,
+                body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`
+              });
+            }
+
+      - name: Move to Done Column
+        if: github.event.action == 'closed' && github.event.issue.state_reason == 'completed'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Move completed issues to Done column in project board
+            const projectId = 'PVT_kwHOAPiRE84A9zBn'; // Sabron Trip Sync Development project
+            
+            // Query to find the project item for this issue
+            const query = `
+              query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issueNumber) {
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project {
+                          id
+                          title
+                        }
+                        fieldValues(first: 20) {
+                          nodes {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                              field {
+                                ... on ProjectV2SingleSelectField {
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            try {
+              const response = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issueNumber: context.payload.issue.number
+              });
+              
+              const projectItems = response.repository.issue.projectItems.nodes;
+              const targetProjectItem = projectItems.find(item => 
+                item.project.id === projectId
+              );
+              
+              if (targetProjectItem) {
+                console.log(`Found project item ${targetProjectItem.id} for issue #${context.payload.issue.number}`);
+                
+                // Note: Moving to Done column would require additional GraphQL mutations
+                // This is a placeholder for the project board automation
+                // The built-in GitHub Projects automation should handle this automatically
+                console.log('Issue should be automatically moved to Done by built-in project automation');
+              } else {
+                console.log(`Issue #${context.payload.issue.number} not found in target project`);
+              }
+              
+            } catch (error) {
+              console.error('Error in project board automation:', error);
+            }
