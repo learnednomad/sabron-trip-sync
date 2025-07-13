@@ -1,0 +1,165 @@
+{{#each imports}}
+{{{this}}}
+{{/each}}
+import { View, ScrollView } from 'react-native';
+import { Text } from '@/components/ui';
+
+export default function {{screenName}}Screen() {
+{{{hooks}}}
+
+  {{#if withLoading}}
+  if (isLoading) {
+    return (
+      <Screen preset="fullscreen">
+        <LoadingState 
+          preset="travel"
+          message="Loading {{screenName}}..." 
+        />
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen preset="fullscreen">
+        <ErrorState
+          preset="travel"
+          message={error}
+          onRetry={() => setError(null)}
+        />
+      </Screen>
+    );
+  }
+  {{/if}}
+
+  {{#if isMultiStep}}
+  const renderStep = () => {
+    switch (currentStep) {
+      {{#each steps}}
+      case {{@index}}:
+        return (
+          <View className="p-4">
+            <Text className="text-lg font-semibold">Step {{@index}}: {{this}}</Text>
+          </View>
+        );
+      {{/each}}
+      default:
+        return (
+          <View className="p-4">
+            <Text>Unknown step</Text>
+          </View>
+        );
+    }
+  };
+  {{/if}}
+
+  return (
+    <Screen preset="scroll">
+      {{#if withHeader}}
+      <Header
+        title="{{screenName}}"
+        preset="travel"
+        showBackButton
+        onLeftPress={() => console.log('Back pressed')}
+      />
+      {{/if}}
+
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {{#if withTabs}}
+        <View className="p-4">
+          <Text className="text-2xl font-bold mb-6">{{screenName}}</Text>
+          
+          {/* Tab navigation */}
+          <View className="flex-row mb-6 bg-gray-100 rounded-lg p-1">
+            <TouchableOpacity
+              className={`flex-1 py-2 px-4 rounded-md ${activeTab === 'overview' ? 'bg-white shadow-sm' : ''}`}
+              onPress={() => setActiveTab('overview')}
+            >
+              <Text className={`text-center ${activeTab === 'overview' ? 'font-medium' : 'text-gray-600'}`}>
+                Overview
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`flex-1 py-2 px-4 rounded-md ${activeTab === 'details' ? 'bg-white shadow-sm' : ''}`}
+              onPress={() => setActiveTab('details')}
+            >
+              <Text className={`text-center ${activeTab === 'details' ? 'font-medium' : 'text-gray-600'}`}>
+                Details
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Tab content */}
+          {activeTab === 'overview' && (
+            <View className="space-y-4">
+              <Text className="text-xl font-semibold">{{screenName}} Overview</Text>
+              {/* Overview content */}
+            </View>
+          )}
+          
+          {activeTab === 'details' && (
+            <View className="space-y-4">
+              <Text className="text-xl font-semibold">{{screenName}} Details</Text>
+              {/* Details content */}
+            </View>
+          )}
+        </View>
+        {{else if isMultiStep}}
+        <View className="p-4">
+          <View className="mb-6">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-2xl font-bold">{{screenName}}</Text>
+              <Text className="text-sm text-gray-600">
+                Step {currentStep + 1} of {{steps.length}}
+              </Text>
+            </View>
+            
+            {/* Progress bar */}
+            <View className="w-full bg-gray-200 rounded-full h-2">
+              <View 
+                className="bg-blue-600 h-2 rounded-full"
+                style={{ width: `${((currentStep + 1) / {{steps.length}}) * 100}%` }}
+              />
+            </View>
+          </View>
+
+          {renderStep()}
+
+          <View className="flex-row justify-between mt-8">
+            <TouchableOpacity
+              onPress={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+              className={`px-6 py-3 rounded-lg ${currentStep === 0 ? 'bg-gray-300' : 'bg-gray-500'}`}
+            >
+              <Text className={currentStep === 0 ? 'text-gray-500' : 'text-white'}>
+                Previous
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={() => setCurrentStep(Math.min({{steps.length}} - 1, currentStep + 1))}
+              disabled={currentStep === {{steps.length}} - 1}
+              className={`px-6 py-3 rounded-lg ${currentStep === {{steps.length}} - 1 ? 'bg-gray-300' : 'bg-blue-600'}`}
+            >
+              <Text className={currentStep === {{steps.length}} - 1 ? 'text-gray-500' : 'text-white'}>
+                Next
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {{else}}
+        <View className="p-4 space-y-6">
+          <Text className="text-3xl font-bold">{{screenName}}</Text>
+          
+          {/* Screen content goes here */}
+          <View className="bg-white rounded-lg p-6 shadow-sm">
+            <Text className="text-gray-600">
+              Your {{screenName}} content goes here.
+            </Text>
+          </View>
+        </View>
+        {{/if}}
+      </ScrollView>
+    </Screen>
+  );
+}

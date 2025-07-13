@@ -1,32 +1,25 @@
 // Base UI Components
-export { Button, buttonVariants } from './button';
-export { Input } from './input';
-export { Textarea } from './textarea';
-export { Label } from './label';
-export { Badge, badgeVariants } from './badge';
-export { Avatar, AvatarFallback, AvatarImage } from './avatar';
-export { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-export { Separator } from './separator';
-export { Skeleton } from './skeleton';
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
-export { Calendar } from './calendar';
-export { Popover, PopoverContent, PopoverTrigger } from './popover';
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './form';
-export { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
-export { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './sheet';
-export { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './dropdown-menu';
-export { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from './command';
-export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger } from './drawer';
-export { ScrollArea } from './scroll-area';
-export { Toggle, toggleVariants } from './toggle';
-export { ToggleGroup, ToggleGroupItem } from './toggle-group';
-export { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
+export { Button, buttonVariants } from './ui/button';
+export { Input } from './ui/input';
+export { Badge, badgeVariants } from './ui/badge';
+export { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
 
-// Travel-specific Components (inspired by travel-log-github-project-creator)
-export { LocationPicker } from './location-picker';
-export { TravelLogForm } from './travel-log-form';
+// Ignite CLI-inspired Enhanced Components
+export { AutoImage, autoImageVariants } from './ui/auto-image';
+export { EnhancedCard, cardVariants } from './ui/enhanced-card';
+export { EmptyState, emptyStateVariants } from './ui/empty-state';
 
-// Types
-export type { LocationData } from './location-picker';
-export type { TravelLogData } from './travel-log-form';
+// Core UI Components (High Priority)
+export { TextField, textFieldVariants } from './ui/text-field';
+export { Header, headerVariants } from './ui/header';
+export { Screen, screenVariants, DefaultLoadingComponent, DefaultErrorComponent } from './ui/screen';
+export { ListItem, listItemVariants } from './ui/list-item';
+export { LoadingState, loadingStateVariants } from './ui/loading-state';
+export { ErrorState, errorStateVariants } from './ui/error-state';
+
+// Travel-Specific Components
+export { TripCard, tripCardVariants } from './ui/trip-card';
+export { ActivityCard, activityCardVariants } from './ui/activity-card';
+
+// Demo Components
+export { IgniteDemoComponents } from './ignite-demo';

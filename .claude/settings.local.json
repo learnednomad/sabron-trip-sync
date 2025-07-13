@@ -54,8 +54,25 @@
       "Bash(gh issue edit:*)",
       "Bash(gh repo view:*)",
       "Bash(gh issue list:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(gh project item-add:*)",
+      "Bash(for i in {55..62})",
+      "Bash(do gh project item-add 4 --owner learnednomad --url \"https://github.com/learnednomad/sabron-trip-sync/issues/$i\")",
+      "Bash(done)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.infinite.red)",
+      "WebFetch(domain:firecrawl.dev)",
+      "mcp__firecrawl__scrape_single_url",
+      "mcp__firecrawl__search_google",
+      "mcp__firecrawl__map_url",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__firecrawl__firecrawl_map"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "firecrawl"
+  ]
 }

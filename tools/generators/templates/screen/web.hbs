@@ -1,0 +1,136 @@
+'use client';
+
+{{#each imports}}
+{{{this}}}
+{{/each}}
+
+export default function {{screenName}}Screen() {
+{{{hooks}}}
+
+  {{#if withLoading}}
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingState message="Loading {{screenName}}..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <ErrorState
+          message={error}
+          onRetry={() => setError(null)}
+        />
+      </div>
+    );
+  }
+  {{/if}}
+
+  {{#if isMultiStep}}
+  const renderStep = () => {
+    switch (currentStep) {
+      {{#each steps}}
+      case {{@index}}:
+        return <div>Step {{@index}}: {{this}}</div>;
+      {{/each}}
+      default:
+        return <div>Unknown step</div>;
+    }
+  };
+  {{/if}}
+
+  return (
+    <div className="min-h-screen">
+      {{#if withHeader}}
+      <Header
+        title="{{screenName}}"
+        preset="travel"
+        showBackButton
+        onLeftPress={() => window.history.back()}
+      />
+      {{/if}}
+
+      <main className="container mx-auto px-4 py-8">
+        {{#if withTabs}}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">{{screenName}} Overview</h2>
+              {/* Overview content */}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="details">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">{{screenName}} Details</h2>
+              {/* Details content */}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="settings">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">{{screenName}} Settings</h2>
+              {/* Settings content */}
+            </div>
+          </TabsContent>
+        </Tabs>
+        {{else if isMultiStep}}
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl font-bold">{{screenName}}</h1>
+              <span className="text-sm text-muted-foreground">
+                Step {currentStep + 1} of {{steps.length}}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentStep + 1) / {{steps.length}}) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {renderStep()}
+
+          <div className="flex justify-between mt-8">
+            <button
+              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentStep(Math.min({{steps.length}} - 1, currentStep + 1))}
+              disabled={currentStep === {{steps.length}} - 1}
+              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+        {{else}}
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold">{{screenName}}</h1>
+          
+          {/* Screen content goes here */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <p className="text-muted-foreground">
+              Your {{screenName}} content goes here.
+            </p>
+          </div>
+        </div>
+        {{/if}}
+      </main>
+    </div>
+  );
+}

@@ -50,6 +50,7 @@
     "@sabron/api-client": "workspace:*",
     "@sabron/i18n": "workspace:*",
     "@sabron/types": "workspace:*",
+    "@sabron/ui": "workspace:*",
     "@sabron/validation": "workspace:*",
     "@shopify/flash-list": "1.7.6",
     "@tanstack/react-query": "^5.81.5",

@@ -1,0 +1,49 @@
+{{#each imports}}
+{{{this}}}
+{{/each}}
+import { TouchableOpacity, View } from 'react-native';
+import { Text } from '@/components/ui';
+
+const {{componentName}}Variants = {{{variants}}};
+
+{{{props}}}
+
+export const {{componentName}}: React.FC<{{componentName}}Props> = ({
+  preset,
+  size,
+  {{#if withI18n}}
+  text,
+  tx,
+  txOptions,
+  {{/if}}
+  {{#if withState}}
+  value,
+  onChange,
+  {{/if}}
+  onPress,
+  className,
+  children,
+}) => {
+{{{hooks}}}
+  
+  {{#if withI18n}}
+  const displayText = tx ? t(tx, txOptions) : text;
+  {{/if}}
+
+  const Component = onPress ? TouchableOpacity : View;
+
+  return (
+    <Component
+      onPress={onPress}
+      activeOpacity={onPress ? 0.7 : 1}
+      className={{{componentName}}Variants({ preset, size, className })}
+    >
+      {{#if withI18n}}
+      {displayText && <Text>{displayText}</Text>}
+      {{/if}}
+      {children}
+    </Component>
+  );
+};
+
+export { {{componentName}}Variants };

@@ -52,6 +52,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="travel-demo"
+        options={{
+          title: 'Travel Demo',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <StyleIcon color={color} />,
+          tabBarButtonTestID: 'travel-demo-tab',
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

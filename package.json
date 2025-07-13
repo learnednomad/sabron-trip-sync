@@ -20,6 +20,8 @@
     "setup": "pnpm install && pnpm db:generate && pnpm build",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "pre-commit": "pnpm lint:fix && pnpm typecheck",
+    "generate": "pnpm --filter @sabron/generators generate",
+    "sabron": "pnpm --filter @sabron/generators sabron",
     "storybook": "turbo run storybook",
     "build-storybook": "turbo run build-storybook",
     "analyze": "turbo run analyze",

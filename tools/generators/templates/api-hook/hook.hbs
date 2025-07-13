@@ -1,0 +1,65 @@
+{{#each imports}}
+{{{this}}}
+{{/each}}
+
+// Types
+export interface {{entityName}} {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  // Add your {{entityName}} properties here
+}
+
+export interface {{entityName}}Input {
+  // Add your {{entityName}} input properties here
+}
+
+// Query hook
+export function {{hookName}}({{#if (eq operation 'fetch')}}{{else}}id?: string{{/if}}) {
+  return useQuery({
+    queryKey: {{{queryKey}}}{{#unless (eq operation 'fetch')}}.concat(id ? [id] : []){{/unless}},
+    queryFn: async () => {
+      const response = await apiClient.get('{{endpoint}}');
+      return response.data;
+    },
+    {{#if withCache}}
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    {{/if}}
+    {{#unless (eq operation 'fetch')}}
+    enabled: !!id,
+    {{/unless}}
+  });
+}
+
+{{#if withMutation}}
+// Mutation hook
+export function {{hookName}}Mutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {{entityName}}Input) => {
+      const response = await apiClient.{{#if (eq operation 'create')}}post{{else if (eq operation 'update')}}put{{else if (eq operation 'delete')}}delete{{else}}post{{/if}}('{{endpoint}}', data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // Show success message
+      toast.success('{{entityName}} {{operation}} successful!');
+      
+      {{#if withCache}}
+      // Invalidate and refetch related queries
+      queryClient.invalidateQueries({ queryKey: {{{queryKey}}} });
+      {{/if}}
+    },
+    onError: (error: any) => {
+      // Show error message
+      toast.error(error.message || '{{entityName}} {{operation}} failed');
+    },
+  });
+}
+{{/if}}
+
+// Export convenience hooks
+export const use{{entityName}}s = {{hookName}};
+{{#if withMutation}}
+export const use{{entityName}}Mutation = {{hookName}}Mutation;
+{{/if}}

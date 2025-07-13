@@ -1,0 +1,55 @@
+{{#each imports}}
+{{{this}}}
+{{/each}}
+import { cn } from '@/lib/utils';
+
+const {{componentName}}Variants = {{{variants}}};
+
+{{{props}}}
+
+export const {{componentName}} = React.forwardRef<
+  HTMLDivElement,
+  {{componentName}}Props
+>(({
+  preset,
+  size,
+  {{#if withI18n}}
+  text,
+  tx,
+  txOptions,
+  {{/if}}
+  {{#if withState}}
+  value,
+  onChange,
+  {{/if}}
+  onPress,
+  className,
+  children,
+  ...props
+}, ref) => {
+{{{hooks}}}
+  
+  {{#if withI18n}}
+  const displayText = tx ? t(tx, txOptions) : text;
+  {{/if}}
+
+  return (
+    <div
+      ref={ref}
+      className={cn({{componentName}}Variants({ preset, size }), className)}
+      onClick={onPress}
+      role={onPress ? 'button' : undefined}
+      tabIndex={onPress ? 0 : undefined}
+      {...props}
+    >
+      {{#if withI18n}}
+      {displayText && <span>{displayText}</span>}
+      {{/if}}
+      {children}
+    </div>
+  );
+});
+
+{{componentName}}.displayName = '{{componentName}}';
+
+export { {{componentName}}Variants };

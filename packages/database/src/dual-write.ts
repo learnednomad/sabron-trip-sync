@@ -198,12 +198,24 @@ export class DualWriteManager {
 
   // Transaction support
   async transaction<T>(
-    operations: ((client: PrismaClient) => Promise<any>)[],
-    operationsBackup: ((client: PrismaClientBackup) => Promise<any>)[]
+    operations: ((client: any) => Promise<any>)[],
+    operationsBackup: ((client: any) => Promise<any>)[]
   ): Promise<DualWriteResult<T[]>> {
     return this.executeWithDualWrite(
-      (client) => client.$transaction(operations.map(op => op(client))),
-      (client) => client.$transaction(operationsBackup.map(op => op(client)))
+      (client) => client.$transaction(async (tx: any) => {
+        const results = [];
+        for (const op of operations) {
+          results.push(await op(tx));
+        }
+        return results;
+      }),
+      (client) => client.$transaction(async (tx: any) => {
+        const results = [];
+        for (const op of operationsBackup) {
+          results.push(await op(tx));
+        }
+        return results;
+      })
     );
   }
 
