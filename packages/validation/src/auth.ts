@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { EmailSchema, IdSchema, TimestampSchema } from './common';
 import {
   isStrongPassword,

@@ -1,9 +1,9 @@
-import type { BaseEntity, ID, Email, URL, CountryCode, LanguageCode, Currency, Timestamp } from './common';
 import type { Role, SecuritySettings } from './auth';
-import type { PaymentMethod } from './payment';
-import type { NotificationPreferences } from './notification';
-import type { EmergencyContact } from './location';
+import type { BaseEntity, ID, Email, URL, CountryCode, LanguageCode, Currency, Timestamp } from './common';
 import type { AccommodationType } from './itinerary';
+import type { EmergencyContact } from './location';
+import type { NotificationPreferences } from './notification';
+import type { PaymentMethod } from './payment';
 
 export interface User extends BaseEntity {
   email: Email;

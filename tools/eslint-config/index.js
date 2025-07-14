@@ -22,6 +22,15 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_'
       }
     ],
+    'no-unused-expressions': 'off',
+    '@typescript-eslint/no-unused-expressions': [
+      'error',
+      {
+        allowShortCircuit: true,
+        allowTernary: true,
+        allowTaggedTemplates: true
+      }
+    ],
     '@typescript-eslint/consistent-type-imports': [
       'error',
       { prefer: 'type-imports' }

@@ -70,7 +70,9 @@
       "mcp__firecrawl__firecrawl_map",
       "Bash(turbo run dev:*)",
       "Bash(pnpm --filter=@sabron/generators build)",
-      "Bash(pnpm --filter=@sabron/database build)"
+      "Bash(pnpm --filter=@sabron/database build)",
+      "Bash(pnpm --filter=@sabron/types lint)",
+      "Bash(pnpm --filter=@sabron/validation lint)"
     ],
     "deny": []
   },

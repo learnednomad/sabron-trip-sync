@@ -1,3 +1,4 @@
+import type { Activity, BookingStatus } from './activity';
 import type {
   BaseEntity,
   ID,
@@ -8,10 +9,9 @@ import type {
   URL,
   Currency
 } from './common';
-import type { Location, ContactInfo, Airport } from './location';
-import type { Activity, BookingStatus } from './activity';
-import type { PaymentMethod, PaymentStatus } from './payment';
 import type { DocumentType } from './itinerary';
+import type { Location, ContactInfo, Airport } from './location';
+import type { PaymentMethod, PaymentStatus } from './payment';
 
 export interface Booking extends BaseEntity {
   userId: ID;

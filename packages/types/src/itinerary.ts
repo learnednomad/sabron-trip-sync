@@ -1,3 +1,4 @@
+import type { Activity } from './activity';
 import type {
   BaseEntity,
   ID,
@@ -6,9 +7,8 @@ import type {
   Visibility,
   Timestamp
 } from './common';
-import type { User } from './user';
 import type { Destination } from './location';
-import type { Activity } from './activity';
+import type { User } from './user';
 
 export interface Itinerary extends BaseEntity {
   userId: ID;

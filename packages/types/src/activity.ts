@@ -5,8 +5,8 @@ import type {
   Image,
   Timestamp
 } from './common';
-import type { User } from './user';
 import type { Location, WeatherInfo } from './location';
+import type { User } from './user';
 
 export interface Activity extends BaseEntity {
   itineraryId: ID;
