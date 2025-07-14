@@ -32,7 +32,7 @@ export async function generateComponent(name: string, options: ComponentOptions)
   const platforms = target === 'both' ? ['web', 'mobile'] : [target];
 
   for (const platform of platforms) {
-    await generateComponentForPlatform(name, platform, templateData);
+    await generateComponentForPlatform(name, platform as 'web' | 'mobile', templateData);
   }
 }
 

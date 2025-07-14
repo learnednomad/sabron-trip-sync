@@ -23,26 +23,26 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentItineraries />
 
-        <div className="bg-gradient-to-br from-primary/10 to-primary/20 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-foreground mb-4">Quick Actions</h3>
+        <div className="rounded-lg bg-gradient-to-br from-primary/10 to-primary/20 p-6">
+          <h3 className="mb-4 text-lg font-medium text-foreground">Quick Actions</h3>
           <div className="space-y-3">
             <a
+              className="block rounded-md bg-card p-3 shadow-sm transition-shadow hover:shadow-md"
               href="/itineraries"
-              className="block p-3 bg-card rounded-md shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="font-medium text-foreground">Plan a New Trip</div>
               <div className="text-sm text-muted-foreground">Create a detailed itinerary</div>
             </a>
             <a
+              className="block rounded-md bg-card p-3 shadow-sm transition-shadow hover:shadow-md"
               href="/activities"
-              className="block p-3 bg-card rounded-md shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="font-medium text-foreground">Browse Activities</div>
               <div className="text-sm text-muted-foreground">Discover things to do</div>
             </a>
             <a
+              className="block rounded-md bg-card p-3 shadow-sm transition-shadow hover:shadow-md"
               href="/bookings"
-              className="block p-3 bg-card rounded-md shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="font-medium text-foreground">Manage Bookings</div>
               <div className="text-sm text-muted-foreground">View confirmations</div>

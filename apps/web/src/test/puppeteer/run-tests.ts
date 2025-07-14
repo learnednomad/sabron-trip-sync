@@ -3,12 +3,17 @@
  * Comprehensive E2E test runner for TravelSync web application
  */
 
-import puppeteer, { Browser } from 'puppeteer';
+
 import { execSync } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
+
+import puppeteer from 'puppeteer';
+
 import { PUPPETEER_CONFIG } from './puppeteer.config';
 import { TestHelpers } from './utils/test-helpers';
+
+import type { Browser } from 'puppeteer';
 
 interface TestResult {
   testFile: string;

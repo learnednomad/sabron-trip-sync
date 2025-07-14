@@ -3,10 +3,13 @@
  * Tests for the main dashboard functionality and trip management
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import { describe, beforeAll, afterAll, beforeEach, afterEach, test, expect } from 'vitest';
+
 import { PUPPETEER_CONFIG } from '../puppeteer.config';
 import { TestHelpers } from '../utils/test-helpers';
+
+import type { Browser, Page } from 'puppeteer';
 
 describe('Dashboard E2E Tests', () => {
   let browser: Browser;

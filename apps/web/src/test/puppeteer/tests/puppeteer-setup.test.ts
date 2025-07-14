@@ -3,9 +3,12 @@
  * Test to verify Puppeteer installation and basic functionality
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import { describe, beforeAll, afterAll, beforeEach, afterEach, test, expect } from 'vitest';
+
 import { PUPPETEER_CONFIG } from '../puppeteer.config';
+
+import type { Browser, Page } from 'puppeteer';
 
 describe('Puppeteer Setup Test', () => {
   let browser: Browser;

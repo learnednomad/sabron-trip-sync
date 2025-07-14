@@ -1,12 +1,14 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import './global.css';
+
+import NetInfo from '@react-native-community/netinfo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import Navigation from './src/navigation';
 import { AuthProvider } from './src/providers/auth-provider';
 import { I18nProvider } from './src/providers/i18n-provider';
-import Navigation from './src/navigation';
-import './global.css';
-import { useEffect } from 'react';
-import NetInfo from '@react-native-community/netinfo';
 import { processOfflineQueue } from './src/utils/offline-queue';
 
 const queryClient = new QueryClient({

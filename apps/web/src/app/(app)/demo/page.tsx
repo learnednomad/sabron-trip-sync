@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { 
   TripCard, 
   ActivityCard, 
@@ -14,6 +13,7 @@ import {
   AutoImage,
   Button
 } from '@sabron/ui';
+import { useState } from 'react';
 
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -80,20 +80,20 @@ export default function DemoPage() {
   ];
 
   return (
-    <Screen preset="scroll" className="bg-gray-50">
+    <Screen className="bg-gray-50" preset="scroll">
       <Header 
-        title="Component Demo"
-        preset="travel"
         showBackButton
-        onLeftPress={() => window.history.back()}
+        preset="travel"
         rightIcon="settings"
+        title="Component Demo"
+        onLeftPress={() => window.history.back()}
         onRightPress={() => console.log('Settings pressed')}
       />
 
-      <div className="p-6 space-y-12">
+      <div className="space-y-12 p-6">
         {/* Trip Cards Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Trip Cards</h2>
+          <h2 className="mb-6 text-2xl font-bold">Trip Cards</h2>
           <div className="grid gap-6 md:grid-cols-2">
             {sampleTrips.map((trip, index) => (
               <TripCard
@@ -108,7 +108,7 @@ export default function DemoPage() {
 
         {/* Activity Cards Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Activity Cards</h2>
+          <h2 className="mb-6 text-2xl font-bold">Activity Cards</h2>
           <div className="space-y-4">
             {sampleActivities.map((activity, index) => (
               <ActivityCard
@@ -123,29 +123,29 @@ export default function DemoPage() {
 
         {/* List Items Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">List Items</h2>
-          <div className="bg-white rounded-lg overflow-hidden">
+          <h2 className="mb-6 text-2xl font-bold">List Items</h2>
+          <div className="overflow-hidden rounded-lg bg-white">
             <ListItem
-              text="Flight Details"
-              subText="Dec 15, 2024 • 2:30 PM"
               leftIcon="plane"
               preset="travel"
+              subText="Dec 15, 2024 • 2:30 PM"
+              text="Flight Details"
               onPress={() => console.log('Flight pressed')}
             />
             <ListItem
-              text="Hotel Reservation"
-              subText="Grand Resort & Spa"
-              leftIcon="map-pin"
-              preset="travel"
               badge="Confirmed"
               badgeColor="success"
+              leftIcon="map-pin"
+              preset="travel"
+              subText="Grand Resort & Spa"
+              text="Hotel Reservation"
               onPress={() => console.log('Hotel pressed')}
             />
             <ListItem
-              text="Travel Insurance"
-              subText="Comprehensive coverage"
               leftIcon="star"
               preset="travel"
+              subText="Comprehensive coverage"
+              text="Travel Insurance"
               onPress={() => console.log('Insurance pressed')}
             />
           </div>
@@ -153,20 +153,20 @@ export default function DemoPage() {
 
         {/* Form Components Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Form Components</h2>
-          <div className="bg-white p-6 rounded-lg space-y-4">
+          <h2 className="mb-6 text-2xl font-bold">Form Components</h2>
+          <div className="space-y-4 rounded-lg bg-white p-6">
             <TextField
-              title="Destination"
               placeholder="Where would you like to go?"
               preset="travel"
+              title="Destination"
             />
             <TextField
-              title="Travel Dates"
+              helper="Choose your departure and return dates"
               placeholder="Select your dates"
               preset="travel"
-              helper="Choose your departure and return dates"
+              title="Travel Dates"
             />
-            <Button preset="travel" className="w-full">
+            <Button className="w-full" preset="travel">
               Search Flights
             </Button>
           </div>
@@ -174,52 +174,52 @@ export default function DemoPage() {
 
         {/* State Components Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">State Components</h2>
+          <h2 className="mb-6 text-2xl font-bold">State Components</h2>
           <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Loading State</h3>
+            <div className="rounded-lg bg-white p-6">
+              <h3 className="mb-4 text-lg font-semibold">Loading State</h3>
               <Button 
-                onClick={() => setIsLoading(!isLoading)}
                 className="mb-4"
+                onClick={() => setIsLoading(!isLoading)}
               >
                 {isLoading ? 'Hide' : 'Show'} Loading
               </Button>
               {isLoading && (
                 <LoadingState
-                  preset="travel"
-                  message="Searching for flights..."
                   showIcon
                   icon="plane"
+                  message="Searching for flights..."
+                  preset="travel"
                 />
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Error State</h3>
+            <div className="rounded-lg bg-white p-6">
+              <h3 className="mb-4 text-lg font-semibold">Error State</h3>
               <Button 
-                onClick={() => setShowError(!showError)}
-                variant="destructive"
                 className="mb-4"
+                variant="destructive"
+                onClick={() => setShowError(!showError)}
               >
                 {showError ? 'Hide' : 'Show'} Error
               </Button>
               {showError && (
                 <ErrorState
-                  preset="travel"
                   message="Unable to load flight information"
+                  preset="travel"
                   onRetry={() => setShowError(false)}
                 />
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Empty State</h3>
+            <div className="rounded-lg bg-white p-6">
+              <h3 className="mb-4 text-lg font-semibold">Empty State</h3>
               <EmptyState
-                preset="travel"
-                heading="No trips planned yet"
-                content="Start planning your next adventure by searching for destinations"
                 button="Plan Your Trip"
                 buttonOnPress={() => console.log('Plan trip pressed')}
+                content="Start planning your next adventure by searching for destinations"
+                heading="No trips planned yet"
+                preset="travel"
               />
             </div>
           </div>
@@ -227,26 +227,26 @@ export default function DemoPage() {
 
         {/* Auto Image Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Auto Image</h2>
+          <h2 className="mb-6 text-2xl font-bold">Auto Image</h2>
           <div className="grid gap-4 md:grid-cols-3">
             <AutoImage
-              src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&h=200&fit=crop"
               alt="Santorini"
-              preset="cover"
               className="rounded-lg"
+              preset="cover"
+              src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&h=200&fit=crop"
             />
             <AutoImage
-              src="https://invalid-url.jpg"
-              fallback="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=200&fit=crop"
               alt="Fallback image"
-              preset="cover"
               className="rounded-lg"
+              fallback="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=200&fit=crop"
+              preset="cover"
+              src="https://invalid-url.jpg"
             />
             <AutoImage
-              src=""
               alt="No image"
-              preset="placeholder"
               className="rounded-lg"
+              preset="placeholder"
+              src=""
             />
           </div>
         </section>

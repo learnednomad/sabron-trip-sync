@@ -6,6 +6,8 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  external: ['@prisma/client', '@prisma/client-backup'],
+  noExternal: [],
   outExtension({ format }) {
     return {
       js: format === 'esm' ? '.js' : '.cjs',

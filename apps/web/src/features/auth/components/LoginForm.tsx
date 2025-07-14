@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button , Input } from '@sabron/ui';
 import { LoginSchema, type Login } from '@sabron/validation';
-import { Button } from '@sabron/ui';
-import { Input } from '@sabron/ui';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import { useAuth } from '@/providers/auth-provider';
 
-export function LoginForm() {
+export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuth();
 
@@ -31,32 +31,32 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <Input
         {...register('email')}
-        type="email"
-        label="Email address"
         autoComplete="email"
         error={errors.email?.message}
+        label="Email address"
+        type="email"
       />
 
       <div className="relative">
         <Input
           {...register('password')}
-          type={showPassword ? 'text' : 'password'}
-          label="Password"
           autoComplete="current-password"
           error={errors.password?.message}
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
         />
         <button
+          className="absolute inset-y-0 right-0 top-1/2 flex -translate-y-1/2 items-center pr-3"
           type="button"
-          className="absolute inset-y-0 right-0 flex items-center pr-3 top-1/2 -translate-y-1/2"
           onClick={() => setShowPassword(!showPassword)}
         >
           {showPassword ? (
-            <EyeOff className="h-5 w-5 text-muted-foreground" />
+            <EyeOff className="size-5 text-muted-foreground" />
           ) : (
-            <Eye className="h-5 w-5 text-muted-foreground" />
+            <Eye className="size-5 text-muted-foreground" />
           )}
         </button>
       </div>
@@ -65,34 +65,34 @@ export function LoginForm() {
         <div className="flex items-center">
           <input
             {...register('rememberMe')}
+            className="size-4 rounded border-input text-primary focus:ring-primary"
             type="checkbox"
-            className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
           />
-          <label htmlFor="rememberMe" className="ml-2 block text-sm text-foreground">
+          <label className="ml-2 block text-sm text-foreground" htmlFor="rememberMe">
             Remember me
           </label>
         </div>
 
         <Link
-          href="/forgot-password"
           className="text-sm text-primary hover:text-primary/80"
+          href="/forgot-password"
         >
           Forgot your password?
         </Link>
       </div>
 
       <Button
-        type="submit"
         className="w-full"
         disabled={isSubmitting}
         loading={isSubmitting}
+        type="submit"
       >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
         Don't have an account?{' '}
-        <Link href="/signup" className="font-medium text-primary hover:text-primary/80">
+        <Link className="font-medium text-primary hover:text-primary/80" href="/signup">
           Sign up
         </Link>
       </p>

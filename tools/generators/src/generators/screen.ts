@@ -31,7 +31,7 @@ export async function generateScreen(name: string, options: ScreenOptions) {
   const platforms = target === 'both' ? ['web', 'mobile'] : [target];
 
   for (const platform of platforms) {
-    await generateScreenForPlatform(name, platform, templateData);
+    await generateScreenForPlatform(name, platform as 'web' | 'mobile', templateData);
   }
 }
 
@@ -91,7 +91,7 @@ function generateSteps(type: string): string[] {
 }
 
 async function generateScreenForPlatform(
-  name: string, 
+  screenName: string, 
   platform: 'web' | 'mobile', 
   templateData: any
 ) {
@@ -113,4 +113,6 @@ async function generateScreenForPlatform(
   const outputPath = path.join(outputDir, fileName);
   
   await fs.writeFile(outputPath, formattedCode);
+  
+  console.log(`✅ Generated ${platform} screen: ${screenName}`);
 }

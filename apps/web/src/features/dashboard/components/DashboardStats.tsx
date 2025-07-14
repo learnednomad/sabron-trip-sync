@@ -2,10 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@sabron/ui';
 import { Calendar, Map, DollarSign, Users } from 'lucide-react';
+
 import { useItineraries } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
 
-export function DashboardStats() {
+export const DashboardStats = () => {
   const { data: itineraries } = useItineraries();
 
   const stats = [
@@ -50,8 +51,8 @@ export function DashboardStats() {
             <CardTitle className="text-sm font-medium">
               {stat.title}
             </CardTitle>
-            <div className={`p-2 rounded-md ${stat.bgColor}`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            <div className={`rounded-md p-2 ${stat.bgColor}`}>
+              <stat.icon className={`size-4 ${stat.color}`} />
             </div>
           </CardHeader>
           <CardContent>

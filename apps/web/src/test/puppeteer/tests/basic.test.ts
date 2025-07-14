@@ -3,9 +3,12 @@
  * Simple test to verify Puppeteer setup is working
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import { describe, beforeAll, afterAll, beforeEach, afterEach, test, expect } from 'vitest';
+
 import { PUPPETEER_CONFIG } from '../puppeteer.config';
+
+import type { Browser, Page } from 'puppeteer';
 
 describe('Basic Puppeteer Test', () => {
   let browser: Browser;

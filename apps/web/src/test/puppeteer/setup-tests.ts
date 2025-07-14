@@ -4,6 +4,7 @@
  */
 
 import { beforeAll, afterAll } from 'vitest';
+
 import { PUPPETEER_CONFIG } from './puppeteer.config';
 
 // Extend the global timeout for E2E tests

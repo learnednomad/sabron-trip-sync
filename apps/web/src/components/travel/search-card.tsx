@@ -1,16 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { addDays } from 'date-fns';
 import { Search, MapPin, Calendar, Users } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatDate } from '@/lib/utils';
-import { addDays } from 'date-fns';
+
 
 interface SearchCardProps {
   onSearch?: (data: {
@@ -22,7 +24,7 @@ interface SearchCardProps {
   className?: string;
 }
 
-export function SearchCard({ onSearch, className }: SearchCardProps) {
+export const SearchCard = ({ onSearch, className }: SearchCardProps) => {
   const [destination, setDestination] = useState('');
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
@@ -42,43 +44,43 @@ export function SearchCard({ onSearch, className }: SearchCardProps) {
       <CardContent className="p-6">
         <div className="grid gap-4 md:grid-cols-4">
           <div className="md:col-span-1">
-            <Label htmlFor="destination" className="mb-2 block">
-              <MapPin className="inline h-4 w-4 mr-1" />
+            <Label className="mb-2 block" htmlFor="destination">
+              <MapPin className="mr-1 inline size-4" />
               Destination
             </Label>
             <Input
+              className="w-full"
               id="destination"
               placeholder="Where to?"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full"
             />
           </div>
 
           <div className="md:col-span-1">
             <Label className="mb-2 block">
-              <Calendar className="inline h-4 w-4 mr-1" />
+              <Calendar className="mr-1 inline size-4" />
               Check-in
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !checkIn && "text-muted-foreground"
                   )}
+                  variant="outline"
                 >
                   {checkIn ? formatDate(checkIn) : "Select date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent align="start" className="w-auto p-0">
                 <CalendarComponent
+                  initialFocus
+                  disabled={(date) => date < new Date()}
                   mode="single"
                   selected={checkIn}
                   onSelect={setCheckIn}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -86,40 +88,40 @@ export function SearchCard({ onSearch, className }: SearchCardProps) {
 
           <div className="md:col-span-1">
             <Label className="mb-2 block">
-              <Calendar className="inline h-4 w-4 mr-1" />
+              <Calendar className="mr-1 inline size-4" />
               Check-out
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !checkOut && "text-muted-foreground"
                   )}
+                  variant="outline"
                 >
                   {checkOut ? formatDate(checkOut) : "Select date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent align="start" className="w-auto p-0">
                 <CalendarComponent
-                  mode="single"
-                  selected={checkOut}
-                  onSelect={setCheckOut}
+                  initialFocus
                   disabled={(date) => {
                     if (date < new Date()) return true;
                     if (checkIn && date < addDays(checkIn, 1)) return true;
                     return false;
                   }}
-                  initialFocus
+                  mode="single"
+                  selected={checkOut}
+                  onSelect={setCheckOut}
                 />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="md:col-span-1">
-            <Label htmlFor="guests" className="mb-2 block">
-              <Users className="inline h-4 w-4 mr-1" />
+            <Label className="mb-2 block" htmlFor="guests">
+              <Users className="mr-1 inline size-4" />
               Guests
             </Label>
             <Select value={guests} onValueChange={setGuests}>
@@ -138,11 +140,11 @@ export function SearchCard({ onSearch, className }: SearchCardProps) {
         </div>
 
         <Button 
-          onClick={handleSearch}
+          className="mt-6 w-full"
           size="lg"
-          className="w-full mt-6"
+          onClick={handleSearch}
         >
-          <Search className="h-4 w-4 mr-2" />
+          <Search className="mr-2 size-4" />
           Search Trips
         </Button>
       </CardContent>

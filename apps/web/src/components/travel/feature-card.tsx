@@ -1,8 +1,10 @@
 'use client';
 
-import { LucideIcon } from 'lucide-react';
+
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+
+import type { LucideIcon } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: LucideIcon;
@@ -22,13 +24,13 @@ const colorVariants = {
   coral: 'bg-travel-coral/10 text-travel-coral group-hover:bg-travel-coral group-hover:text-white',
 };
 
-export function FeatureCard({ 
+export const FeatureCard = ({ 
   icon: Icon, 
   title, 
   description, 
   color = 'primary',
   className 
-}: FeatureCardProps) {
+}: FeatureCardProps) => {
   return (
     <Card 
       className={cn(
@@ -36,19 +38,19 @@ export function FeatureCard({
         className
       )}
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-primary/5 rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform duration-500" />
+      <div className="absolute right-0 top-0 size-32 -translate-y-16 translate-x-16 rounded-full bg-gradient-to-br from-transparent to-primary/5 transition-transform duration-500 group-hover:scale-150" />
       
       <CardHeader>
         <div className={cn(
           "inline-flex p-3 rounded-lg transition-all duration-300",
           colorVariants[color]
         )}>
-          <Icon className="h-6 w-6" />
+          <Icon className="size-6" />
         </div>
       </CardHeader>
       
       <CardContent>
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <h3 className="mb-2 text-lg font-semibold">{title}</h3>
         <p className="text-muted-foreground">{description}</p>
       </CardContent>
     </Card>

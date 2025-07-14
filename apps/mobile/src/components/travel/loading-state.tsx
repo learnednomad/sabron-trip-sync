@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { View, ActivityIndicator } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Calendar, MapPin, Plane } from 'lucide-react-native';
+import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plane, MapPin, Calendar } from 'lucide-react-native';
+import { ActivityIndicator, View } from 'react-native';
+
 import { Text } from '@/components/ui';
 
 const loadingStateVariants = cva(
@@ -10,10 +11,11 @@ const loadingStateVariants = cva(
   {
     variants: {
       preset: {
-        default: 'py-12 px-6',
-        travel: 'py-16 px-8 bg-gradient-to-b from-blue-50 to-purple-50 rounded-lg',
-        minimal: 'py-8 px-4',
-        fullscreen: 'flex-1 py-0 px-6',
+        default: 'px-6 py-12',
+        travel:
+          'rounded-lg bg-gradient-to-b from-blue-50 to-purple-50 px-8 py-16',
+        minimal: 'px-4 py-8',
+        fullscreen: 'flex-1 px-6 py-0',
       },
       size: {
         small: '',
@@ -33,13 +35,13 @@ export interface LoadingStateProps
   message?: string;
   messageTx?: string;
   messageTxOptions?: Record<string, any>;
-  
+
   spinnerSize?: 'small' | 'large';
   spinnerColor?: string;
-  
+
   showIcon?: boolean;
   icon?: 'plane' | 'map' | 'calendar' | React.ReactNode;
-  
+
   className?: string;
 }
 
@@ -56,20 +58,25 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   className,
 }) => {
   const { t } = useTranslation();
-  
-  const messageText = messageTx ? t(messageTx, messageTxOptions) : message || 'Loading...';
-  
+
+  const messageText = messageTx
+    ? t(messageTx, messageTxOptions)
+    : message || 'Loading...';
+
   const renderIcon = () => {
     if (!showIcon) return null;
-    
+
     const iconMap = {
       plane: Plane,
       map: MapPin,
       calendar: Calendar,
     };
-    
-    const IconComponent = typeof icon === 'string' && icon in iconMap ? iconMap[icon as keyof typeof iconMap] : null;
-    
+
+    const IconComponent =
+      typeof icon === 'string' && icon in iconMap
+        ? iconMap[icon as keyof typeof iconMap]
+        : null;
+
     return (
       <View className="mb-4 opacity-30">
         {IconComponent ? (
@@ -84,14 +91,20 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   return (
     <View className={loadingStateVariants({ preset, size, className })}>
       {renderIcon()}
-      <ActivityIndicator 
-        size={spinnerSize} 
+      <ActivityIndicator
+        size={spinnerSize}
         color={spinnerColor || (preset === 'travel' ? '#3B82F6' : '#6B7280')}
         className="mb-4"
       />
-      <Text className={`text-muted-foreground ${
-        size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
-      }`}>
+      <Text
+        className={`text-muted-foreground ${
+          size === 'small'
+            ? 'text-sm'
+            : size === 'large'
+              ? 'text-lg'
+              : 'text-base'
+        }`}
+      >
         {messageText}
       </Text>
     </View>

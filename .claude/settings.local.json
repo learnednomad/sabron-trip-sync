@@ -67,7 +67,10 @@
       "mcp__firecrawl__search_google",
       "mcp__firecrawl__map_url",
       "mcp__firecrawl__firecrawl_scrape",
-      "mcp__firecrawl__firecrawl_map"
+      "mcp__firecrawl__firecrawl_map",
+      "Bash(turbo run dev:*)",
+      "Bash(pnpm --filter=@sabron/generators build)",
+      "Bash(pnpm --filter=@sabron/database build)"
     ],
     "deny": []
   },

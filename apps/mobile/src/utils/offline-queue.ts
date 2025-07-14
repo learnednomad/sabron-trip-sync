@@ -1,6 +1,7 @@
-import * as FileSystem from 'expo-file-system';
-import { apiClient } from '@/lib/api-client';
 import type { ApiRequestConfig } from '@sabron/types';
+import * as FileSystem from 'expo-file-system';
+
+import { apiClient } from '@/lib/api-client';
 
 interface QueuedRequest {
   id: string;
@@ -10,7 +11,9 @@ interface QueuedRequest {
 
 const QUEUE_FILE = `${FileSystem.documentDirectory}offline-queue.json`;
 
-export async function addToOfflineQueue(config: ApiRequestConfig): Promise<void> {
+export async function addToOfflineQueue(
+  config: ApiRequestConfig
+): Promise<void> {
   try {
     const queue = await getOfflineQueue();
     const request: QueuedRequest = {
@@ -49,7 +52,10 @@ export async function processOfflineQueue(): Promise<void> {
         await apiClient.request(request.config);
         // Remove successful request from queue
         const updatedQueue = queue.filter((q) => q.id !== request.id);
-        await FileSystem.writeAsStringAsync(QUEUE_FILE, JSON.stringify(updatedQueue));
+        await FileSystem.writeAsStringAsync(
+          QUEUE_FILE,
+          JSON.stringify(updatedQueue)
+        );
       } catch (error) {
         console.error('Failed to process queued request:', error);
       }

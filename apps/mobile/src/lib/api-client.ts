@@ -1,8 +1,9 @@
-import { ApiClient } from '@sabron/api-client';
-import { toast } from 'sonner';
-import { addToOfflineQueue, processOfflineQueue } from '@/utils/offline-queue';
 import NetInfo from '@react-native-community/netinfo';
+import { ApiClient } from '@sabron/api-client';
 import type { ApiRequestConfig } from '@sabron/types';
+import { toast } from 'sonner';
+
+import { addToOfflineQueue, processOfflineQueue } from '@/utils/offline-queue';
 
 class ConfiguredApiClient extends ApiClient {
   constructor() {
@@ -11,7 +12,7 @@ class ConfiguredApiClient extends ApiClient {
 
   async request<T>(config: ApiRequestConfig): Promise<T> {
     const state = await NetInfo.fetch();
-    
+
     if (!state.isConnected) {
       await addToOfflineQueue(config);
       throw new Error('You are offline. Request has been queued.');
@@ -23,7 +24,7 @@ class ConfiguredApiClient extends ApiClient {
 
       // Process queued requests when online
       await processOfflineQueue();
-      
+
       return response.data!;
     } catch (error: any) {
       if (error.message.includes('offline')) {

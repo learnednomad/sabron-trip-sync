@@ -1,18 +1,19 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { 
-  TripCard, 
-  ActivityCard, 
-  Header, 
-  Screen, 
+import { ScrollView, View } from 'react-native';
+
+import {
+  ActivityCard,
+  EmptyState,
+  ErrorState,
+  Header,
   ListItem,
   LoadingState,
-  ErrorState,
-  EmptyState,
-  TextField
+  Screen,
+  TextField,
+  TripCard,
 } from '@/components/travel';
-import { Text, Button } from '@/components/ui';
+import { Button, Text } from '@/components/ui';
 
 export default function TravelDemoScreen() {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,8 @@ export default function TravelDemoScreen() {
       dates: 'Dec 15-22, 2024',
       duration: '7 days',
       status: 'upcoming' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&h=250&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&h=250&fit=crop',
       participants: 2,
       budget: 1500,
       showBudget: true,
@@ -36,18 +38,20 @@ export default function TravelDemoScreen() {
       dates: 'Jan 10-20, 2025',
       duration: '10 days',
       status: 'planning' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=250&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=250&fit=crop',
       participants: 4,
       budget: 3200,
       showBudget: true,
       showParticipants: true,
-    }
+    },
   ];
 
   const sampleActivities = [
     {
       title: 'Sunset Wine Tasting',
-      description: 'Experience the famous Santorini sunset while tasting local wines',
+      description:
+        'Experience the famous Santorini sunset while tasting local wines',
       category: 'food' as const,
       status: 'confirmed' as const,
       startTime: new Date('2024-12-16T18:00:00'),
@@ -63,7 +67,8 @@ export default function TravelDemoScreen() {
     },
     {
       title: 'Temple Walking Tour',
-      description: 'Guided tour through ancient temples and traditional neighborhoods',
+      description:
+        'Guided tour through ancient temples and traditional neighborhoods',
       category: 'sightseeing' as const,
       status: 'planned' as const,
       startTime: new Date('2025-01-12T09:00:00'),
@@ -76,19 +81,19 @@ export default function TravelDemoScreen() {
       showLocation: true,
       showCost: true,
       showRating: true,
-    }
+    },
   ];
 
   const renderSection = (title: string, children: React.ReactNode) => (
     <View className="mb-8">
-      <Text className="text-xl font-bold mb-4 px-4">{title}</Text>
+      <Text className="mb-4 px-4 text-xl font-bold">{title}</Text>
       {children}
     </View>
   );
 
   return (
     <Screen preset="scroll" safeAreaEdges="all">
-      <Header 
+      <Header
         title="Component Demo"
         preset="travel"
         showBackButton
@@ -99,8 +104,9 @@ export default function TravelDemoScreen() {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Trip Cards Section */}
-        {renderSection('Trip Cards', (
-          <View className="px-4 space-y-4">
+        {renderSection(
+          'Trip Cards',
+          <View className="space-y-4 px-4">
             {sampleTrips.map((trip, index) => (
               <TripCard
                 key={index}
@@ -110,11 +116,12 @@ export default function TravelDemoScreen() {
               />
             ))}
           </View>
-        ))}
+        )}
 
         {/* Activity Cards Section */}
-        {renderSection('Activity Cards', (
-          <View className="px-4 space-y-4">
+        {renderSection(
+          'Activity Cards',
+          <View className="space-y-4 px-4">
             {sampleActivities.map((activity, index) => (
               <ActivityCard
                 key={index}
@@ -124,11 +131,12 @@ export default function TravelDemoScreen() {
               />
             ))}
           </View>
-        ))}
+        )}
 
         {/* List Items Section */}
-        {renderSection('List Items', (
-          <View className="mx-4 bg-white rounded-lg overflow-hidden">
+        {renderSection(
+          'List Items',
+          <View className="mx-4 overflow-hidden rounded-lg bg-white">
             <ListItem
               text="Flight Details"
               subText="Dec 15, 2024 • 2:30 PM"
@@ -153,11 +161,12 @@ export default function TravelDemoScreen() {
               onPress={() => console.log('Insurance pressed')}
             />
           </View>
-        ))}
+        )}
 
         {/* Form Components Section */}
-        {renderSection('Form Components', (
-          <View className="px-4 space-y-4">
+        {renderSection(
+          'Form Components',
+          <View className="space-y-4 px-4">
             <TextField
               title="Destination"
               placeholder="Where would you like to go?"
@@ -171,24 +180,22 @@ export default function TravelDemoScreen() {
               preset="travel"
               helper="Choose your departure and return dates"
             />
-            <Button 
+            <Button
               className="bg-gradient-to-r from-blue-500 to-purple-600"
               onPress={() => console.log('Search pressed')}
             >
-              <Text className="text-white font-medium">Search Flights</Text>
+              <Text className="font-medium text-white">Search Flights</Text>
             </Button>
           </View>
-        ))}
+        )}
 
         {/* State Components Section */}
-        {renderSection('State Components', (
-          <View className="px-4 space-y-6">
-            <View className="bg-white p-4 rounded-lg">
-              <Text className="text-lg font-semibold mb-4">Loading State</Text>
-              <Button 
-                onPress={() => setIsLoading(!isLoading)}
-                className="mb-4"
-              >
+        {renderSection(
+          'State Components',
+          <View className="space-y-6 px-4">
+            <View className="rounded-lg bg-white p-4">
+              <Text className="mb-4 text-lg font-semibold">Loading State</Text>
+              <Button onPress={() => setIsLoading(!isLoading)} className="mb-4">
                 <Text className="text-white">
                   {isLoading ? 'Hide' : 'Show'} Loading
                 </Text>
@@ -203,9 +210,9 @@ export default function TravelDemoScreen() {
               )}
             </View>
 
-            <View className="bg-white p-4 rounded-lg">
-              <Text className="text-lg font-semibold mb-4">Error State</Text>
-              <Button 
+            <View className="rounded-lg bg-white p-4">
+              <Text className="mb-4 text-lg font-semibold">Error State</Text>
+              <Button
                 onPress={() => setShowError(!showError)}
                 className="mb-4 bg-red-600"
               >
@@ -222,8 +229,8 @@ export default function TravelDemoScreen() {
               )}
             </View>
 
-            <View className="bg-white p-4 rounded-lg">
-              <Text className="text-lg font-semibold mb-4">Empty State</Text>
+            <View className="rounded-lg bg-white p-4">
+              <Text className="mb-4 text-lg font-semibold">Empty State</Text>
               <EmptyState
                 preset="travel"
                 heading="No trips planned yet"
@@ -234,7 +241,7 @@ export default function TravelDemoScreen() {
               />
             </View>
           </View>
-        ))}
+        )}
 
         {/* Bottom spacing */}
         <View className="h-8" />

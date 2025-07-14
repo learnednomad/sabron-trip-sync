@@ -3,8 +3,11 @@
  * Common functions for TravelSync web app testing
  */
 
-import { Browser, Page, ElementHandle } from 'puppeteer';
+import { Browser } from 'puppeteer';
+
 import { PUPPETEER_CONFIG } from '../puppeteer.config';
+
+import type { Page, ElementHandle } from 'puppeteer';
 
 export class TestHelpers {
   static async waitForPageLoad(page: Page, timeout = PUPPETEER_CONFIG.TIMEOUTS.NAVIGATION): Promise<void> {
