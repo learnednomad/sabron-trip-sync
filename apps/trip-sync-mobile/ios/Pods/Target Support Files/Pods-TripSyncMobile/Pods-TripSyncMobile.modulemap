@@ -1,0 +1,6 @@
+module Pods_TripSyncMobile {
+  umbrella header "Pods-TripSyncMobile-umbrella.h"
+
+  export *
+  module * { export * }
+}
