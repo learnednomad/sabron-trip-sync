@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '../lib/utils';
-import { Button } from './button';
-import { Input } from './input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { MapPin, Search, Star, Clock, Globe } from 'lucide-react';
 
 export interface LocationData {

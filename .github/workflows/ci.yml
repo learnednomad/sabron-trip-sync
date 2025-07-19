@@ -36,9 +36,6 @@ jobs:
 
   build-mobile:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/mobile
 
     steps:
       - uses: actions/checkout@v4
@@ -53,21 +50,16 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Approve build scripts
         run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
-      - name: Lint
-        run: pnpm lint
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Test
-        run: pnpm test
-      - name: Build Android
-        run: pnpm build
+      - name: Lint mobile app
+        run: pnpm --filter=mobile lint
+      - name: Typecheck mobile app
+        run: pnpm --filter=mobile typecheck
+      - name: Test mobile app
+        run: pnpm --filter=mobile test
+      - name: Build mobile app
+        run: pnpm --filter=mobile build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-app
-          path: apps/mobile/*.apk
 
   deploy:
     needs: [build, build-mobile]

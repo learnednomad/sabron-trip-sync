@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaClient as PrismaClientBackup } from '@prisma/client-backup';
 
 export interface SyncReport {
   table: string;
@@ -19,9 +18,9 @@ export interface SyncStatus {
 
 export class SyncVerifier {
   private primaryClient: PrismaClient;
-  private backupClient: PrismaClientBackup;
+  private backupClient: PrismaClient;
 
-  constructor(primaryClient: PrismaClient, backupClient: PrismaClientBackup) {
+  constructor(primaryClient: PrismaClient, backupClient: PrismaClient) {
     this.primaryClient = primaryClient;
     this.backupClient = backupClient;
   }
@@ -57,7 +56,7 @@ export class SyncVerifier {
         const report = await this.checkTableSync(table);
         reports.push(report);
       } catch (error) {
-        errors.push(new Error(`Failed to check sync for table ${table}: ${error.message}`));
+        errors.push(new Error(`Failed to check sync for table ${table}: ${error instanceof Error ? error.message : String(error)}`));
       }
     }
 
@@ -145,7 +144,7 @@ export class SyncVerifier {
         }
       } catch (error) {
         result.failed++;
-        result.errors.push(new Error(`Failed to sync record ${id}: ${error.message}`));
+        result.errors.push(new Error(`Failed to sync record ${id}: ${error instanceof Error ? error.message : String(error)}`));
       }
     }
 
@@ -199,7 +198,7 @@ export class SyncVerifier {
         await this.primaryClient.$queryRaw`SELECT 1 as health_check`;
         return { healthy: true };
       } catch (error) {
-        return { healthy: false, error: error.message };
+        return { healthy: false, error: error instanceof Error ? error.message : String(error) };
       }
     };
 
@@ -208,7 +207,7 @@ export class SyncVerifier {
         await this.backupClient.$queryRaw`SELECT 1 as health_check`;
         return { healthy: true };
       } catch (error) {
-        return { healthy: false, error: error.message };
+        return { healthy: false, error: error instanceof Error ? error.message : String(error) };
       }
     };
 

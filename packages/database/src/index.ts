@@ -1,23 +1,21 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaClient as PrismaClientBackup } from '@prisma/client-backup';
-import { DualWriteManager } from './dual-write';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 
-const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL || process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+// Create Supabase client
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+  },
 });
 
-const prismaBackup = new PrismaClientBackup({
-  log: ['query', 'info', 'warn', 'error'],
-});
-
-const dualWriteManager = new DualWriteManager(prisma, prismaBackup, {
-  enableSync: process.env.ENABLE_BACKUP_SYNC === 'true',
-  failOnBackupError: process.env.FAIL_ON_BACKUP_ERROR === 'true',
-});
-
-export * from '@prisma/client';
-export { prisma, prismaBackup, dualWriteManager };
-export { DualWriteManager } from './dual-write';
-export type { DualWriteConfig, DualWriteResult } from './dual-write';
-export { SyncVerifier } from './sync-utils';
-export type { SyncReport, SyncStatus } from './sync-utils';
+// Export types
+export type { Database, Json } from './types';

@@ -1,14 +1,14 @@
-import { parsePhoneNumber, isValidPhoneNumber as isValid } from 'libphonenumber-js';
-
 // Email validation and sanitization
 export function sanitizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-// Phone number validation
+// Phone number validation (basic implementation for React Native compatibility)
 export function isValidPhoneNumber(phone: string): boolean {
   try {
-    return isValid(phone);
+    // Basic international phone number validation
+    const cleaned = phone.replace(/\D/g, '');
+    return cleaned.length >= 10 && cleaned.length <= 15;
   } catch {
     return false;
   }
@@ -16,8 +16,11 @@ export function isValidPhoneNumber(phone: string): boolean {
 
 export function formatPhoneNumber(phone: string): string {
   try {
-    const phoneNumber = parsePhoneNumber(phone);
-    return phoneNumber.formatInternational();
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
   } catch {
     return phone;
   }

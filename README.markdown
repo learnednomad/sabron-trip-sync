@@ -1,13 +1,12 @@
-```markdown
 # Sabron Trip Sync
 
 A comprehensive travel planning platform with a mobile app (React Native with Expo), web dashboard (Next.js), and API backend (Hono with Prisma, Supabase, Redis, MongoDB).
 
 ## Tech Stack
-- **Monorepo**: pnpm@9.5.0, Turborepo@2.0.6
-- **Mobile**: React Native@0.74.1, Expo SDK@51, NativeWind
-- **Web**: Next.js@14.1.0, Tailwind CSS, shadcn/ui
-- **API**: Hono@3.12.0, Prisma, Supabase, Redis@7, MongoDB@7
+- **Monorepo**: pnpm@10.12.3, Turborepo@2.5.5
+- **Mobile**: React Native@0.76.9, Expo SDK@53, NativeWind
+- **Web**: Next.js@14, Tailwind CSS, shadcn/ui
+- **API**: Hono, Prisma, Supabase, Redis, MongoDB
 - **Shared**: TypeScript, Zod, Radix UI, i18next
 - **Deployment**: Coolify (Docker-based)
 
@@ -42,7 +41,7 @@ sabron-trip-sync/
 2. **Install dependencies**:
    ```bash
    corepack enable
-   corepack prepare pnpm@9.5.0 --activate
+   corepack prepare pnpm@10.12.3 --activate
    pnpm install
    ```
 
@@ -107,7 +106,7 @@ sabron-trip-sync/
 5. Submit a pull request.
 
 ## Troubleshooting
-- **Build Issues**: Ensure Node.js@20.14.0 and pnpm@9.5.0 are used.
+- **Build Issues**: Ensure Node.js@22.17.0 and pnpm@10.12.3 are used.
 - **Database Errors**: Verify PostgreSQL, Redis, and MongoDB connections.
 - **Auth Issues**: Check Supabase credentials and URL configurations.
 - **Offline Mode**: Ensure `expo-file-system` and `NetInfo` are properly set up.

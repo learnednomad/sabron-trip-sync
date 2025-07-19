@@ -3,6 +3,8 @@ import type { AppContext } from '../types';
 
 export function authMiddleware() {
   return async (c: AppContext, next: () => Promise<void>) => {
+    // Create a Supabase client with service key for auth verification
+    // Note: We use service key here for server-side auth verification
     const supabase = createClient(
       process.env.SUPABASE_URL || '',
       process.env.SUPABASE_SERVICE_KEY || ''
