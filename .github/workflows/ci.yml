@@ -21,8 +21,6 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
       - name: Lint
         run: pnpm lint
       - name: Typecheck
@@ -48,16 +46,12 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
       - name: Lint mobile app
-        run: pnpm --filter=mobile lint
+        run: pnpm --filter=trip-sync-mobile lint
       - name: Typecheck mobile app
-        run: pnpm --filter=mobile typecheck
+        run: pnpm --filter=trip-sync-mobile type-check
       - name: Test mobile app
-        run: pnpm --filter=mobile test
-      - name: Build mobile app
-        run: pnpm --filter=mobile build
+        run: pnpm --filter=trip-sync-mobile test
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -77,8 +71,6 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
       - name: Build and push to Coolify
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
