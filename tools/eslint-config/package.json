@@ -9,9 +9,9 @@
     "clean": "echo 'ESLint config - no clean needed'"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "@typescript-eslint/parser": "^8.35.1",
-    "eslint": "^9.30.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
@@ -26,6 +26,6 @@
     "eslint-plugin-tailwindcss": "^3.18.0",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-sonarjs": "^1.0.3",
-    "eslint-plugin-unicorn": "^59.0.1"
+    "eslint-plugin-unicorn": "^48.0.1"
   }
 }
