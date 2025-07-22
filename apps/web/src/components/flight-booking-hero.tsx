@@ -14,8 +14,8 @@ export function FlightBookingHero() {
   const [tripType, setTripType] = useState('round-trip');
   const [passengerCount, _setPassengerCount] = useState(2);
   const [travelClass, _setTravelClass] = useState('Business Class');
-  const [departureDate, setDepartureDate] = useState(new Date('2024-03-22'));
-  const [returnDate, setReturnDate] = useState(new Date('2024-04-02'));
+  const [departureDate, _setDepartureDate] = useState(new Date('2024-03-22'));
+  const [returnDate, _setReturnDate] = useState(new Date('2024-04-02'));
   const [fromLocation, setFromLocation] = useState('Behance');
   const [fromCity, setFromCity] = useState('BHN, North America, USA');
   const [toLocation, setToLocation] = useState('Dribbble');
