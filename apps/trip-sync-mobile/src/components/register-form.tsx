@@ -8,7 +8,7 @@ import * as z from 'zod';
 
 import { Button, Checkbox, ControlledInput, Text, View } from '@/components/ui';
 
-const { height } = Dimensions.get('window');
+const { height: _height } = Dimensions.get('window');
 
 const schema = z
   .object({

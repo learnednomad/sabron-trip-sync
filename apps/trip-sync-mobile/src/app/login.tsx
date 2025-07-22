@@ -8,7 +8,7 @@ import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 import { useAuth } from '@/lib';
 
 export default function Login() {
-  const router = useRouter();
+  const _router = useRouter();
   const signIn = useAuth.use.signIn();
   const status = useAuth.use.status();
 
@@ -33,7 +33,7 @@ export default function Login() {
         {/* Sign Up Link */}
         <View className="absolute inset-x-0 bottom-0 bg-white pb-8 dark:bg-gray-900">
           <Text className="text-center text-gray-600 dark:text-gray-400">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" asChild>
               <Text className="font-semibold text-blue-600 dark:text-blue-400">
                 Sign Up

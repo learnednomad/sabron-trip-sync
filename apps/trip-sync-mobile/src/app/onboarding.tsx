@@ -11,7 +11,7 @@ import {
 } from '@/components/ui';
 import { useIsFirstTime } from '@/lib/hooks';
 
-const { width } = Dimensions.get('window');
+const { width: _width } = Dimensions.get('window');
 
 export default function Onboarding() {
   const [_, setIsFirstTime] = useIsFirstTime();
@@ -65,7 +65,7 @@ export default function Onboarding() {
                     Track Your Adventures
                   </Text>
                   <Text className="text-gray-600 dark:text-gray-400">
-                    Keep a record of all the amazing places you've visited
+                    Keep a record of all the amazing places you&apos;ve visited
                   </Text>
                 </View>
               </View>
