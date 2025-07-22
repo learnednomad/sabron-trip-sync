@@ -85,7 +85,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --file=apps/trip-sync-mobile/package.json
+          args: --severity-threshold=high --file=trip-sync-mobile/package.json
           command: test
 
       # Generate vulnerability report
@@ -127,11 +127,13 @@ jobs:
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
+        continue-on-error: false
         with:
           path: ./
           base: main
           head: HEAD
           extra_args: --debug --only-verified
+        timeout-minutes: 10
 
   # License compliance scanning
   license-check:
@@ -155,11 +157,21 @@ jobs:
       - name: Check licenses
         run: |
           # Install license checker
-          pnpm add -g license-checker
+          if ! pnpm add -g license-checker; then
+            echo "❌ Failed to install license-checker"
+            exit 1
+          fi
           
           # Generate license report
-          license-checker --summary > license-summary.txt
-          license-checker --csv > license-report.csv
+          if ! license-checker --summary > license-summary.txt; then
+            echo "❌ Failed to generate license summary"
+            exit 1
+          fi
+          
+          if ! license-checker --csv > license-report.csv; then
+            echo "❌ Failed to generate license report"
+            exit 1
+          fi
           
           # Check for forbidden licenses
           FORBIDDEN_LICENSES="GPL-2.0,GPL-3.0,AGPL-1.0,AGPL-3.0"

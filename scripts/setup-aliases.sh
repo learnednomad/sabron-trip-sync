@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Setup shell aliases for CI/CD pipeline commands
-# This script adds useful aliases to your shell configuration
+# Development Productivity Aliases - Sanitized & Organized
+# This script sets up useful aliases for the Sabron Trip Sync development workflow
+# Usage: source scripts/setup-aliases.sh
 
 # Detect shell
 SHELL_NAME=$(basename "$SHELL")
@@ -19,8 +20,8 @@ case "$SHELL_NAME" in
         ;;
 esac
 
-echo "🔧 Setting up CI/CD aliases for $SHELL_NAME"
-echo "Adding aliases to: $RC_FILE"
+echo "🔧 Setting up development aliases for $SHELL_NAME"
+echo "📁 Adding aliases to: $RC_FILE"
 
 # Backup existing RC file
 cp "$RC_FILE" "$RC_FILE.backup.$(date +%s)" 2>/dev/null || true
@@ -29,7 +30,8 @@ cp "$RC_FILE" "$RC_FILE.backup.$(date +%s)" 2>/dev/null || true
 cat >> "$RC_FILE" << 'EOF'
 
 # ============================================================================
-# Sabron Trip Sync CI/CD Aliases
+# Sabron Trip Sync Development Aliases - Auto-generated
+# Generated on: $(date)
 # ============================================================================
 
 # Development shortcuts
@@ -60,19 +62,19 @@ alias dkb='pnpm docker:build'
 alias dku='pnpm docker:up'
 alias dkd='pnpm docker:down'
 
-# CI/CD helper shortcuts
-alias cisetup='pnpm ci:setup'
-alias cicheck='pnpm ci:check'
-alias ciclean='pnpm ci:clean'
-alias cianalyze='pnpm ci:analyze'
+# CI/CD and automation shortcuts
+alias qcmd='./scripts/quick-commands.sh'
+alias qdev='./scripts/quick-commands.sh dev'
+alias qbuild='./scripts/quick-commands.sh build'
+alias qtest='./scripts/quick-commands.sh test'
+alias qlint='./scripts/quick-commands.sh lint'
+alias qclean='./scripts/quick-commands.sh clean'
 
 # Git helper shortcuts
-alias gfeat='pnpm git:feature'
-alias gcom='pnpm git:commit'
-alias gsync='pnpm git:sync'
-alias gstat='pnpm git:status'
-alias gpr='pnpm git:pr'
-alias gclean='pnpm git:cleanup'
+alias ghhelp='./scripts/git-helpers.sh'
+alias gcommit='./scripts/git-helpers.sh commit'
+alias gfeat='./scripts/git-helpers.sh feature'
+alias gsync='./scripts/git-helpers.sh sync'
 
 # Standard git shortcuts
 alias gs='git status'
@@ -119,14 +121,14 @@ pstatus() {
 qc() {
     echo "🧪 Running Quality Checks"
     echo "========================="
-    pnpm ci:check
+    ./scripts/quick-commands.sh quality
 }
 
 # Project setup
 psetup() {
     echo "🚀 Project Setup"
     echo "================"
-    pnpm ci:setup
+    ./scripts/ci-cd-setup.sh
 }
 
 EOF
@@ -137,13 +139,13 @@ echo "To start using the aliases, either:"
 echo "1. Restart your terminal"
 echo "2. Run: source $RC_FILE"
 echo ""
-echo "Available aliases:"
+echo "📋 Available aliases:"
 echo "  dev, build, test, lint, check    - Development commands"
 echo "  tb, tt, tl, tc, td               - Turbo shortcuts"
 echo "  dbgen, dbmig, dbseed, dbstudio   - Database commands"
-echo "  cisetup, cicheck, ciclean        - CI/CD helpers"
-echo "  gfeat, gcom, gsync, gstat        - Git helpers"
-echo "  gs, ga, gc, gp, gl              - Standard git shortcuts"
+echo "  qcmd, qdev, qbuild, qtest        - Quick command shortcuts"
+echo "  ghhelp, gcommit, gfeat, gsync    - Git workflow helpers"
+echo "  gs, ga, gc, gp, gl               - Standard git shortcuts"
 echo ""
 echo "Available functions:"
 echo "  cdproject                        - Go to project root"
