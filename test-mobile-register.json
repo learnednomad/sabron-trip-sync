@@ -1,0 +1,8 @@
+{
+  "email": "mobile.test@gmail.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!",
+  "name": "Mobile Test User",
+  "acceptTerms": true,
+  "marketingConsent": false
+}

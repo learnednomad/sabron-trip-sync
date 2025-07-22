@@ -16,13 +16,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
       - name: Lint
         run: pnpm lint
       - name: Typecheck
@@ -36,9 +33,6 @@ jobs:
 
   build-mobile:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/mobile
 
     steps:
       - uses: actions/checkout@v4
@@ -46,28 +40,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
-      - name: Lint
-        run: pnpm lint
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Test
-        run: pnpm test
-      - name: Build Android
-        run: pnpm build
+      - name: Lint mobile app
+        run: pnpm --filter=trip-sync-mobile lint
+      - name: Typecheck mobile app
+        run: pnpm --filter=trip-sync-mobile type-check
+      - name: Test mobile app
+        run: pnpm --filter=trip-sync-mobile test
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-app
-          path: apps/mobile/*.apk
 
   deploy:
     needs: [build, build-mobile]
@@ -80,13 +64,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.17.0'
-          cache: 'pnpm'
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.12.3 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Approve build scripts
-        run: pnpm approve-builds @prisma/client @prisma/engines esbuild prisma
       - name: Build and push to Coolify
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}

@@ -54,8 +54,40 @@
       "Bash(gh issue edit:*)",
       "Bash(gh repo view:*)",
       "Bash(gh issue list:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "mcp__github__create_issue",
+      "Bash(pnpm list:*)",
+      "mcp__github__add_issue_comment",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm db:generate:*)",
+      "WebFetch(domain:starter.obytes.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:docs.firecrawl.dev)",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__firecrawl__firecrawl_map",
+      "mcp__firecrawl__firecrawl_crawl",
+      "mcp__firecrawl__firecrawl_check_crawl_status",
+      "mcp__coolify__projects",
+      "mcp__coolify__databases",
+      "Bash(DATABASE_URL=\"postgres://sabron_user:sabron_secure_password_2024@learnednomad.com:5434/sabron_trip_sync\" pnpm db:seed)",
+      "mcp__multi-ai-collab__ai_consensus",
+      "mcp__multi-ai-collab__ai_consensus",
+      "Bash(chmod:*)",
+      "mcp__supabase__list_organizations",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "Bash(pnpm db:types:*)",
+      "Bash(npx expo run:*)",
+      "Bash(pnpm turbo run build:*)",
+      "Bash(pnpm turbo run lint:*)",
+      "Bash(gh workflow:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "firecrawl",
+    "openai"
+  ]
 }

@@ -1,5 +1,5 @@
 import { DualWriteResult } from './dual-write';
-import { SyncVerifier, SyncStatus } from './sync-utils';
+import { SyncStatus } from './sync-utils';
 
 export interface AlertConfig {
   webhook?: string;

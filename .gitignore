@@ -86,3 +86,7 @@ desktop.ini
 .claude/sessions/
 .claude/logs/
 .claude/mcp.json
+.claude/settings.local.json
+
+# Supabase
+supabase/.temp/

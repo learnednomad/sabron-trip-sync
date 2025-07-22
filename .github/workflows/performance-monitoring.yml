@@ -1,0 +1,263 @@
+name: Pipeline Performance Monitoring
+
+on:
+  workflow_run:
+    workflows: ["CI Optimized"]
+    types:
+      - completed
+
+jobs:
+  monitor-performance:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Get workflow run details
+        id: workflow-details
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const workflowRun = context.payload.workflow_run;
+            const runId = workflowRun.id;
+            
+            // Get detailed workflow run information
+            const { data: run } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            
+            // Get jobs for this workflow run
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            
+            // Calculate performance metrics
+            const startTime = new Date(run.created_at);
+            const endTime = new Date(run.updated_at);
+            const totalDuration = (endTime - startTime) / 1000; // in seconds
+            
+            // Job-level metrics
+            const jobMetrics = jobs.jobs.map(job => ({
+              name: job.name,
+              status: job.status,
+              conclusion: job.conclusion,
+              duration: job.started_at && job.completed_at ? 
+                (new Date(job.completed_at) - new Date(job.started_at)) / 1000 : 0,
+              steps: job.steps?.length || 0
+            }));
+            
+            const successfulJobs = jobMetrics.filter(job => job.conclusion === 'success');
+            const failedJobs = jobMetrics.filter(job => job.conclusion === 'failure');
+            
+            const metrics = {
+              runId: runId,
+              runNumber: run.run_number,
+              branch: run.head_branch,
+              event: run.event,
+              status: run.status,
+              conclusion: run.conclusion,
+              totalDuration: Math.round(totalDuration),
+              totalJobs: jobs.jobs.length,
+              successfulJobs: successfulJobs.length,
+              failedJobs: failedJobs.length,
+              averageJobDuration: jobMetrics.length > 0 ? 
+                Math.round(jobMetrics.reduce((sum, job) => sum + job.duration, 0) / jobMetrics.length) : 0,
+              longestJob: jobMetrics.reduce((max, job) => job.duration > max.duration ? job : max, { duration: 0 }),
+              shortestJob: jobMetrics.reduce((min, job) => job.duration < min.duration ? job : min, { duration: Infinity }),
+              jobDetails: jobMetrics,
+              timestamp: new Date().toISOString()
+            };
+            
+            // Store metrics in output
+            core.setOutput('metrics', JSON.stringify(metrics, null, 2));
+            
+            // Log summary
+            console.log('📊 Pipeline Performance Metrics:');
+            console.log(`Run #${metrics.runNumber} (${metrics.conclusion})`);
+            console.log(`Total Duration: ${metrics.totalDuration}s`);
+            console.log(`Jobs: ${metrics.totalJobs} (${metrics.successfulJobs} success, ${metrics.failedJobs} failed)`);
+            console.log(`Average Job Duration: ${metrics.averageJobDuration}s`);
+            console.log(`Longest Job: ${metrics.longestJob.name} (${Math.round(metrics.longestJob.duration)}s)`);
+            console.log(`Shortest Job: ${metrics.shortestJob.name} (${Math.round(metrics.shortestJob.duration)}s)`);
+            
+            return metrics;
+
+      - name: Store performance metrics
+        run: |
+          # Create metrics directory if it doesn't exist
+          mkdir -p .github/metrics
+          
+          # Store current metrics
+          echo '${{ steps.workflow-details.outputs.metrics }}' > .github/metrics/latest-run.json
+          
+          # Append to historical metrics (keep last 50 runs)
+          METRICS_FILE=".github/metrics/pipeline-history.jsonl"
+          echo '${{ steps.workflow-details.outputs.metrics }}' >> "$METRICS_FILE"
+          
+          # Keep only last 50 entries
+          if [ -f "$METRICS_FILE" ]; then
+            tail -n 50 "$METRICS_FILE" > "${METRICS_FILE}.tmp"
+            mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
+          fi
+
+      - name: Generate performance report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const metrics = JSON.parse('${{ steps.workflow-details.outputs.metrics }}');
+            
+            // Read historical data if available
+            let historicalData = [];
+            try {
+              const historyFile = '.github/metrics/pipeline-history.jsonl';
+              if (fs.existsSync(historyFile)) {
+                const lines = fs.readFileSync(historyFile, 'utf8').trim().split('\n');
+                historicalData = lines.filter(line => line.trim()).map(line => JSON.parse(line));
+              }
+            } catch (error) {
+              console.log('No historical data available yet');
+            }
+            
+            // Calculate trends (last 10 runs)
+            const recentRuns = historicalData.slice(-10);
+            const avgDuration = recentRuns.length > 0 ? 
+              recentRuns.reduce((sum, run) => sum + run.totalDuration, 0) / recentRuns.length : 0;
+            
+            const successRate = recentRuns.length > 0 ?
+              (recentRuns.filter(run => run.conclusion === 'success').length / recentRuns.length * 100) : 0;
+            
+            // Performance status
+            const isSlower = metrics.totalDuration > avgDuration * 1.2;
+            const isFaster = metrics.totalDuration < avgDuration * 0.8;
+            
+            // Create summary
+            const performanceEmoji = isFaster ? '🚀' : isSlower ? '🐌' : '📊';
+            const statusEmoji = metrics.conclusion === 'success' ? '✅' : '❌';
+            
+            await core.summary
+              .addHeading(`${performanceEmoji} Pipeline Performance Report`)
+              .addTable([
+                [{ data: 'Metric', header: true }, { data: 'Current Run', header: true }, { data: 'Average (Last 10)', header: true }],
+                ['Status', `${statusEmoji} ${metrics.conclusion}`, `${Math.round(successRate)}% success rate`],
+                ['Duration', `${metrics.totalDuration}s`, `${Math.round(avgDuration)}s`],
+                ['Jobs', `${metrics.totalJobs}`, '-'],
+                ['Success Rate', `${Math.round((metrics.successfulJobs / metrics.totalJobs) * 100)}%`, `${Math.round(successRate)}%`],
+                ['Avg Job Duration', `${metrics.averageJobDuration}s`, '-']
+              ])
+              .addDetails('Job Breakdown', 
+                metrics.jobDetails
+                  .sort((a, b) => b.duration - a.duration)
+                  .map(job => {
+                    const statusIcon = job.conclusion === 'success' ? '✅' : 
+                                     job.conclusion === 'failure' ? '❌' : '⏳';
+                    return `${statusIcon} **${job.name}**: ${Math.round(job.duration)}s (${job.steps} steps)`;
+                  })
+                  .join('\n')
+              )
+              .addDetails('Performance Analysis',
+                [
+                  `**Trend**: ${isFaster ? '⬇️ Faster than average' : isSlower ? '⬆️ Slower than average' : '➡️ Within normal range'}`,
+                  `**Total Runs Analyzed**: ${historicalData.length}`,
+                  `**Branch**: ${metrics.branch}`,
+                  `**Trigger**: ${metrics.event}`,
+                  `**Run Number**: #${metrics.runNumber}`,
+                  `**Timestamp**: ${metrics.timestamp}`
+                ].join('\n')
+              )
+              .write();
+
+      - name: Check for performance regressions
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const metrics = JSON.parse('${{ steps.workflow-details.outputs.metrics }}');
+            
+            // Read historical data
+            let historicalData = [];
+            try {
+              const historyFile = '.github/metrics/pipeline-history.jsonl';
+              if (fs.existsSync(historyFile)) {
+                const lines = fs.readFileSync(historyFile, 'utf8').trim().split('\n');
+                historicalData = lines.filter(line => line.trim()).map(line => JSON.parse(line));
+              }
+            } catch (error) {
+              console.log('No historical data for comparison');
+              return;
+            }
+            
+            if (historicalData.length < 5) {
+              console.log('Not enough historical data for regression analysis');
+              return;
+            }
+            
+            // Calculate baseline (average of last 5 successful runs)
+            const recentSuccessful = historicalData
+              .filter(run => run.conclusion === 'success')
+              .slice(-5);
+            
+            if (recentSuccessful.length < 3) {
+              console.log('Not enough successful runs for baseline');
+              return;
+            }
+            
+            const baseline = recentSuccessful.reduce((sum, run) => sum + run.totalDuration, 0) / recentSuccessful.length;
+            const threshold = baseline * 1.5; // 50% increase considered regression
+            
+            // Check for regression
+            if (metrics.conclusion === 'success' && metrics.totalDuration > threshold) {
+              console.log('⚠️ Performance regression detected!');
+              console.log(`Current: ${metrics.totalDuration}s, Baseline: ${Math.round(baseline)}s, Threshold: ${Math.round(threshold)}s`);
+              
+              // Find the slowest jobs
+              const slowJobs = metrics.jobDetails
+                .filter(job => job.duration > 300) // Jobs taking more than 5 minutes
+                .sort((a, b) => b.duration - a.duration)
+                .slice(0, 3);
+              
+              if (slowJobs.length > 0) {
+                console.log('Slowest jobs:');
+                slowJobs.forEach(job => {
+                  console.log(`- ${job.name}: ${Math.round(job.duration)}s`);
+                });
+              }
+              
+              // Set output for potential alerting
+              core.setOutput('regression-detected', 'true');
+              core.setOutput('current-duration', metrics.totalDuration);
+              core.setOutput('baseline-duration', Math.round(baseline));
+              
+            } else {
+              console.log('✅ No performance regression detected');
+              core.setOutput('regression-detected', 'false');
+            }
+
+      - name: Commit metrics (if on main branch)
+        if: github.event.workflow_run.head_branch == 'main'
+        run: |
+          if [ -n "$(git status --porcelain .github/metrics/)" ]; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add .github/metrics/
+            git commit -m "📊 Update pipeline performance metrics [skip ci]"
+            git push
+          else
+            echo "No metrics changes to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

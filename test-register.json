@@ -1,0 +1,8 @@
+{
+  "email": "test.user123@gmail.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!",
+  "name": "Test User",
+  "acceptTerms": true,
+  "marketingConsent": false
+}

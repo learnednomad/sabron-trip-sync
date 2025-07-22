@@ -22,6 +22,9 @@
 "NEXT_PUBLIC_API_URL",
 "EXPO_PUBLIC_API_URL"
 ],
+"remoteCache": {
+"signature": true
+},
 "tasks": {
 "build": {
 "dependsOn": ["^build"],
@@ -35,7 +38,8 @@
 "NEXT_PUBLIC_*",
 "EXPO_PUBLIC_*",
 "SENTRY_*"
-]
+],
+"passThroughEnv": ["CI", "VERCEL"]
 },
 "dev": {
 "cache": false,
@@ -44,8 +48,9 @@
 },
 "test": {
 "outputs": ["coverage/**"],
-"dependsOn": ["build"],
-"env": ["NODE_ENV"]
+"dependsOn": ["^build"],
+"env": ["NODE_ENV"],
+"inputs": ["src/**/*.{js,jsx,ts,tsx}", "test/**/*", "jest.config.*", "vitest.config.*"]
 },
 "test:watch": {
 "cache": false,
@@ -53,8 +58,9 @@
 },
 "test:ci": {
 "outputs": ["coverage/**"],
-"dependsOn": ["build"],
-"env": ["NODE_ENV", "CI"]
+"dependsOn": ["^build"],
+"env": ["NODE_ENV", "CI"],
+"inputs": ["src/**/*.{js,jsx,ts,tsx}", "test/**/*", "jest.config.*", "vitest.config.*"]
 },
 "test:e2e": {
 "outputs": ["playwright-report/**", "test-results/**"],
@@ -63,44 +69,33 @@
 },
 "lint": {
 "outputs": [],
-"dependsOn": ["^build"]
+"dependsOn": ["^build"],
+"inputs": ["src/**/*.{js,jsx,ts,tsx}", ".eslintrc.*", "eslint.config.*"]
 },
 "lint:fix": {
 "outputs": [],
-"dependsOn": ["^build"]
+"dependsOn": ["^build"],
+"inputs": ["src/**/*.{js,jsx,ts,tsx}", ".eslintrc.*", "eslint.config.*"]
 },
 "typecheck": {
-"outputs": [],
-"dependsOn": ["^build"]
+"outputs": ["*.tsbuildinfo"],
+"dependsOn": ["^build"],
+"inputs": ["src/**/*.{ts,tsx}", "tsconfig.json", "**/*.d.ts"]
 },
 "clean": {
 "cache": false
 },
-"db:generate": {
-"cache": false,
-"inputs": ["**/prisma/schema.prisma"],
-"outputs": ["**/node_modules/.prisma/**", "**/generated/prisma/**"]
-},
 "@sabron/database#build": {
-"dependsOn": ["db:generate"]
+"dependsOn": ["^build"]
 },
 "@sabron/api#build": {
-"dependsOn": ["^build", "db:generate"]
+"dependsOn": ["^build"]
 },
 "@sabron/api#dev": {
-"dependsOn": ["^build", "db:generate"]
-},
-"db:migrate": {
-"cache": false,
-"inputs": ["**/prisma/schema.prisma", "**/prisma/migrations/**"]
+"dependsOn": ["^build"]
 },
 "db:seed": {
-"cache": false,
-"dependsOn": ["db:generate"]
-},
-"db:studio": {
-"cache": false,
-"persistent": true
+"cache": false
 },
 "analyze": {
 "dependsOn": ["build"],

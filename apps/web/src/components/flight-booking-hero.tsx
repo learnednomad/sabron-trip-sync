@@ -13,7 +13,7 @@ export function FlightBookingHero() {
   const [activeTab, setActiveTab] = useState<TabType>('flight');
   const [tripType, setTripType] = useState('round-trip');
   const [passengerCount, _setPassengerCount] = useState(2);
-  const [travelClass, setTravelClass] = useState('Business Class');
+  const [travelClass, _setTravelClass] = useState('Business Class');
   const [departureDate, setDepartureDate] = useState(new Date('2024-03-22'));
   const [returnDate, setReturnDate] = useState(new Date('2024-04-02'));
   const [fromLocation, setFromLocation] = useState('Behance');

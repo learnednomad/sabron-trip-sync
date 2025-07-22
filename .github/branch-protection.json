@@ -1,0 +1,45 @@
+{
+  "protection": {
+    "enabled": true,
+    "required_status_checks": {
+      "strict": true,
+      "contexts": [
+        "CI Optimized / setup",
+        "CI Optimized / lint-and-typecheck (lint, monorepo)",
+        "CI Optimized / lint-and-typecheck (typecheck, monorepo)",
+        "CI Optimized / lint-and-typecheck (lint, mobile)",
+        "CI Optimized / lint-and-typecheck (typecheck, mobile)",
+        "CI Optimized / test (monorepo)",
+        "CI Optimized / test (mobile)",
+        "CI Optimized / build (web)",
+        "CI Optimized / build (mobile)",
+        "Security Checks / secret-scan",
+        "Security Checks / vulnerability-scan",
+        "Security Checks / license-check",
+        "Security Checks / docker-security-scan",
+        "CodeQL",
+        "SonarCloud"
+      ]
+    },
+    "enforce_admins": true,
+    "required_pull_request_reviews": {
+      "dismiss_stale_reviews": true,
+      "require_code_owner_reviews": true,
+      "required_approving_review_count": 1,
+      "require_last_push_approval": true,
+      "bypass_pull_request_allowances": {
+        "users": [],
+        "teams": [],
+        "apps": ["dependabot"]
+      }
+    },
+    "restrictions": null,
+    "required_linear_history": true,
+    "allow_force_pushes": false,
+    "allow_deletions": false,
+    "block_creations": false,
+    "required_conversation_resolution": true,
+    "lock_branch": false,
+    "allow_fork_syncing": true
+  }
+}

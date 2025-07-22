@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaClient as PrismaClientBackup } from '@prisma/client-backup';
 
 export interface DualWriteConfig {
   primaryRetries: number;
@@ -23,12 +22,12 @@ export interface DualWriteResult<T> {
 
 export class DualWriteManager {
   private primaryClient: PrismaClient;
-  private backupClient: PrismaClientBackup;
+  private backupClient: PrismaClient;
   private config: DualWriteConfig;
 
   constructor(
     primaryClient: PrismaClient,
-    backupClient: PrismaClientBackup,
+    backupClient: PrismaClient,
     config: Partial<DualWriteConfig> = {}
   ) {
     this.primaryClient = primaryClient;
@@ -46,7 +45,7 @@ export class DualWriteManager {
 
   async executeWithDualWrite<T>(
     operation: (client: PrismaClient) => Promise<T>,
-    operationBackup: (client: PrismaClientBackup) => Promise<T>
+    operationBackup: (client: PrismaClient) => Promise<T>
   ): Promise<DualWriteResult<T>> {
     const result: DualWriteResult<T> = {
       primaryResult: null as any,
@@ -199,11 +198,15 @@ export class DualWriteManager {
   // Transaction support
   async transaction<T>(
     operations: ((client: PrismaClient) => Promise<any>)[],
-    operationsBackup: ((client: PrismaClientBackup) => Promise<any>)[]
+    operationsBackup: ((client: PrismaClient) => Promise<any>)[]
   ): Promise<DualWriteResult<T[]>> {
     return this.executeWithDualWrite(
-      (client) => client.$transaction(operations.map(op => op(client))),
-      (client) => client.$transaction(operationsBackup.map(op => op(client)))
+      (client) => client.$transaction(async (tx: any) => {
+        return Promise.all(operations.map(op => op(tx)));
+      }),
+      (client) => client.$transaction(async (tx: any) => {
+        return Promise.all(operationsBackup.map(op => op(tx)));
+      })
     );
   }
 
