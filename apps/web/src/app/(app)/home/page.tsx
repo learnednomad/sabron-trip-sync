@@ -125,7 +125,7 @@ const HomePage = () => {
     );
   };
 
-  const handleSearch = (data: { destination?: string; dates?: string; guests?: number }) => {
+  const handleSearch = (data: { destination: string; checkIn: Date | undefined; checkOut: Date | undefined; guests: string }) => {
     // eslint-disable-next-line no-console
     console.log('Search data:', data);
   };

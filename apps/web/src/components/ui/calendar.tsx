@@ -184,6 +184,17 @@ const CalendarDayButton = ({
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])
 
+  // Filter out formAction, children and other incompatible props
+  const { 
+    formAction: _formAction, 
+    formEncType: _formEncType, 
+    formMethod: _formMethod, 
+    formNoValidate: _formNoValidate, 
+    formTarget: _formTarget, 
+    children,
+    ...buttonProps 
+  } = props
+
   return (
     <Button
       ref={ref}
@@ -204,8 +215,10 @@ const CalendarDayButton = ({
       }
       size="icon"
       variant="ghost"
-      {...props}
-    />
+      {...buttonProps}
+    >
+      {children as React.ReactNode}
+    </Button>
   )
 }
 

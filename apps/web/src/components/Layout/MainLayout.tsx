@@ -43,7 +43,17 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
         'fixed inset-0 z-50 lg:hidden',
         sidebarOpen ? 'block' : 'hidden'
       )}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div 
+          className="fixed inset-0 bg-gray-600/75" 
+          role="button"
+          tabIndex={0}
+          onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              setSidebarOpen(false);
+            }
+          }}
+        />
         <nav className="fixed left-0 top-0 flex h-full w-64 flex-col bg-card">
           <div className="flex h-16 items-center justify-between px-4">
             <span className="text-xl font-semibold text-foreground">Sabron Trip Sync</span>

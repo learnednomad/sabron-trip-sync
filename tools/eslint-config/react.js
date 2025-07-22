@@ -44,7 +44,7 @@ module.exports = {
       'error',
       {
         html: 'enforce',
-        custom: 'enforce',
+        custom: 'ignore', // Allow spreading in custom components (UI library components)
         explicitSpread: 'ignore',
         exceptions: ['Component']
       }

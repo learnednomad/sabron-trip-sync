@@ -48,19 +48,21 @@ interface NavigationEnhancedProps {
   };
 }
 
-const _popularDestinations = [
-  { id: '1', name: 'Tokyo, Japan', icon: '🇯🇵' },
-  { id: '2', name: 'Paris, France', icon: '🇫🇷' },
-  { id: '3', name: 'Bali, Indonesia', icon: '🇮🇩' },
-  { id: '4', name: 'New York, USA', icon: '🇺🇸' },
-  { id: '5', name: 'Barcelona, Spain', icon: '🇪🇸' },
-];
+// Popular destinations data for future implementation
+// const popularDestinations = [
+//   { id: '1', name: 'Tokyo, Japan', icon: '🇯🇵' },
+//   { id: '2', name: 'Paris, France', icon: '🇫🇷' },
+//   { id: '3', name: 'Bali, Indonesia', icon: '🇮🇩' },
+//   { id: '4', name: 'New York, USA', icon: '🇺🇸' },
+//   { id: '5', name: 'Barcelona, Spain', icon: '🇪🇸' },
+// ];
 
-const _recentSearches = [
-  { id: '1', query: 'Beach resorts in Maldives', type: 'search' },
-  { id: '2', query: 'Tokyo travel guide', type: 'search' },
-  { id: '3', query: 'Budget trips to Europe', type: 'search' },
-];
+// Recent searches data for future implementation
+// const recentSearches = [
+//   { id: '1', query: 'Beach resorts in Maldives', type: 'search' },
+//   { id: '2', query: 'Tokyo travel guide', type: 'search' },
+//   { id: '3', query: 'Budget trips to Europe', type: 'search' },
+// ];
 
 export const NavigationEnhanced = ({ user }: NavigationEnhancedProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -214,7 +216,17 @@ export const NavigationEnhanced = ({ user }: NavigationEnhancedProps) => {
           "fixed inset-0 z-50 lg:hidden",
           mobileMenuOpen ? "block" : "hidden"
         )}>
-          <div className="fixed inset-0 bg-black/20" onClick={() => setMobileMenuOpen(false)} />
+          <div 
+            className="fixed inset-0 bg-black/20" 
+            role="button"
+            tabIndex={0}
+            onClick={() => setMobileMenuOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setMobileMenuOpen(false);
+              }
+            }}
+          />
           <div className="fixed inset-y-0 right-0 w-full max-w-xs bg-white shadow-xl">
             <div className="flex items-center justify-between border-b p-4">
               <span className="text-lg font-semibold">Menu</span>
