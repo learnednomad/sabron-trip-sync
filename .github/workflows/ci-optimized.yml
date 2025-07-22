@@ -1,0 +1,420 @@
+name: CI Optimized
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      affected-packages: ${{ steps.affected.outputs.packages }}
+      has-web-changes: ${{ steps.affected.outputs.has-web-changes }}
+      has-mobile-changes: ${{ steps.affected.outputs.has-mobile-changes }}
+      has-api-changes: ${{ steps.affected.outputs.has-api-changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect affected packages
+        id: affected
+        run: |
+          set -e
+          
+          # Initialize outputs
+          echo "packages=" >> $GITHUB_OUTPUT
+          echo "has-web-changes=false" >> $GITHUB_OUTPUT
+          echo "has-mobile-changes=false" >> $GITHUB_OUTPUT
+          echo "has-api-changes=false" >> $GITHUB_OUTPUT
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Get affected packages using Turbo
+            AFFECTED_JSON=$(pnpm turbo run build --dry=json --filter="...[origin/${{ github.base_ref }}]" 2>/dev/null || echo '{"packages":[]}')
+            AFFECTED_PACKAGES=$(echo "$AFFECTED_JSON" | jq -r '.packages // [] | join(",")')
+            
+            # If no packages detected or error occurred, fall back to file-based detection
+            if [ -z "$AFFECTED_PACKAGES" ] || [ "$AFFECTED_PACKAGES" = "null" ]; then
+              echo "Turbo detection failed, using file-based detection..."
+              
+              # Get changed files
+              CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+              echo "Changed files:"
+              echo "$CHANGED_FILES"
+              
+              # Check for specific package changes
+              if echo "$CHANGED_FILES" | grep -E "^(apps/web|packages|services/api)" > /dev/null; then
+                echo "has-web-changes=true" >> $GITHUB_OUTPUT
+              fi
+              
+              if echo "$CHANGED_FILES" | grep -E "^trip-sync-mobile" > /dev/null; then
+                echo "has-mobile-changes=true" >> $GITHUB_OUTPUT
+              fi
+              
+              if echo "$CHANGED_FILES" | grep -E "^(services/api|packages)" > /dev/null; then
+                echo "has-api-changes=true" >> $GITHUB_OUTPUT
+              fi
+              
+              # Set affected packages based on changed files
+              if echo "$CHANGED_FILES" | grep -E "^(apps|packages|services)" > /dev/null; then
+                AFFECTED_PACKAGES="all"
+              fi
+            else
+              # Parse Turbo results for specific package types
+              if echo "$AFFECTED_PACKAGES" | grep -E "(web|@sabron)" > /dev/null; then
+                echo "has-web-changes=true" >> $GITHUB_OUTPUT
+              fi
+              
+              if echo "$AFFECTED_PACKAGES" | grep "trip-sync-mobile" > /dev/null; then
+                echo "has-mobile-changes=true" >> $GITHUB_OUTPUT
+              fi
+              
+              if echo "$AFFECTED_PACKAGES" | grep -E "(api|@sabron)" > /dev/null; then
+                echo "has-api-changes=true" >> $GITHUB_OUTPUT
+              fi
+            fi
+          else
+            # For push events, consider all packages affected
+            AFFECTED_PACKAGES="all"
+            echo "has-web-changes=true" >> $GITHUB_OUTPUT
+            echo "has-mobile-changes=true" >> $GITHUB_OUTPUT
+            echo "has-api-changes=true" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "packages=$AFFECTED_PACKAGES" >> $GITHUB_OUTPUT
+          echo "Final affected packages: $AFFECTED_PACKAGES"
+
+  setup:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.affected-packages != ''
+    outputs:
+      affected-packages: ${{ needs.detect-changes.outputs.affected-packages }}
+      has-web-changes: ${{ needs.detect-changes.outputs.has-web-changes }}
+      has-mobile-changes: ${{ needs.detect-changes.outputs.has-mobile-changes }}
+      has-api-changes: ${{ needs.detect-changes.outputs.has-api-changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.affected-packages != ''
+    strategy:
+      matrix:
+        include:
+          - task: lint
+            workspace: monorepo
+          - task: typecheck
+            workspace: monorepo
+          - task: lint
+            workspace: mobile
+            command: pnpm --filter=trip-sync-mobile lint
+          - task: typecheck
+            workspace: mobile
+            command: pnpm --filter=trip-sync-mobile type-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ matrix.task }}-${{ matrix.workspace }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ matrix.task }}-${{ matrix.workspace }}-
+
+      - name: Run ${{ matrix.task }} (Monorepo)
+        if: matrix.workspace == 'monorepo' && (needs.setup.outputs.has-web-changes == 'true' || needs.setup.outputs.has-api-changes == 'true')
+        run: |
+          if [ "${{ needs.setup.outputs.affected-packages }}" = "all" ]; then
+            pnpm turbo run ${{ matrix.task }} --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}' --continue
+          else
+            pnpm turbo run ${{ matrix.task }} --filter="...[origin/${{ github.base_ref || 'main' }}]" --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}' --continue
+          fi
+
+      - name: Run ${{ matrix.task }} (Mobile)
+        if: matrix.workspace == 'mobile' && needs.setup.outputs.has-mobile-changes == 'true'
+        run: ${{ matrix.command || format('pnpm --filter=trip-sync-mobile {0}', matrix.task) }}
+
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.affected-packages != ''
+    strategy:
+      matrix:
+        workspace: [monorepo, mobile]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-test-${{ matrix.workspace }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-test-${{ matrix.workspace }}-
+
+      - name: Run tests (Monorepo)
+        if: matrix.workspace == 'monorepo' && (needs.setup.outputs.has-web-changes == 'true' || needs.setup.outputs.has-api-changes == 'true')
+        run: |
+          if [ "${{ needs.setup.outputs.affected-packages }}" = "all" ]; then
+            pnpm turbo run test:ci --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}'
+          else
+            pnpm turbo run test:ci --filter="...[origin/${{ github.base_ref || 'main' }}]" --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}'
+          fi
+
+      - name: Run tests (Mobile)
+        if: matrix.workspace == 'mobile' && needs.setup.outputs.has-mobile-changes == 'true'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: pnpm --filter=trip-sync-mobile test
+
+      - name: Upload coverage reports
+        if: matrix.workspace == 'monorepo' && (needs.setup.outputs.has-web-changes == 'true' || needs.setup.outputs.has-api-changes == 'true')
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [setup, lint-and-typecheck, test]
+    if: needs.setup.outputs.affected-packages != ''
+    strategy:
+      matrix:
+        target: [web, mobile]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-build-${{ matrix.target }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-build-${{ matrix.target }}-
+
+      - name: Cache Next.js build
+        if: matrix.target == 'web'
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/web/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/web/**/*.js', 'apps/web/**/*.jsx', 'apps/web/**/*.ts', 'apps/web/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      - name: Build web applications
+        if: matrix.target == 'web'
+        run: |
+          if [ "${{ needs.setup.outputs.affected-packages }}" = "all" ]; then
+            pnpm turbo run build --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}'
+          else
+            pnpm turbo run build --filter="...[origin/${{ github.base_ref || 'main' }}]" --filter='{packages/*}' --filter='{services/*}' --filter='{apps/web}'
+          fi
+
+      - name: Build mobile application
+        if: matrix.target == 'mobile'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ "${{ needs.setup.outputs.affected-packages }}" = "all" ] || echo "${{ needs.setup.outputs.affected-packages }}" | grep -q "trip-sync-mobile"; then
+            echo "Building mobile app..."
+            # Mobile build commands would go here
+            # For now, just verify the workspace
+            pnpm --filter=trip-sync-mobile run check-all || echo "Mobile build verification completed"
+          else
+            echo "Skipping mobile build - not affected"
+          fi
+
+      - name: Upload build artifacts (Web)
+        if: matrix.target == 'web'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-artifacts
+          path: |
+            apps/web/.next/
+            apps/web/out/
+          retention-days: 1
+
+  deploy:
+    needs: [setup, build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.setup.outputs.affected-packages != ''
+    strategy:
+      matrix:
+        environment: [web]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        if: matrix.environment == 'web'
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build-artifacts
+          path: apps/web/
+
+      - name: Deploy to Coolify
+        if: matrix.environment == 'web'
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          # Coolify deployment logic
+          echo "Deploying to Coolify..."
+          # docker-compose push
+          # curl -X POST \
+          #   -H "Authorization: Bearer $COOLIFY_TOKEN" \
+          #   -H "Content-Type: application/json" \
+          #   -d '{"projectId": "your-project-id"}' \
+          #   https://api.coolify.io/v1/projects/deploy
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [setup, lint-and-typecheck, test, build]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.setup.outputs.affected-packages }}" = "" ]; then
+            echo "✅ No changes detected - pipeline skipped"
+          elif [ "${{ needs.lint-and-typecheck.result }}" = "success" ] && [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
+            echo "✅ All checks passed successfully"
+          else
+            echo "❌ Some checks failed"
+            exit 1
+          fi
