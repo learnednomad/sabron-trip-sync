@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, Dimensions } from 'react-native';
+import { Dimensions, ScrollView } from 'react-native';
 
 import {
   Button,
@@ -9,7 +9,6 @@ import {
   Text,
   View,
 } from '@/components/ui';
-import { Logo } from '@/components/ui/icons';
 import { useIsFirstTime } from '@/lib/hooks';
 
 const { width } = Dimensions.get('window');
@@ -17,24 +16,24 @@ const { width } = Dimensions.get('window');
 export default function Onboarding() {
   const [_, setIsFirstTime] = useIsFirstTime();
   const router = useRouter();
-  
+
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
       <FocusAwareStatusBar />
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 px-6">
           {/* Header with Logo */}
-          <View className="items-center pt-20 pb-10">
-            <View className="w-32 h-32 bg-blue-600 rounded-full items-center justify-center mb-8 shadow-2xl">
-              <Text className="text-white text-6xl font-bold">T</Text>
+          <View className="items-center pb-10 pt-20">
+            <View className="mb-8 size-32 items-center justify-center rounded-full bg-blue-600 shadow-2xl">
+              <Text className="text-6xl font-bold text-white">T</Text>
             </View>
-            <Text className="text-4xl font-bold text-gray-900 dark:text-white text-center">
+            <Text className="text-center text-4xl font-bold text-gray-900 dark:text-white">
               Welcome to TripSync
             </Text>
-            <Text className="mt-3 text-lg text-gray-600 dark:text-gray-400 text-center px-4">
+            <Text className="mt-3 px-4 text-center text-lg text-gray-600 dark:text-gray-400">
               Your ultimate travel companion
             </Text>
           </View>
@@ -43,25 +42,26 @@ export default function Onboarding() {
           <View className="flex-1 justify-center px-4 pb-8">
             <View className="space-y-6">
               <View className="flex-row items-start">
-                <View className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl items-center justify-center mr-4">
+                <View className="mr-4 size-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/30">
                   <Text className="text-2xl">✈️</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  <Text className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                     Plan Your Journey
                   </Text>
                   <Text className="text-gray-600 dark:text-gray-400">
-                    Create detailed itineraries and organize your trips effortlessly
+                    Create detailed itineraries and organize your trips
+                    effortlessly
                   </Text>
                 </View>
               </View>
 
               <View className="flex-row items-start">
-                <View className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl items-center justify-center mr-4">
+                <View className="mr-4 size-12 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30">
                   <Text className="text-2xl">📍</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  <Text className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                     Track Your Adventures
                   </Text>
                   <Text className="text-gray-600 dark:text-gray-400">
@@ -71,11 +71,11 @@ export default function Onboarding() {
               </View>
 
               <View className="flex-row items-start">
-                <View className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-2xl items-center justify-center mr-4">
+                <View className="mr-4 size-12 items-center justify-center rounded-2xl bg-purple-100 dark:bg-purple-900/30">
                   <Text className="text-2xl">🌍</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  <Text className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                     Share Memories
                   </Text>
                   <Text className="text-gray-600 dark:text-gray-400">
@@ -94,10 +94,10 @@ export default function Onboarding() {
                 setIsFirstTime(false);
                 router.replace('/login');
               }}
-              className="bg-blue-600 h-14 rounded-2xl shadow-lg"
+              className="h-14 rounded-2xl bg-blue-600 shadow-lg"
             />
-            
-            <Text className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
+
+            <Text className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
               By continuing, you agree to our Terms & Privacy Policy
             </Text>
           </View>

@@ -15,11 +15,13 @@ async function getOrCreateEncryptionKey(): Promise<string> {
 
     // Generate new encryption key if none exists
     const randomBytes = await Crypto.getRandomBytesAsync(32);
-    const encryptionKey = btoa(String.fromCharCode(...new Uint8Array(randomBytes)));
-    
+    const encryptionKey = btoa(
+      String.fromCharCode(...new Uint8Array(randomBytes))
+    );
+
     // Store the key securely
     await SecureStore.setItemAsync(ENCRYPTION_KEY_ALIAS, encryptionKey);
-    
+
     return encryptionKey;
   } catch (error) {
     console.error('Error managing encryption key:', error);
@@ -48,12 +50,12 @@ export const SecureMMKVAdapter = {
     const storage = await getSecureAuthStorage();
     return storage.getString(key) ?? null;
   },
-  
+
   setItem: async (key: string, value: string): Promise<void> => {
     const storage = await getSecureAuthStorage();
     storage.set(key, value);
   },
-  
+
   removeItem: async (key: string): Promise<void> => {
     const storage = await getSecureAuthStorage();
     storage.delete(key);

@@ -3,7 +3,7 @@ import '../../global.css';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { APIProvider } from '@/api';
-import { hydrateAuth, loadSelectedTheme, useAuth } from '@/lib';
+import { loadSelectedTheme, useAuth } from '@/lib';
 import { useThemeConfig } from '@/lib/use-theme-config';
 
 export { ErrorBoundary } from 'expo-router';
@@ -55,9 +55,18 @@ export default function RootLayout() {
         {status === 'signIn' ? (
           <>
             <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen name="onboarding" options={{ headerShown: false, presentation: 'modal' }} />
-            <Stack.Screen name="login" options={{ headerShown: false, presentation: 'modal' }} />
-            <Stack.Screen name="register" options={{ headerShown: false, presentation: 'modal' }} />
+            <Stack.Screen
+              name="onboarding"
+              options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="login"
+              options={{ headerShown: false, presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="register"
+              options={{ headerShown: false, presentation: 'modal' }}
+            />
           </>
         ) : (
           <>

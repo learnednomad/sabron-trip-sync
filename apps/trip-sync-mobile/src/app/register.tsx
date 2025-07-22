@@ -34,19 +34,19 @@ export default function Register() {
       );
     }
   };
-  
+
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
       <FocusAwareStatusBar />
       <View className="flex-1">
         <RegisterForm onSubmit={onSubmit} isLoading={status === 'loading'} />
-        
+
         {/* Sign In Link */}
-        <View className="absolute bottom-0 left-0 right-0 pb-8 bg-white dark:bg-gray-900">
+        <View className="absolute inset-x-0 bottom-0 bg-white pb-8 dark:bg-gray-900">
           <Text className="text-center text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
             <Link href="/login" asChild>
-              <Text className="text-blue-600 dark:text-blue-400 font-semibold">
+              <Text className="font-semibold text-blue-600 dark:text-blue-400">
                 Sign In
               </Text>
             </Link>
