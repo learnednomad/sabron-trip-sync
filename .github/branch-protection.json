@@ -13,10 +13,10 @@
         "CI Optimized / test (mobile)",
         "CI Optimized / build (web)",
         "CI Optimized / build (mobile)",
-        "Security Checks / secret-scan",
-        "Security Checks / vulnerability-scan",
+        "Security Checks / secret-scanning",
+        "Security Checks / vulnerability-scan", 
         "Security Checks / license-check",
-        "Security Checks / docker-security-scan",
+        "Security Checks / docker-security",
         "CodeQL",
         "SonarCloud"
       ]

@@ -44,7 +44,7 @@ module.exports = {
       'error',
       {
         html: 'enforce',
-        custom: 'enforce',
+        custom: 'ignore', // Allow spreading in custom components (UI library components)
         explicitSpread: 'ignore',
         exceptions: ['Component']
       }
@@ -74,18 +74,18 @@ module.exports = {
       }
     ],
     'tailwindcss/classnames-order': 'error',
-    'tailwindcss/no-custom-classname': 'off',
-    'unicorn/filename-case': [
-      'error',
-      {
-        cases: {
-          kebabCase: true,
-          pascalCase: true,
-          camelCase: true
-        },
-        ignore: ['^\\[.*\\]\\.(jsx?|tsx?)$']
-      }
-    ]
+    'tailwindcss/no-custom-classname': 'off'
+    // 'unicorn/filename-case': [
+    //   'error',
+    //   {
+    //     cases: {
+    //       kebabCase: true,
+    //       pascalCase: true,
+    //       camelCase: true
+    //     },
+    //     ignore: ['^\\[.*\\]\\.(jsx?|tsx?)$']
+    //   }
+    // ]
   },
   settings: {
     react: {

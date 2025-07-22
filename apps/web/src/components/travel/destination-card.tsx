@@ -1,10 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { MapPin, Star, Heart } from 'lucide-react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import Image from 'next/image';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface DestinationCardProps {
@@ -25,12 +26,12 @@ interface DestinationCardProps {
   onClick?: (id: string) => void;
 }
 
-export function DestinationCard({ 
+export const DestinationCard = ({ 
   destination, 
   className,
   onLike,
   onClick 
-}: DestinationCardProps) {
+}: DestinationCardProps) => {
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onLike?.(destination.id);
@@ -46,32 +47,32 @@ export function DestinationCard({
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
-          src={destination.image}
-          alt={destination.name}
           fill
+          alt={destination.name}
           className="object-cover transition-transform duration-300 group-hover:scale-110"
+          src={destination.image}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         
         <Button
-          size="icon"
-          variant="ghost"
           className={cn(
             "absolute top-4 right-4 h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white",
             destination.liked && "text-red-500"
           )}
+          size="icon"
+          variant="ghost"
           onClick={handleLikeClick}
         >
           <Heart className={cn("h-5 w-5", destination.liked && "fill-current")} />
         </Button>
 
-        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-x-4 bottom-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="flex flex-wrap gap-2">
             {destination.tags.map((tag) => (
               <Badge 
                 key={tag} 
+                className="bg-white/90 text-xs backdrop-blur-sm"
                 variant="secondary"
-                className="bg-white/90 backdrop-blur-sm text-xs"
               >
                 {tag}
               </Badge>
@@ -81,20 +82,20 @@ export function DestinationCard({
       </div>
 
       <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
+        <div className="mb-2 flex items-start justify-between">
           <div>
-            <h3 className="font-semibold text-lg line-clamp-1">{destination.name}</h3>
+            <h3 className="line-clamp-1 text-lg font-semibold">{destination.name}</h3>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-3 w-3" />
+              <MapPin className="size-3" />
               <span>{destination.country}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <span className="font-medium text-sm">{destination.rating}</span>
+            <Star className="size-4 fill-amber-400 text-amber-400" />
+            <span className="text-sm font-medium">{destination.rating}</span>
           </div>
           <span className="text-sm text-muted-foreground">
             ({destination.reviews.toLocaleString()} reviews)

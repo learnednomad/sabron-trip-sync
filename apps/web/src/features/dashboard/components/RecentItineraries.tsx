@@ -1,13 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@sabron/ui';
-import { Button, Badge } from '@sabron/ui';
-import { formatDate } from '@/lib/utils';
-import { useItineraries } from '@/lib/api-client';
+import { Card, CardContent, CardHeader, CardTitle , Button, Badge } from '@sabron/ui';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
-export function RecentItineraries() {
+import { useItineraries } from '@/lib/api-client';
+import { formatDate } from '@/lib/utils';
+
+export const RecentItineraries = () => {
   const { data: itineraries, isLoading } = useItineraries();
 
   const recentItineraries = itineraries?.items.slice(0, 3) || [];
@@ -22,8 +22,8 @@ export function RecentItineraries() {
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-muted rounded w-1/2"></div>
+                <div className="mb-2 h-4 w-3/4 rounded bg-muted" />
+                <div className="h-3 w-1/2 rounded bg-muted" />
               </div>
             ))}
           </div>
@@ -36,10 +36,10 @@ export function RecentItineraries() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Recent Itineraries</CardTitle>
-        <Button variant="ghost" size="sm" asChild>
+        <Button asChild size="sm" variant="ghost">
           <Link href="/itineraries">
             View All
-            <ArrowRight className="h-4 w-4 ml-1" />
+            <ArrowRight className="ml-1 size-4" />
           </Link>
         </Button>
       </CardHeader>
@@ -47,11 +47,11 @@ export function RecentItineraries() {
         {recentItineraries.length > 0 ? (
           <div className="space-y-4">
             {recentItineraries.map((itinerary) => (
-              <div key={itinerary.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent transition-colors">
+              <div key={itinerary.id} className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent">
                 <div className="flex-1">
                   <Link
-                    href={`/itineraries/${itinerary.id}`}
                     className="font-medium text-foreground hover:text-primary"
+                    href={`/itineraries/${itinerary.id}`}
                   >
                     {itinerary.title}
                   </Link>
@@ -66,8 +66,8 @@ export function RecentItineraries() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-6">
-            <p className="text-muted-foreground mb-4">No itineraries yet</p>
+          <div className="py-6 text-center">
+            <p className="mb-4 text-muted-foreground">No itineraries yet</p>
             <Button asChild>
               <Link href="/itineraries">Create Your First Trip</Link>
             </Button>

@@ -1,6 +1,6 @@
 import { SignupForm } from '@/features/auth/components/SignupForm';
 
-export default function SignupPage() {
+const SignupPage = () => {
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -12,4 +12,6 @@ export default function SignupPage() {
       <SignupForm />
     </div>
   );
-}
+};
+
+export default SignupPage;

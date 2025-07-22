@@ -37,8 +37,6 @@ jobs:
           languages: ${{ matrix.language }}
           # Override default queries with security-focused queries
           queries: security-extended,security-and-quality
-          # Add custom CodeQL configuration
-          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { cn } from '@sabron/ui';
 import {
   Calendar,
   Home,
@@ -14,8 +12,12 @@ import {
   LogOut,
   CreditCard,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+
 import { useAuth } from '@/providers/auth-provider';
-import { cn } from '@sabron/ui';
+
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -29,7 +31,7 @@ const userNavigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-export function MainLayout({ children }: { children: React.ReactNode }) {
+export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { user, signOut } = useAuth();
@@ -41,12 +43,22 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         'fixed inset-0 z-50 lg:hidden',
         sidebarOpen ? 'block' : 'hidden'
       )}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div 
+          className="fixed inset-0 bg-gray-600/75" 
+          role="button"
+          tabIndex={0}
+          onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              setSidebarOpen(false);
+            }
+          }}
+        />
         <nav className="fixed left-0 top-0 flex h-full w-64 flex-col bg-card">
           <div className="flex h-16 items-center justify-between px-4">
             <span className="text-xl font-semibold text-foreground">Sabron Trip Sync</span>
             <button onClick={() => setSidebarOpen(false)}>
-              <X className="h-6 w-6 text-foreground" />
+              <X className="size-6 text-foreground" />
             </button>
           </div>
           <div className="flex-1 space-y-1 px-2 py-4">
@@ -55,15 +67,15 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               return (
                 <Link
                   key={item.name}
-                  href={item.href}
                   className={cn(
                     'group flex items-center rounded-md px-2 py-2 text-sm font-medium',
                     isActive
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                   )}
+                  href={item.href}
                 >
-                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <item.icon className="mr-3 size-5 shrink-0" />
                   {item.name}
                 </Link>
               );
@@ -74,18 +86,18 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               {userNavigation.map((item) => (
                 <Link
                   key={item.name}
+                  className="group flex items-center rounded-md p-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                   href={item.href}
-                  className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
-                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <item.icon className="mr-3 size-5 shrink-0" />
                   {item.name}
                 </Link>
               ))}
               <button
+                className="group flex w-full items-center rounded-md p-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => signOut()}
-                className="group flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
               >
-                <LogOut className="mr-3 h-5 w-5 flex-shrink-0" />
+                <LogOut className="mr-3 size-5 shrink-0" />
                 Sign out
               </button>
             </div>
@@ -95,7 +107,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <nav className="flex flex-1 flex-col bg-card border-r">
+        <nav className="flex flex-1 flex-col border-r bg-card">
           <div className="flex h-16 items-center px-4">
             <span className="text-xl font-semibold text-foreground">Sabron Trip Sync</span>
           </div>
@@ -105,15 +117,15 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               return (
                 <Link
                   key={item.name}
-                  href={item.href}
                   className={cn(
                     'group flex items-center rounded-md px-2 py-2 text-sm font-medium',
                     isActive
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                   )}
+                  href={item.href}
                 >
-                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <item.icon className="mr-3 size-5 shrink-0" />
                   {item.name}
                 </Link>
               );
@@ -124,18 +136,18 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               {userNavigation.map((item) => (
                 <Link
                   key={item.name}
+                  className="group flex items-center rounded-md p-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                   href={item.href}
-                  className="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
-                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <item.icon className="mr-3 size-5 shrink-0" />
                   {item.name}
                 </Link>
               ))}
               <button
+                className="group flex w-full items-center rounded-md p-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => signOut()}
-                className="group flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
               >
-                <LogOut className="mr-3 h-5 w-5 flex-shrink-0" />
+                <LogOut className="mr-3 size-5 shrink-0" />
                 Sign out
               </button>
             </div>
@@ -147,10 +159,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col lg:pl-64">
         <header className="flex h-16 items-center gap-4 border-b bg-card px-4 lg:px-6">
           <button
-            onClick={() => setSidebarOpen(true)}
             className="lg:hidden"
+            onClick={() => setSidebarOpen(true)}
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="size-6" />
           </button>
           <div className="flex flex-1 items-center justify-between">
             <h1 className="text-lg font-semibold">

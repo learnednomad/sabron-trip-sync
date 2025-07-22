@@ -1,8 +1,10 @@
-# Sabron-Trip-Sync Project Setup Scripts
+# Sabron Trip Sync - Development Scripts & Commands
 
-This directory contains automation scripts for setting up the Sabron-Trip-Sync project infrastructure.
+This directory contains organized automation scripts and command references for the Sabron Trip Sync project infrastructure and CI/CD pipeline management.
 
-## 🚀 GitHub Project Setup
+## 📋 Available Scripts
+
+### 🚀 GitHub Project Setup (`setup-github-project.js`)
 
 The `setup-github-project.js` script automates the creation of GitHub project structure including:
 
@@ -10,6 +12,50 @@ The `setup-github-project.js` script automates the creation of GitHub project st
 - **4 Milestones** for our development phases (Foundation, Core, Advanced, Polish)
 - **6 Epic Issues** for major feature areas
 - **4 Initial Tasks** ready for Sprint 1
+
+### 🔧 CI/CD Pipeline Setup (`ci-cd-setup.sh`)
+
+Comprehensive CI/CD pipeline setup automation with:
+- Prerequisites validation (Node.js, pnpm, git)
+- Development environment setup
+- GitHub workflows validation  
+- Quality gate configuration
+- Branch protection setup
+
+### 🔀 Git Workflow Helpers (`git-helpers.sh`)
+
+Smart git workflow automation including:
+- Conventional commit formatting
+- Feature branch creation and management
+- Pull request automation
+- Repository management utilities
+
+### ⚡ Development Aliases (`setup-aliases.sh`)
+
+Productivity aliases for common development tasks:
+- Turborepo shortcuts (tb, tt, tl, tc)
+- Git shortcuts (gs, ga, gc, gp, gl)
+- Development workflow shortcuts
+
+## 🎯 Quick Start Commands
+
+```bash
+# Set up entire development environment
+./scripts/ci-cd-setup.sh
+
+# Configure GitHub project structure
+cd scripts && npm install && node setup-github-project.js
+
+# Install productivity aliases
+source scripts/setup-aliases.sh
+
+# Smart commit with conventional format
+./scripts/git-helpers.sh commit "feat: your feature description"
+```
+
+## 📖 Command References
+
+See [`../docs/CI-CD-COMMANDS.md`](../docs/CI-CD-COMMANDS.md) for complete command reference organized by development phase.
 
 ### Features Aligned with Development Plan
 
@@ -223,3 +269,6 @@ After successful setup:
 - ✅ 4 initial tasks ready for development
 - ✅ Project structure aligns with development plan
 - ✅ All functional requirements mapped to issues
+- ✅ CI/CD pipeline optimized and secured
+- ✅ Development productivity enhanced with aliases
+- ✅ Git workflow automation in place

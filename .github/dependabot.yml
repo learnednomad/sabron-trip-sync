@@ -61,7 +61,7 @@ updates:
 
   # React Native mobile app directory
   - package-ecosystem: "npm"
-    directory: "/apps/trip-sync-mobile"
+    directory: "/trip-sync-mobile"
     schedule:
       interval: "daily"
       time: "04:30"

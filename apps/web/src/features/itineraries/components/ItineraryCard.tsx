@@ -1,18 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@sabron/ui';
-import { Badge } from '@sabron/ui';
-import { Button } from '@sabron/ui';
+import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@sabron/ui';
 import { Calendar, MapPin, Users, MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
+
 import { formatDate, formatCurrency } from '@/lib/utils';
+
 import type { Itinerary } from '@sabron/types';
 
 interface ItineraryCardProps {
   itinerary: Itinerary;
 }
 
-export function ItineraryCard({ itinerary }: ItineraryCardProps) {
+export const ItineraryCard = ({ itinerary }: ItineraryCardProps) => {
   const statusColor = {
     draft: 'secondary',
     planned: 'default',
@@ -22,20 +22,20 @@ export function ItineraryCard({ itinerary }: ItineraryCardProps) {
   } as const;
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-lg">
               <Link
+                className="transition-colors hover:text-primary/80"
                 href={`/itineraries/${itinerary.id}`}
-                className="hover:text-primary/80 transition-colors"
               >
                 {itinerary.title}
               </Link>
             </CardTitle>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
+              <MapPin className="size-4" />
               {itinerary.destinations[0]?.name}, {itinerary.destinations[0]?.country}
             </div>
           </div>
@@ -43,8 +43,8 @@ export function ItineraryCard({ itinerary }: ItineraryCardProps) {
             <Badge variant={statusColor[itinerary.status as keyof typeof statusColor]}>
               {itinerary.status}
             </Badge>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
+            <Button size="icon" variant="ghost">
+              <MoreHorizontal className="size-4" />
             </Button>
           </div>
         </div>
@@ -52,11 +52,11 @@ export function ItineraryCard({ itinerary }: ItineraryCardProps) {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="size-4 text-muted-foreground" />
             <span>{formatDate(itinerary.startDate)} - {formatDate(itinerary.endDate)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="size-4 text-muted-foreground" />
             <span>{itinerary.travelers.length} traveler{itinerary.travelers.length !== 1 ? 's' : ''}</span>
           </div>
         </div>
@@ -72,10 +72,10 @@ export function ItineraryCard({ itinerary }: ItineraryCardProps) {
         </div>
 
         <div className="flex gap-2">
-          <Button asChild size="sm" className="flex-1">
+          <Button asChild className="flex-1" size="sm">
             <Link href={`/itineraries/${itinerary.id}`}>View Details</Link>
           </Button>
-          <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+          <Button className="flex-1" size="sm" variant="outline">Edit</Button>
         </div>
       </CardContent>
     </Card>

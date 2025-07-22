@@ -1,6 +1,8 @@
 import 'react-native-url-polyfill/auto';
+
 import { Env } from '@env';
 import { createClient } from '@supabase/supabase-js';
+
 import { SecureMMKVAdapter } from './secure-storage';
 
 const supabaseUrl = Env.SUPABASE_URL;

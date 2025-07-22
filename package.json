@@ -32,7 +32,17 @@
     "db:studio": "turbo run db:studio",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "ci:setup": "./scripts/ci-cd-setup.sh setup",
+    "ci:check": "./scripts/ci-cd-setup.sh check",
+    "ci:clean": "./scripts/ci-cd-setup.sh clean",
+    "ci:analyze": "./scripts/ci-cd-setup.sh analyze",
+    "git:feature": "./scripts/git-helpers.sh feature",
+    "git:commit": "./scripts/git-helpers.sh commit",
+    "git:sync": "./scripts/git-helpers.sh sync",
+    "git:status": "./scripts/git-helpers.sh status",
+    "git:pr": "./scripts/git-helpers.sh pr",
+    "git:cleanup": "./scripts/git-helpers.sh cleanup"
   },
   "devDependencies": {
     "eslint": "^9.31.0",

@@ -67,7 +67,7 @@ jobs:
           ls -la coverage-reports/ || echo "No coverage files found"
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@v3.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -92,7 +92,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Wait for Quality Gate
-        uses: sonarqube-quality-gate-action@master
+        uses: sonarqube-quality-gate-action@v1.3.0
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

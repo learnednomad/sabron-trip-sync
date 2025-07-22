@@ -1,16 +1,10 @@
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
-import Svg, { Path, G, Circle } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 
 export function Logo({ color = '#000', ...props }: SvgProps) {
   return (
-    <Svg
-      width={100}
-      height={100}
-      viewBox="0 0 100 100"
-      fill="none"
-      {...props}
-    >
+    <Svg width={100} height={100} viewBox="0 0 100 100" fill="none" {...props}>
       <G>
         {/* Airplane icon simplified */}
         <Path

@@ -1,19 +1,20 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, FormField, Card, CardContent, CardHeader, CardTitle } from '@sabron/ui';
+import { CreateItinerarySchema, type CreateItinerary } from '@sabron/validation';
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateItinerarySchema, type CreateItinerary } from '@sabron/validation';
-import { Button, FormField, Card, CardContent, CardHeader, CardTitle } from '@sabron/ui';
-import { useCreateItinerary } from '@/lib/api-client';
 import { toast } from 'sonner';
+
+import { useCreateItinerary } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 
 interface CreateItineraryFormProps {
   onSuccess?: () => void;
 }
 
-export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
+export const CreateItineraryForm = ({ onSuccess }: CreateItineraryFormProps) => {
   const [step, setStep] = useState(1);
   const createItinerary = useCreateItinerary();
 
@@ -53,7 +54,7 @@ export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
   const prevStep = () => setStep(step - 1);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Create New Itinerary</CardTitle>
         <div className="flex items-center space-x-2">
@@ -76,18 +77,18 @@ export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
       </CardHeader>
       <CardContent>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             {step === 1 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Basic Information</h3>
                 <FormField
-                  name="title"
                   label="Trip Title"
+                  name="title"
                   placeholder="e.g., Paris Summer Vacation"
                 />
                 <FormField
-                  name="description"
                   label="Description (Optional)"
+                  name="description"
                   placeholder="Tell us about your trip..."
                 />
                 <div className="flex justify-end">
@@ -103,25 +104,25 @@ export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
                 <h3 className="text-lg font-medium">Destination & Dates</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="destinations.0.name"
                     label="Destination"
+                    name="destinations.0.name"
                     placeholder="e.g., Paris"
                   />
                   <FormField
-                    name="destinations.0.country"
                     label="Country"
+                    name="destinations.0.country"
                     placeholder="e.g., France"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="dateRange.start"
                     label="Start Date"
+                    name="dateRange.start"
                     type="date"
                   />
                   <FormField
-                    name="dateRange.end"
                     label="End Date"
+                    name="dateRange.end"
                     type="date"
                   />
                 </div>
@@ -141,14 +142,14 @@ export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
                 <h3 className="text-lg font-medium">Budget</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    name="budget.estimated.amount"
                     label="Total Budget"
-                    type="number"
+                    name="budget.estimated.amount"
                     placeholder="1000"
+                    type="number"
                   />
                   <FormField
-                    name="budget.currency"
                     label="Currency"
+                    name="budget.currency"
                     placeholder="USD"
                   />
                 </div>
@@ -157,8 +158,8 @@ export function CreateItineraryForm({ onSuccess }: CreateItineraryFormProps) {
                     Previous
                   </Button>
                   <Button
-                    type="submit"
                     loading={createItinerary.isPending}
+                    type="submit"
                   >
                     Create Itinerary
                   </Button>
