@@ -1,9 +1,11 @@
 import { MainLayout } from '@/components/Layout/MainLayout';
 
-export default function ItinerariesLayout({
+const ItinerariesLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return <MainLayout>{children}</MainLayout>;
-}
+};
+
+export default ItinerariesLayout;

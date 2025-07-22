@@ -1,10 +1,10 @@
 import { NavigationEnhanced } from '@/components/navigation-enhanced';
 
-export default function AppLayout({
+const AppLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   // Sample user data - replace with actual auth state
   const user = {
     name: 'John Doe',
@@ -20,4 +20,6 @@ export default function AppLayout({
       </main>
     </>
   );
-}
+};
+
+export default AppLayout;

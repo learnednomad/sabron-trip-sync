@@ -1,11 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import { Calendar, MapPin, Users, MoreHorizontal } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import Image from 'next/image';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,13 +45,13 @@ const statusVariants = {
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
 
-export function TripCard({ 
+export const TripCard = ({ 
   trip, 
   className,
   onEdit,
   onCancel,
   onView
-}: TripCardProps) {
+}: TripCardProps) => {
   const displayedTravelers = trip.travelers.slice(0, 3);
   const remainingTravelers = trip.travelers.length - 3;
 
@@ -65,23 +66,23 @@ export function TripCard({
       <CardHeader className="p-0">
         <div className="relative aspect-[16/9] overflow-hidden">
           <Image
-            src={trip.image}
-            alt={trip.title}
             fill
+            alt={trip.title}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            src={trip.image}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           
-          <div className="absolute top-4 right-4">
+          <div className="absolute right-4 top-4">
             <Badge className={cn("capitalize", statusVariants[trip.status])}>
               {trip.status}
             </Badge>
           </div>
 
           <div className="absolute bottom-4 left-4 text-white">
-            <h3 className="text-xl font-bold mb-1">{trip.title}</h3>
+            <h3 className="mb-1 text-xl font-bold">{trip.title}</h3>
             <div className="flex items-center gap-1 text-sm">
-              <MapPin className="h-4 w-4" />
+              <MapPin className="size-4" />
               <span>{trip.destination}</span>
             </div>
           </div>
@@ -89,8 +90,8 @@ export function TripCard({
       </CardHeader>
 
       <CardContent className="p-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-          <Calendar className="h-4 w-4" />
+        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+          <Calendar className="size-4" />
           <span>
             {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
           </span>
@@ -98,21 +99,21 @@ export function TripCard({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="size-4 text-muted-foreground" />
             <div className="flex -space-x-2">
               {displayedTravelers.map((traveler) => (
                 <Avatar 
                   key={traveler.id} 
-                  className="h-8 w-8 border-2 border-background"
+                  className="size-8 border-2 border-background"
                 >
-                  <AvatarImage src={traveler.avatar} alt={traveler.name} />
+                  <AvatarImage alt={traveler.name} src={traveler.avatar} />
                   <AvatarFallback className="text-xs">
                     {getInitials(traveler.name)}
                   </AvatarFallback>
                 </Avatar>
               ))}
               {remainingTravelers > 0 && (
-                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background">
+                <div className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
                   +{remainingTravelers}
                 </div>
               )}
@@ -121,8 +122,8 @@ export function TripCard({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button size="icon" variant="ghost" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
+              <Button className="size-8" size="icon" variant="ghost">
+                <MoreHorizontal className="size-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -156,7 +157,7 @@ export function TripCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 border-t">
+      <CardFooter className="border-t p-4 pt-0">
         <div className="flex items-baseline gap-1">
           <span className="text-sm text-muted-foreground">Total</span>
           <span className="text-xl font-bold">

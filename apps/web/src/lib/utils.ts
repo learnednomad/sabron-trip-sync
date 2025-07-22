@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { format, formatRelative, isValid } from 'date-fns';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Combines class names using clsx and merges Tailwind classes with twMerge.
@@ -76,7 +76,7 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
       style: 'currency',
       currency,
     }).format(amount);
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`Invalid currency code: ${currency}`);
   }
 }

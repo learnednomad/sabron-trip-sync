@@ -1,9 +1,11 @@
 import { MainLayout } from '@/components/Layout/MainLayout';
 
-export default function ActivitiesLayout({
+const ActivitiesLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return <MainLayout>{children}</MainLayout>;
-}
+};
+
+export default ActivitiesLayout;

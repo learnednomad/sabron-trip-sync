@@ -1,9 +1,11 @@
 import { MainLayout } from '@/components/Layout/MainLayout';
 
-export default function DashboardLayout({
+const DashboardLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return <MainLayout>{children}</MainLayout>;
-}
+};
+
+export default DashboardLayout;
