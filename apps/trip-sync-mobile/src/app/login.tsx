@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import React from 'react';
 import { Alert, SafeAreaView } from 'react-native';
 
@@ -8,7 +8,6 @@ import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 import { useAuth } from '@/lib';
 
 export default function Login() {
-  const _router = useRouter();
   const signIn = useAuth.use.signIn();
   const status = useAuth.use.status();
 

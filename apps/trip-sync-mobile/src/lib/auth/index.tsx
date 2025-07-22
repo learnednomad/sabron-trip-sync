@@ -16,6 +16,62 @@ interface AuthState {
   hydrate: () => Promise<void>;
 }
 
+const createSignInMethod =
+  (set: any, get: any) => async (email: string, password: string) => {
+    set({ status: 'loading', error: null });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      set({ error: error.message, status: 'signOut' });
+      throw error;
+    } else {
+      get().setSession(data.session);
+    }
+  };
+
+const createSignUpMethod =
+  (set: any, get: any) => async (email: string, password: string) => {
+    set({ status: 'loading', error: null });
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      set({ error: error.message, status: 'signOut' });
+      throw error;
+    } else {
+      get().setSession(data.session);
+    }
+  };
+
+const createSignOutMethod = (set: any, get: any) => async () => {
+  set({ status: 'loading', error: null });
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    set({ error: error.message, status: get().status });
+    throw error;
+  } else {
+    get().setSession(null);
+  }
+};
+
+const createHydrateMethod = (set: any, get: any) => async () => {
+  set({ status: 'loading' });
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error('Error hydrating auth store:', error);
+    set({ error: error.message, status: 'signOut' });
+  } else {
+    get().setSession(session);
+  }
+};
+
 const _useAuth = create<AuthState>((set, get) => ({
   session: null,
   user: null,
@@ -31,62 +87,10 @@ const _useAuth = create<AuthState>((set, get) => ({
     });
   },
 
-  signIn: async (email: string, password: string) => {
-    set({ status: 'loading', error: null });
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      set({ error: error.message, status: 'signOut' });
-      throw error;
-    } else {
-      get().setSession(data.session);
-    }
-  },
-
-  signUp: async (email: string, password: string) => {
-    set({ status: 'loading', error: null });
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      set({ error: error.message, status: 'signOut' });
-      throw error;
-    } else {
-      get().setSession(data.session);
-    }
-  },
-
-  signOut: async () => {
-    set({ status: 'loading', error: null });
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      set({ error: error.message, status: get().status });
-      throw error;
-    } else {
-      get().setSession(null);
-    }
-  },
-
-  hydrate: async () => {
-    set({ status: 'loading' });
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
-
-    if (error) {
-      console.error('Error hydrating auth store:', error);
-      set({ error: error.message, status: 'signOut' });
-    } else {
-      get().setSession(session);
-    }
-  },
+  signIn: createSignInMethod(set, get),
+  signUp: createSignUpMethod(set, get),
+  signOut: createSignOutMethod(set, get),
+  hydrate: createHydrateMethod(set, get),
 }));
 
 // Listen for Supabase auth state changes
