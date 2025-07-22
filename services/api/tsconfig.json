@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "incremental": false
+    "incremental": false,
+    "moduleResolution": "bundler",
+    "resolvePackageJsonExports": true
   },
   "include": ["src/**/*", "prisma/**/*"],
   "exclude": ["node_modules", "dist"]
