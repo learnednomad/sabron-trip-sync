@@ -1,0 +1,97 @@
+# CodeQL configuration for Sabron Trip Sync
+# This configuration enhances security analysis with additional queries and paths
+
+name: "Sabron Trip Sync CodeQL Config"
+
+# Specify additional query suites to run
+queries:
+  - uses: security-extended
+  - uses: security-and-quality
+  
+# Configure paths to analyze
+paths:
+  - "apps/"
+  - "services/"
+  - "packages/"
+  - "tools/"
+
+# Exclude paths that don't need analysis
+paths-ignore:
+  - "**/node_modules/"
+  - "**/dist/"
+  - "**/build/"
+  - "**/.turbo/"
+  - "**/.next/"
+  - "**/coverage/"
+  - "**/__tests__/"
+  - "**/*.test.ts"
+  - "**/*.test.js"
+  - "**/*.spec.ts"
+  - "**/*.spec.js"
+  - "**/test/"
+  - "**/tests/"
+  - "**/__mocks__/"
+  - "**/*.d.ts"
+  - "**/jest.config.*"
+  - "**/vitest.config.*"
+  - "**/tailwind.config.*"
+  - "**/next.config.*"
+  - "**/metro.config.*"
+  - "**/babel.config.*"
+
+# Additional query filters
+query-filters:
+  - exclude:
+      id: js/unused-local-variable
+  - exclude:
+      id: js/debugger-statement
+  - include:
+      kind: problem
+      severity: warning
+  - include:
+      security-severity: high
+      
+# Custom queries specific to React/Next.js/React Native
+query-suites:
+  - name: "React Security"
+    queries:
+      - name: "React XSS vulnerabilities"
+        description: "Find potential XSS vulnerabilities in React components"
+      - name: "Unsafe React patterns"
+        description: "Detect unsafe patterns in React code"
+        
+  - name: "Node.js Security"
+    queries:
+      - name: "SQL injection"
+        description: "Find potential SQL injection vulnerabilities"
+      - name: "Command injection"
+        description: "Find potential command injection vulnerabilities"
+      - name: "Path traversal"
+        description: "Find potential path traversal vulnerabilities"
+        
+  - name: "API Security"
+    queries:
+      - name: "Unvalidated input"
+        description: "Find API endpoints with unvalidated input"
+      - name: "Authentication bypass"
+        description: "Find potential authentication bypass vulnerabilities"
+      - name: "Authorization issues"
+        description: "Find potential authorization vulnerabilities"
+
+# Configuration for specific languages
+javascript:
+  # Additional TypeScript/JavaScript specific configuration
+  index:
+    # Include all TypeScript and JavaScript files
+    include:
+      - "**/*.ts"
+      - "**/*.tsx"  
+      - "**/*.js"
+      - "**/*.jsx"
+    exclude:
+      - "**/*.d.ts"
+      - "**/*.test.*"
+      - "**/*.spec.*"
+
+# External data sources for enhanced analysis
+external-repository-token-stdin: true

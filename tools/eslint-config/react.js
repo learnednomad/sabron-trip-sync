@@ -13,6 +13,18 @@ module.exports = {
     'tailwindcss'
   ],
   rules: {
+    // Security-critical React rules
+    'react/no-danger': 'error',
+    'react/no-danger-with-children': 'error',
+    'react/jsx-no-script-url': 'error',
+    'react/jsx-no-target-blank': ['error', { 
+      allowReferrer: false,
+      enforceDynamicLinks: 'always'
+    }],
+    'react/no-unsafe': 'error',
+    'react/no-deprecated': 'error',
+    
+    // Standard React rules
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
     'react/display-name': 'off',

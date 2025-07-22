@@ -1,0 +1,159 @@
+# Dependabot configuration for automated dependency updates
+# See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Package ecosystems to monitor
+  
+  # Main pnpm workspace (monorepo root)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "UTC"
+    assignees:
+      - "learnednomad"
+    reviewers:
+      - "learnednomad" 
+    commit-message:
+      prefix: "feat"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "security"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+    versioning-strategy: "increase"
+    # Group updates by category
+    groups:
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+          - "typescript"
+          - "vitest*"
+          - "jest*"
+          - "@testing-library/*"
+          - "tsup"
+          - "turbo"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+          - "typescript"
+          - "vitest*"
+          - "jest*"
+          - "@testing-library/*"
+          - "tsup"
+          - "turbo"
+        update-types:
+          - "security"
+          - "patch"
+
+  # React Native mobile app directory
+  - package-ecosystem: "npm"
+    directory: "/apps/trip-sync-mobile"
+    schedule:
+      interval: "daily"
+      time: "04:30"
+      timezone: "UTC"
+    assignees:
+      - "learnednomad"
+    reviewers:
+      - "learnednomad"
+    commit-message:
+      prefix: "feat"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "mobile"
+      - "react-native"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+    versioning-strategy: "increase"
+    # Group mobile-specific updates
+    groups:
+      expo-dependencies:
+        patterns:
+          - "expo*"
+          - "@expo/*"
+        update-types:
+          - "minor"
+          - "patch"
+      react-native-dependencies:
+        patterns:
+          - "react-native*"
+          - "@react-native*"
+        update-types:
+          - "minor"
+          - "patch"
+      mobile-development:
+        patterns:
+          - "@types/*"
+          - "typescript"
+          - "jest*"
+          - "@testing-library/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker configurations
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    assignees:
+      - "learnednomad"
+    reviewers:
+      - "learnednomad"
+    commit-message:
+      prefix: "feat"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+
+  # GitHub Actions workflow dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "05:00"
+      timezone: "UTC"
+    assignees:
+      - "learnednomad"
+    reviewers:
+      - "learnednomad"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci/cd"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    # Group GitHub Actions updates
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

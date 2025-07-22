@@ -263,6 +263,50 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: pnpm --filter=trip-sync-mobile test
 
+      - name: Check Coverage Thresholds
+        if: matrix.workspace == 'monorepo' && (needs.setup.outputs.has-web-changes == 'true' || needs.setup.outputs.has-api-changes == 'true')
+        run: |
+          echo "## Coverage Threshold Check" >> coverage-summary.md
+          echo "Checking coverage thresholds for all packages..." >> coverage-summary.md
+          
+          # Find all coverage files
+          find . -name "coverage-summary.json" -not -path "*/node_modules/*" | while read file; do
+            package_name=$(dirname $file | sed 's|./||' | sed 's|/coverage||')
+            echo "Checking coverage for: $package_name" >> coverage-summary.md
+            
+            if [ -f "$file" ]; then
+              # Extract coverage percentages
+              lines=$(cat $file | jq '.total.lines.pct // 0')
+              statements=$(cat $file | jq '.total.statements.pct // 0')
+              functions=$(cat $file | jq '.total.functions.pct // 0')
+              branches=$(cat $file | jq '.total.branches.pct // 0')
+              
+              echo "  - Lines: ${lines}%" >> coverage-summary.md
+              echo "  - Statements: ${statements}%" >> coverage-summary.md
+              echo "  - Functions: ${functions}%" >> coverage-summary.md
+              echo "  - Branches: ${branches}%" >> coverage-summary.md
+              
+              # Check thresholds (80% minimum)
+              if (( $(echo "$lines >= 80" | bc -l) )) && \
+                 (( $(echo "$statements >= 80" | bc -l) )) && \
+                 (( $(echo "$functions >= 80" | bc -l) )) && \
+                 (( $(echo "$branches >= 80" | bc -l) )); then
+                echo "  ✅ Coverage meets thresholds" >> coverage-summary.md
+              else
+                echo "  ❌ Coverage below 80% threshold" >> coverage-summary.md
+                echo "COVERAGE_FAILED=true" >> $GITHUB_ENV
+              fi
+              echo "" >> coverage-summary.md
+            fi
+          done
+          
+          if [ "$COVERAGE_FAILED" = "true" ]; then
+            echo "❌ One or more packages failed coverage thresholds"
+            exit 1
+          else
+            echo "✅ All packages meet coverage thresholds"
+          fi
+
       - name: Upload coverage reports
         if: matrix.workspace == 'monorepo' && (needs.setup.outputs.has-web-changes == 'true' || needs.setup.outputs.has-api-changes == 'true')
         uses: codecov/codecov-action@v4
@@ -271,6 +315,32 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+          directory: ./coverage-reports/
+          files: ./coverage-reports/*.info
+
+      - name: Upload coverage summary
+        if: always() && matrix.workspace == 'monorepo'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary-${{ matrix.workspace }}
+          path: coverage-summary.md
+          retention-days: 30
+
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request' && matrix.workspace == 'monorepo'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('coverage-summary.md')) {
+              const coverage = fs.readFileSync('coverage-summary.md', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## 📊 Coverage Report\n\n' + coverage
+              });
+            }
 
   build:
     runs-on: ubuntu-latest
