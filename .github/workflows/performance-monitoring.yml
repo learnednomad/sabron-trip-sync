@@ -119,7 +119,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const metrics = JSON.parse('${{ steps.workflow-details.outputs.metrics }}');
+            const metrics = ${{ steps.workflow-details.outputs.metrics }};
             
             // Read historical data if available
             let historicalData = [];
@@ -186,7 +186,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const metrics = JSON.parse('${{ steps.workflow-details.outputs.metrics }}');
+            const metrics = ${{ steps.workflow-details.outputs.metrics }};
             
             // Read historical data
             let historicalData = [];

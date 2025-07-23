@@ -4,9 +4,9 @@ on:
   workflow_run:
     workflows: 
       - "CI Optimized"
-      - "Security Checks"
-      - "CodeQL"
-      - "SonarCloud"
+      - "Security Analysis"
+      - "CodeQL Security Analysis"
+      - "SonarCloud Analysis"
     types:
       - completed
 
