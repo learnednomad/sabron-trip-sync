@@ -5,9 +5,15 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface SeparatorProps {
+  className?: string
+  orientation?: 'horizontal' | 'vertical'
+  decorative?: boolean
+}
+
 const Separator = React.forwardRef<
-  React.ElementRef<typeof SeparatorPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+  HTMLDivElement,
+  SeparatorProps
 >(
   (
     { className, orientation = "horizontal", decorative = true, ...props },
@@ -26,6 +32,6 @@ const Separator = React.forwardRef<
     />
   )
 )
-Separator.displayName = SeparatorPrimitive.Root.displayName
+Separator.displayName = "Separator"
 
 export { Separator }

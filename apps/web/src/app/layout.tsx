@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google';
+import type { ReactNode } from 'react';
 
 import { Providers } from '@/providers';
 import { AuthProvider } from '@/providers/auth-provider';
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
   description: 'Plan and sync your travel itineraries',
 };
 
-const RootLayout = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html suppressHydrationWarning lang="en">
       <body className={inter.className}>

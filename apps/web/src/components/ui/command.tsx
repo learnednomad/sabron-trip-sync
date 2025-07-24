@@ -8,9 +8,14 @@ import * as React from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
+interface CommandProps {
+  className?: string
+  children?: React.ReactNode
+}
+
 const Command = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+  CommandProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
@@ -21,9 +26,13 @@ const Command = React.forwardRef<
     {...props}
   />
 ))
-Command.displayName = CommandPrimitive.displayName
+Command.displayName = "Command"
 
-const CommandDialog = ({ children, ...props }: DialogProps) => {
+interface CommandDialogProps extends DialogProps {
+  children?: React.ReactNode
+}
+
+const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0">
@@ -35,9 +44,14 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
   )
 }
 
+interface CommandInputProps {
+  className?: string
+  placeholder?: string
+}
+
 const CommandInput = React.forwardRef<
   HTMLInputElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
+  CommandInputProps
 >(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" data-cmdk-input-wrapper="">
     <Search className="mr-2 size-4 shrink-0 opacity-50" />
@@ -52,11 +66,16 @@ const CommandInput = React.forwardRef<
   </div>
 ))
 
-CommandInput.displayName = CommandPrimitive.Input.displayName
+CommandInput.displayName = "CommandInput"
+
+interface CommandListProps {
+  className?: string
+  children?: React.ReactNode
+}
 
 const CommandList = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
+  CommandListProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
@@ -65,11 +84,16 @@ const CommandList = React.forwardRef<
   />
 ))
 
-CommandList.displayName = CommandPrimitive.List.displayName
+CommandList.displayName = "CommandList"
+
+interface CommandEmptyProps {
+  className?: string
+  children?: React.ReactNode
+}
 
 const CommandEmpty = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+  CommandEmptyProps
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
@@ -78,11 +102,16 @@ const CommandEmpty = React.forwardRef<
   />
 ))
 
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName
+CommandEmpty.displayName = "CommandEmpty"
+
+interface CommandGroupProps {
+  className?: string
+  children?: React.ReactNode
+}
 
 const CommandGroup = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
+  CommandGroupProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
@@ -94,11 +123,15 @@ const CommandGroup = React.forwardRef<
   />
 ))
 
-CommandGroup.displayName = CommandPrimitive.Group.displayName
+CommandGroup.displayName = "CommandGroup"
+
+interface CommandSeparatorProps {
+  className?: string
+}
 
 const CommandSeparator = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
+  CommandSeparatorProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
@@ -106,11 +139,16 @@ const CommandSeparator = React.forwardRef<
     {...props}
   />
 ))
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName
+CommandSeparator.displayName = "CommandSeparator"
+
+interface CommandItemProps {
+  className?: string
+  children?: React.ReactNode
+}
 
 const CommandItem = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+  CommandItemProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
@@ -122,7 +160,7 @@ const CommandItem = React.forwardRef<
   />
 ))
 
-CommandItem.displayName = CommandPrimitive.Item.displayName
+CommandItem.displayName = "CommandItem"
 
 const CommandShortcut = ({
   className,

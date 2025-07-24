@@ -28,10 +28,17 @@ const toggleVariants = cva(
   }
 )
 
+interface ToggleProps extends VariantProps<typeof toggleVariants> {
+  className?: string
+  children?: React.ReactNode
+  pressed?: boolean
+  defaultPressed?: boolean
+  onPressedChange?: (pressed: boolean) => void
+}
+
 const Toggle = React.forwardRef<
-  React.ElementRef<typeof TogglePrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
-    VariantProps<typeof toggleVariants>
+  HTMLButtonElement,
+  ToggleProps
 >(({ className, variant, size, ...props }, ref) => (
   <TogglePrimitive.Root
     ref={ref}
@@ -40,6 +47,6 @@ const Toggle = React.forwardRef<
   />
 ))
 
-Toggle.displayName = TogglePrimitive.Root.displayName
+Toggle.displayName = "Toggle"
 
 export { Toggle, toggleVariants }

@@ -5,10 +5,15 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface AvatarRootProps {
+  className?: string
+  children?: React.ReactNode
+}
+
 const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
+  HTMLDivElement,
+  AvatarRootProps
+>(({ className, children, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
@@ -16,13 +21,21 @@ const Avatar = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    {children}
+  </AvatarPrimitive.Root>
 ))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+Avatar.displayName = "Avatar"
+
+interface AvatarImageProps {
+  className?: string
+  src?: string
+  alt?: string
+}
 
 const AvatarImage = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
+  HTMLImageElement,
+  AvatarImageProps
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
@@ -30,12 +43,18 @@ const AvatarImage = React.forwardRef<
     {...props}
   />
 ))
-AvatarImage.displayName = AvatarPrimitive.Image.displayName
+AvatarImage.displayName = "AvatarImage"
+
+interface AvatarFallbackProps {
+  className?: string
+  children?: React.ReactNode
+  delayMs?: number
+}
 
 const AvatarFallback = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
+  HTMLDivElement,
+  AvatarFallbackProps
+>(({ className, children, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
@@ -43,8 +62,10 @@ const AvatarFallback = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    {children}
+  </AvatarPrimitive.Fallback>
 ))
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
+AvatarFallback.displayName = "AvatarFallback"
 
 export { Avatar, AvatarImage, AvatarFallback }

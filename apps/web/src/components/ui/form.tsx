@@ -14,8 +14,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-import type * as LabelPrimitive from "@radix-ui/react-label"
-
 const Form = FormProvider
 
 type FormFieldContextValue<
@@ -87,9 +85,14 @@ const FormItem = React.forwardRef<
 })
 FormItem.displayName = "FormItem"
 
+interface FormLabelProps {
+  className?: string
+  children?: React.ReactNode
+}
+
 const FormLabel = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+  HTMLLabelElement,
+  FormLabelProps
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
@@ -104,9 +107,13 @@ const FormLabel = React.forwardRef<
 })
 FormLabel.displayName = "FormLabel"
 
+interface FormControlProps {
+  children?: React.ReactNode
+}
+
 const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
-  React.ComponentPropsWithoutRef<typeof Slot>
+  HTMLElement,
+  FormControlProps
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
