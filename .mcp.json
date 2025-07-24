@@ -9,10 +9,12 @@
     },
     "supabase": {
       "command": "npx",
-      "args": ["@supabase/mcp-server-supabase"],
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=vaalkoxkshpnuuevkdro"
+      ],
       "env": {
-        "SUPABASE_URL": "https://vaalkoxkshpnuuevkdro.supabase.co",
-        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhYWxrb3hrc2hwbnV1ZXZrZHJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NTAwMTAsImV4cCI6MjA2NzQyNjAxMH0.RM3YD7Jl60WWpNgGkam9Z3pOIvBiodccRJy8UlOp4eA",
         "SUPABASE_ACCESS_TOKEN": "sbp_30a084012c82c76065d2fceabf472ce79ada6e2b"
       }
     }

@@ -45,6 +45,7 @@
     "git:cleanup": "./scripts/git-helpers.sh cleanup"
   },
   "devDependencies": {
+    "@supabase/mcp-server-supabase": "^0.4.5",
     "eslint": "^9.31.0",
     "turbo": "^2.5.5",
     "typescript": "^5.8.3"

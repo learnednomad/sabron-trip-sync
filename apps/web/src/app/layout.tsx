@@ -5,6 +5,7 @@ import { AuthProvider } from '@/providers/auth-provider';
 import { I18nProvider } from '@/providers/i18n-provider';
 
 import type { Metadata } from 'next';
+import '@radix-ui/themes/styles.css';
 import '../globals.css';
 
 const inter = Inter({ subsets: ['latin'] });

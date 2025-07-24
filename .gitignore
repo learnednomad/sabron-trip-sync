@@ -88,5 +88,8 @@ desktop.ini
 .claude/mcp.json
 .claude/settings.local.json
 
+# MCP configuration (contains sensitive tokens)
+.mcp.json
+
 # Supabase
 supabase/.temp/

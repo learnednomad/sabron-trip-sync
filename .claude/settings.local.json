@@ -82,7 +82,10 @@
       "Bash(pnpm turbo run build:*)",
       "Bash(pnpm turbo run lint:*)",
       "Bash(gh workflow:*)",
-      "Bash(pnpm start:*)"
+      "Bash(pnpm start:*)",
+      "mcp__jetbrains__list_directory_tree",
+      "mcp__jetbrains__find_files_by_glob",
+      "Bash(npm search:*)"
     ],
     "deny": []
   },

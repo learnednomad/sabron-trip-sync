@@ -183,3 +183,45 @@ Apps and packages reference each other using `workspace:*` protocol in the monor
 - Leverage shadcn/ui components from `@sabron/ui`
 - Implement proper SEO and accessibility standards
 - Use React Query for API state management
+
+## Database Stack
+
+### Supabase Integration
+The project uses Supabase as the primary database solution:
+- **Database Package**: `packages/database/` exports a Supabase client
+- **Type Generation**: Run `pnpm db:types` in the database package to generate TypeScript types from Supabase
+- **API Integration**: The API service (`services/api/`) uses Supabase for all database operations
+- **Authentication**: Supabase Auth is integrated for user authentication
+- **Environment Variables**: 
+  - `SUPABASE_URL`: Your Supabase project URL
+  - `SUPABASE_ANON_KEY`: Anonymous key for client-side access
+  - `SUPABASE_SERVICE_KEY`: Service role key for server-side access
+
+### MCP Server Configuration
+The project includes a local Model Context Protocol (MCP) server for Supabase:
+- **Configuration File**: `.mcp.json` (added to .gitignore for security)
+- **Installation**: `@supabase/mcp-server-supabase` installed as dev dependency
+- **Mode**: Configured for read-write access (remove `--read-only` flag for write access)
+- **Project Scoped**: Limited to project ref `vaalkoxkshpnuuevkdro`
+- **Authentication**: Uses Supabase Personal Access Token (PAT)
+
+#### MCP Server Features
+With the Supabase MCP server, you can:
+- Execute SQL queries (SELECT, INSERT, UPDATE, DELETE)
+- Manage database schema
+- View logs and analytics
+- Create and manage projects
+- Handle migrations
+- And more Supabase operations
+
+#### Security Best Practices for MCP
+- Use read-only mode in production environments
+- Keep `.mcp.json` in .gitignore to protect credentials
+- Review all MCP tool calls before execution
+- Consider using database branching for safer development
+
+## Project Recommendations
+
+### Development Environment
+- Use filesystem instead of JetBrains for file management
+- Restart Claude Code after modifying `.mcp.json` to apply MCP server changes
