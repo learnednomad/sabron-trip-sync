@@ -12,6 +12,8 @@ export function APIProvider({ children }: APIProviderProps) {
   useReactQueryDevTools(queryClient);
   return (
     // Provide the client to your App
-    <QueryClientProvider client={queryClient}>{children as any}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {children as any}
+    </QueryClientProvider>
   );
 }

@@ -70,10 +70,10 @@ const TermsCheckbox = ({
   onToggle: () => void;
 }) => (
   <View className="mb-6 mt-2 flex-row items-start">
-    <Checkbox 
-      checked={agreeToTerms} 
-      onChange={() => onToggle()} 
-      className="mt-1" 
+    <Checkbox
+      checked={agreeToTerms}
+      onChange={() => onToggle()}
+      className="mt-1"
       accessibilityLabel="Agree to terms and conditions"
     />
     <View className="ml-3 flex-1">

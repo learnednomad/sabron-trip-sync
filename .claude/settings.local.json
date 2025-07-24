@@ -82,7 +82,8 @@
       "Bash(pnpm turbo run build:*)",
       "Bash(pnpm turbo run lint:*)",
       "Bash(gh workflow:*)",
-      "Bash(pnpm start:*)"
+      "Bash(pnpm start:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   },
