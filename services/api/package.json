@@ -4,8 +4,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "pnpm build:deps && tsx watch src/index.ts",
     "build": "tsup",
+    "build:deps": "pnpm --filter @sabron/types --filter @sabron/validation --filter @sabron/database build",
     "start": "node dist/index.js",
     "clean": "rm -rf dist .turbo",
     "typecheck": "tsc --noEmit",

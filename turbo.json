@@ -12,10 +12,6 @@
 "SUPABASE_URL",
 "SUPABASE_ANON_KEY",
 "SUPABASE_SERVICE_KEY",
-"DATABASE_URL",
-"BACKUP_DATABASE_URL",
-"ENABLE_BACKUP_SYNC",
-"FAIL_ON_BACKUP_ERROR",
 "REDIS_URL",
 "MONGODB_URI",
 "ALLOWED_ORIGINS",
@@ -31,10 +27,6 @@
 "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
 "env": [
 "NODE_ENV",
-"DATABASE_URL",
-"BACKUP_DATABASE_URL",
-"ENABLE_BACKUP_SYNC",
-"FAIL_ON_BACKUP_ERROR",
 "NEXT_PUBLIC_*",
 "EXPO_PUBLIC_*",
 "SENTRY_*"
@@ -92,7 +84,9 @@
 "dependsOn": ["^build"]
 },
 "@sabron/api#dev": {
-"dependsOn": ["^build"]
+"dependsOn": ["^build"],
+"cache": false,
+"persistent": true
 },
 "db:seed": {
 "cache": false
