@@ -4,17 +4,17 @@
   "rsc": true,
   "tsx": true,
   "tailwind": {
-    "config": "./tailwind.config.js",
-    "css": "../../packages/ui/src/styles/input.css",
+    "config": "tailwind.config.ts",
+    "css": "src/styles/input.css",
     "baseColor": "slate",
     "cssVariables": true
   },
+  "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
-    "hooks": "@/hooks",
-    "lib": "@/lib",
+    "components": "@sabron/ui/components",
     "utils": "@sabron/ui/lib/utils",
+    "hooks": "@sabron/ui/hooks",
+    "lib": "@sabron/ui/lib",
     "ui": "@sabron/ui/components"
-  },
-  "iconLibrary": "lucide"
+  }
 }
