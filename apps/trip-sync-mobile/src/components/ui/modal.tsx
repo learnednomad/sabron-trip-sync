@@ -113,13 +113,13 @@ export const Modal = React.forwardRef(
  * Custom Backdrop
  */
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable as any);
 
 const CustomBackdrop = ({ style }: BottomSheetBackdropProps) => {
   const { close } = useBottomSheet();
   return (
     <AnimatedPressable
-      onPress={() => close()}
+      {...({ onPress: () => close() } as any)}
       entering={FadeIn.duration(50)}
       exiting={FadeOut.duration(20)}
       style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.4)' }]}

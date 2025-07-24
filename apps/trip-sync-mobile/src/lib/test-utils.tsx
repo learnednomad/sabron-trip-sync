@@ -7,10 +7,14 @@ import { render, userEvent } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import React from 'react';
 
+interface WrapperProps {
+  children: React.ReactNode;
+}
+
 const createAppWrapper = () => {
-  return ({ children }: { children: React.ReactNode }) => (
+  return ({ children }: WrapperProps) => (
     <BottomSheetModalProvider>
-      <NavigationContainer>{children}</NavigationContainer>
+      <NavigationContainer>{children as any}</NavigationContainer>
     </BottomSheetModalProvider>
   );
 };
@@ -20,7 +24,7 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>
 ) => {
   const Wrapper = createAppWrapper(); // make sure we have a new wrapper for each render
-  return render(ui, { wrapper: Wrapper, ...options });
+  return render(ui as any, { wrapper: Wrapper, ...options });
 };
 
 // use this if you want to test user events
@@ -31,7 +35,7 @@ export const setup = (
   const Wrapper = createAppWrapper();
   return {
     user: userEvent.setup(),
-    ...render(ui, { wrapper: Wrapper, ...options }),
+    ...render(ui as any, { wrapper: Wrapper, ...options }),
   };
 };
 
