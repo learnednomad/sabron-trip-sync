@@ -18,7 +18,6 @@ jobs:
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const { context } = require('@actions/github');
             
             // Process both issues and PRs with parent EPIC references
             const body = context.payload.issue?.body || context.payload.pull_request?.body || '';
