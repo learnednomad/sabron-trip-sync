@@ -1,0 +1,23 @@
+name: Test Minimal Workflow
+on: 
+  workflow_dispatch: {}
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simple test
+        run: echo "Testing workflow startup"
+        
+      - name: Test GitHub Script Basic
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('GitHub Script working');
+            console.log('Context:', JSON.stringify(context, null, 2));
