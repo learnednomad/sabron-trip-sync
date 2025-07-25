@@ -1,6 +1,6 @@
 name: Test Minimal Workflow
 on: 
-  workflow_dispatch:
+  workflow_dispatch: {}
   issues:
     types: [opened]
 
