@@ -1,0 +1,114 @@
+name: Epic Progress Tracker
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited]
+  pull_request:
+    types: [opened, closed, ready_for_review]
+
+jobs:
+  update-epic-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Epic Progress
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const { context } = require('@actions/github');
+            
+            // Process both issues and PRs with parent EPIC references
+            const body = context.payload.issue?.body || context.payload.pull_request?.body || '';
+            const epicMatch = body.match(/\*\*Parent EPIC\*\*:\s*#(\d+)|(?:Epic|EPIC):\s*#(\d+)|(?:Closes|Fixes|Resolves)\s+#(\d+)/i);
+            
+            if (!epicMatch) {
+              console.log('No parent EPIC found in issue/PR body');
+              return;
+            }
+            
+            const epicNumber = parseInt(epicMatch[1] || epicMatch[2] || epicMatch[3]);
+            const childItem = context.payload.issue || context.payload.pull_request;
+            const childItemNumber = childItem.number;
+            const childItemType = context.payload.issue ? 'issue' : 'PR';
+            const isClosed = childItem.state === 'closed';
+            const isDraft = context.payload.pull_request?.draft || false;
+            
+            console.log(`Processing child ${childItemType} #${childItemNumber} for epic #${epicNumber}`);
+            
+            try {
+              // Get the epic issue
+              const { data: epic } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber
+              });
+              
+              // Find and update checkbox for this issue
+              let updatedBody = epic.body;
+              
+              // Pattern to match checkbox items that reference this issue/PR
+              const checkboxPattern = new RegExp(
+                `(- \\[[ x]\\].*?#${childItemNumber}(?:\\s|$|\\)))`,
+                'gim'
+              );
+              
+              // Skip draft PRs for completion tracking
+              const shouldMarkComplete = isClosed && !isDraft;
+              
+              if (checkboxPattern.test(updatedBody)) {
+                // Update existing checkbox
+                updatedBody = updatedBody.replace(checkboxPattern, (match) => {
+                  return match.replace(/- \[[ x]\]/, shouldMarkComplete ? '- [x]' : '- [ ]');
+                });
+                
+                console.log(`Updated checkbox for ${childItemType} #${childItemNumber} in epic #${epicNumber}`);
+              } else {
+                // Add new checkbox if not found
+                const checkboxLine = `- [${shouldMarkComplete ? 'x' : ' '}] ${childItem.title} #${childItemNumber}`;
+                updatedBody += `\n${checkboxLine}`;
+                console.log(`Added new checkbox for ${childItemType} #${childItemNumber} in epic #${epicNumber}`);
+              }
+              
+              // Update the epic issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber,
+                body: updatedBody
+              });
+              
+              // Add comment to epic about the progress update
+              const action = shouldMarkComplete ? 'completed' : (isClosed ? 'closed' : 'updated');
+              const statusEmoji = shouldMarkComplete ? '✅' : isClosed ? '🔄' : '📝';
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: epicNumber,
+                body: `${statusEmoji} **Automated Progress Update**\n\nChild ${childItemType} #${childItemNumber} has been ${action}. Epic progress updated automatically.${isDraft ? '\n\n*Note: Draft PRs are not marked as completed until ready for review.*' : ''}`
+              });
+              
+            } catch (error) {
+              console.error('Error updating epic progress:', error);
+              
+              // Create a comment on the child issue/PR if epic update fails
+              const itemNumber = childItemNumber;
+              if (context.payload.issue) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: itemNumber,
+                  body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`
+                });
+              } else if (context.payload.pull_request) {
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: itemNumber,
+                  body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`,
+                  event: 'COMMENT'
+                });
+              }
+            }
