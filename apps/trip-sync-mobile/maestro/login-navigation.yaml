@@ -1,0 +1,25 @@
+# TripSync Mobile - Login Navigation Test
+# This flow tests navigation between login and register screens
+
+appId: com.tripsyncmobile.development
+---
+- launchApp
+- assertVisible: "Welcome Back"
+
+# Test navigation to register screen
+- assertVisible: "Don't have an account?"
+- tapOn: "Sign Up"
+- assertVisible: "Create Account"
+
+# Navigate back to login (if there's a back button or link)
+- back
+- assertVisible: "Welcome Back"
+
+# Test forgot password link
+- assertVisible: "Forgot Password?"
+- tapOn: "Forgot Password?"
+# Add assertions for forgot password flow when implemented
+
+# Test social login buttons
+- assertVisible: "Continue with Google"
+- assertVisible: "Continue with Apple"

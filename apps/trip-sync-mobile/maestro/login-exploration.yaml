@@ -1,0 +1,43 @@
+# Explore app navigation to find login flow
+
+appId: com.tripsyncmobile.development
+---
+- launchApp
+- waitForAnimationToEnd
+- takeScreenshot: "app-start"
+
+# Look for common navigation patterns
+- runFlow:
+    when:
+      visible: "Get Started"
+    commands:
+      - tapOn: "Get Started"
+      - takeScreenshot: "after-get-started"
+
+- runFlow:
+    when:
+      visible: "Skip"
+    commands:
+      - tapOn: "Skip"
+      - takeScreenshot: "after-skip"
+
+- runFlow:
+    when:
+      visible: "Login"
+    commands:
+      - tapOn: "Login"
+      - takeScreenshot: "after-login-tap"
+
+- runFlow:
+    when:
+      visible: "Sign In"
+    commands:
+      - tapOn: "Sign In"
+      - takeScreenshot: "after-signin-tap"
+
+# Check if we're now on login screen
+- runFlow:
+    when:
+      visible: "Welcome Back"
+    commands:
+      - takeScreenshot: "found-login-screen"
