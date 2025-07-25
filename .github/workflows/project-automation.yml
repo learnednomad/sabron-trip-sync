@@ -18,14 +18,14 @@ jobs:
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/users/learnednomad/projects/4
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           labeled: feature:auth,feature:itinerary,feature:visa,feature:cultural,feature:expense,feature:social,feature:maps,feature:booking,feature:safety,feature:offline,feature:analytics,bug,enhancement,security,ci-cd,documentation
           label-operator: OR
 
       - name: Set Priority Field
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const { context } = require('@actions/github');
             
@@ -151,7 +151,7 @@ jobs:
       - name: Set Phase Field
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const { context } = require('@actions/github');
             
@@ -281,7 +281,7 @@ jobs:
       - name: Move New Items to Backlog
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const { context } = require('@actions/github');
             

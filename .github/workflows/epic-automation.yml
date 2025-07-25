@@ -20,7 +20,7 @@ jobs:
       - name: Update Epic Progress
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const { context } = require('@actions/github');
             
@@ -121,7 +121,7 @@ jobs:
         if: github.event.action == 'closed' && github.event.issue.state_reason == 'completed'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             // Move completed issues to Done column in project board
             const projectId = 'PVT_kwHOAPiRE84A9zBn'; // Sabron Trip Sync Development project
