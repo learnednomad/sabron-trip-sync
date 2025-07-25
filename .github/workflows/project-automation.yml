@@ -12,7 +12,6 @@ jobs:
     permissions:
       issues: write
       contents: read
-      projects: write
 
     steps:
       - name: Add to Sabron Trip Sync Project
@@ -275,7 +274,6 @@ jobs:
     permissions:
       issues: write
       contents: read
-      projects: write
     
     if: github.event.action == 'opened'
     
