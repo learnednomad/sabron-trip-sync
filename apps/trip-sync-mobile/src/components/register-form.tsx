@@ -8,6 +8,21 @@ import * as z from 'zod';
 
 import { Button, Checkbox, ControlledInput, Text, View } from '@/components/ui';
 
+// Password validation helper
+const isStrongPassword = (password: string): boolean => {
+  // At least 8 characters
+  if (password.length < 8) return false;
+  // Contains uppercase letter
+  if (!/[A-Z]/.test(password)) return false;
+  // Contains lowercase letter
+  if (!/[a-z]/.test(password)) return false;
+  // Contains number
+  if (!/[0-9]/.test(password)) return false;
+  // Contains special character
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+  return true;
+};
+
 const schema = z
   .object({
     fullName: z
@@ -24,11 +39,12 @@ const schema = z
       .string({
         required_error: 'Password is required',
       })
-      .min(6, 'Password must be at least 6 characters')
-      .regex(
-        /^(?=.*[A-Za-z])(?=.*\d)/,
-        'Password must contain letters and numbers'
-      ),
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password must be less than 100 characters')
+      .refine(isStrongPassword, {
+        message:
+          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+      }),
     confirmPassword: z.string({
       required_error: 'Please confirm your password',
     }),
