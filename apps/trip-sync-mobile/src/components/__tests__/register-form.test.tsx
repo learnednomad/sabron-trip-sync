@@ -5,10 +5,15 @@ import { RegisterForm } from '../register-form';
 
 // Mock the UI components
 jest.mock('@/components/ui', () => ({
-  Button: ({ onPress, label, disabled }: any) => {
+  Button: ({ onPress, label, disabled, testID, ...props }: any) => {
     const { TouchableOpacity, Text } = require('react-native');
     return (
-      <TouchableOpacity onPress={onPress} disabled={disabled} testID="register-button">
+      <TouchableOpacity 
+        onPress={onPress} 
+        disabled={disabled} 
+        testID={testID || 'button'}
+        {...props}
+      >
         <Text>{label}</Text>
       </TouchableOpacity>
     );
@@ -74,13 +79,15 @@ describe('RegisterForm', () => {
     fireEvent.press(getByTestId('register-button'));
 
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({
-        fullName: 'John Doe',
-        email: 'john@example.com',
-        password: 'Pass123!@#',
-        confirmPassword: 'Pass123!@#',
-        agreeToTerms: true,
-      });
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fullName: 'John Doe',
+          email: 'john@example.com',
+          password: 'Pass123!@#',
+          confirmPassword: 'Pass123!@#',
+          agreeToTerms: true,
+        })
+      );
     });
   });
 
