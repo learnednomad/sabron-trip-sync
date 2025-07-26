@@ -1,10 +1,10 @@
-name: Project Board Automation GitHub Script
+name: Project Board Automation
 
 on:
   issues:
-    types: [opened, closed, labeled, unlabeled]
+    types: [opened, labeled]  # Only add when opened or labeled
   pull_request:
-    types: [opened, closed, labeled, unlabeled, ready_for_review]
+    types: [opened, labeled, ready_for_review]  # Only add when opened, labeled, or ready for review
 
 permissions:
   contents: read
@@ -14,15 +14,17 @@ permissions:
 jobs:
   add-to-project-graphql:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: PVT_kwHOAPiRE84A9zBn  # Sabron Trip Sync Development project
     steps:
       - name: Add to Project via GraphQL
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const { context } = require('@actions/github');
+            const core = require('@actions/core');
             
-            console.log('🎯 Project automation workflow started successfully!');
+            console.log('🎯 Project automation workflow started');
             console.log('Event:', context.eventName);
             console.log('Action:', context.payload.action);
             
@@ -51,9 +53,83 @@ jobs:
               return;
             }
             
-            console.log('✅ Item has relevant labels, would add to project');
-            console.log('Labels:', itemLabels);
+            console.log('✅ Item has relevant labels:', itemLabels);
             
-            // TODO: Add actual GraphQL mutation to add to project
-            // For now, just log success to confirm workflow works
-            console.log('🚀 Workflow completed successfully without startup_failure!');
+            try {
+              const projectId = process.env.PROJECT_ID;
+              const itemType = context.payload.issue ? 'Issue' : 'PullRequest';
+              const fieldName = itemType === 'Issue' ? 'issue' : 'pullRequest'; // Fix case sensitivity for GraphQL
+              const itemNumber = item.number;
+              
+              // First, check if the item is already in the project
+              const checkQuery = `
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    ${fieldName}(number: $number) {
+                      id
+                      projectItems(first: 10) {
+                        nodes {
+                          id
+                          project {
+                            id
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const checkResponse = await github.graphql(checkQuery, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                number: itemNumber
+              });
+              
+              const itemNode = checkResponse.repository[fieldName];
+              
+              // Add defensive null check
+              if (!itemNode) {
+                console.log('⚠️ Item not found in repository');
+                return;
+              }
+              const existingProjectItem = itemNode.projectItems.nodes.find(
+                projectItem => projectItem.project.id === projectId
+              );
+              
+              if (existingProjectItem) {
+                console.log(`✅ Item already exists in project: ${existingProjectItem.id}`);
+                return;
+              }
+              
+              // Add item to project
+              const addMutation = `
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {
+                    projectId: $projectId
+                    contentId: $contentId
+                  }) {
+                    item {
+                      id
+                    }
+                  }
+                }
+              `;
+              
+              const addResponse = await github.graphql(addMutation, {
+                projectId: projectId,
+                contentId: itemNode.id
+              });
+              
+              console.log(`🚀 Successfully added item to project: ${addResponse.addProjectV2ItemById.item.id}`);
+              
+            } catch (error) {
+              const errorMessage = `Error adding item to project: ${error.message}`;
+              console.error('❌', errorMessage);
+              console.error('Error details:', {
+                message: error.message,
+                type: error.type,
+                documentation_url: error.documentation_url
+              });
+              core.setFailed(errorMessage);
+            }
