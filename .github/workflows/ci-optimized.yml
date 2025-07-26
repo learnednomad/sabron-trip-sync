@@ -28,10 +28,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -56,9 +56,8 @@ jobs:
           echo "has-api-changes=false" >> $GITHUB_OUTPUT
           
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # Get affected packages using Turbo
-            AFFECTED_JSON=$(pnpm turbo run build --dry=json --filter="...[origin/${{ github.base_ref }}]" 2>/dev/null || echo '{"packages":[]}')
-            AFFECTED_PACKAGES=$(echo "$AFFECTED_JSON" | jq -r '.packages // [] | join(",")')
+            # Get affected packages using Turbo's built-in affected command
+            AFFECTED_PACKAGES=$(pnpm turbo run build --dry=json --filter="...[origin/${{ github.base_ref }}...HEAD]" | jq -r '.packages // [] | join(",")' || echo "")
             
             # If no packages detected or error occurred, fall back to file-based detection
             if [ -z "$AFFECTED_PACKAGES" ] || [ "$AFFECTED_PACKAGES" = "null" ]; then
@@ -74,7 +73,7 @@ jobs:
                 echo "has-web-changes=true" >> $GITHUB_OUTPUT
               fi
               
-              if echo "$CHANGED_FILES" | grep -E "^trip-sync-mobile" > /dev/null; then
+              if echo "$CHANGED_FILES" | grep -E "^apps/trip-sync-mobile" > /dev/null; then
                 echo "has-mobile-changes=true" >> $GITHUB_OUTPUT
               fi
               
@@ -92,7 +91,7 @@ jobs:
                 echo "has-web-changes=true" >> $GITHUB_OUTPUT
               fi
               
-              if echo "$AFFECTED_PACKAGES" | grep "trip-sync-mobile" > /dev/null; then
+              if echo "$AFFECTED_PACKAGES" | grep -E "(trip-sync-mobile|@trip-sync/mobile)" > /dev/null; then
                 echo "has-mobile-changes=true" >> $GITHUB_OUTPUT
               fi
               
@@ -129,10 +128,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -171,10 +170,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -224,10 +223,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -286,11 +285,8 @@ jobs:
               echo "  - Functions: ${functions}%" >> coverage-summary.md
               echo "  - Branches: ${branches}%" >> coverage-summary.md
               
-              # Check thresholds (80% minimum)
-              if (( $(echo "$lines >= 80" | bc -l) )) && \
-                 (( $(echo "$statements >= 80" | bc -l) )) && \
-                 (( $(echo "$functions >= 80" | bc -l) )) && \
-                 (( $(echo "$branches >= 80" | bc -l) )); then
+              # Check thresholds (80% minimum) using awk for proper floating-point comparison
+              if awk "BEGIN { exit !($lines >= 80 && $statements >= 80 && $functions >= 80 && $branches >= 80) }"; then
                 echo "  ✅ Coverage meets thresholds" >> coverage-summary.md
               else
                 echo "  ❌ Coverage below 80% threshold" >> coverage-summary.md
@@ -358,10 +354,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -439,10 +435,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: '22.x'
 
       - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@10.12.3 --activate
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
