@@ -1,0 +1,65 @@
+# TripSync Mobile - Login Flow Test
+# This flow tests the complete login process including validation and error handling
+
+appId: com.tripsyncmobile.development
+---
+- launchApp
+- waitForAnimationToEnd
+
+# Navigate to login if not already there
+- runFlow:
+    when:
+      notVisible: "Welcome Back"
+    commands:
+      # Try to find and tap a login/sign in button
+      - runFlow:
+          when:
+            visible: "Sign In"
+          commands:
+            - tapOn: "Sign In"
+      - runFlow:
+          when:
+            visible: "Login"
+          commands:
+            - tapOn: "Login"
+      - runFlow:
+          when:
+            visible: "Get Started"
+          commands:
+            - tapOn: "Get Started"
+
+# Now assert we're on the login screen
+- assertVisible: "Welcome Back"
+- assertVisible: "Sign in to continue your journey with TripSync"
+
+# Test email input field
+- tapOn: 
+    id: "email-input"
+- inputText: "test@example.com"
+
+# Test password input field  
+- tapOn:
+    id: "password-input"
+- inputText: "password123"
+
+# Test login button
+- tapOn:
+    id: "login-button"
+
+# Wait for either success navigation or error alert
+- runFlow:
+    when:
+      visible: "Login Failed"
+    commands:
+      - assertVisible: "Login Failed"
+      - tapOn: "OK"
+
+# If no error dialog appears, assume successful login and check navigation
+- runFlow:
+    when:
+      notVisible: "Login Failed"
+    commands:
+      # Wait a moment for navigation to complete
+      - waitForAnimationToEnd
+      # Check that we navigated away from login screen
+      - assertNotVisible: "Welcome Back"

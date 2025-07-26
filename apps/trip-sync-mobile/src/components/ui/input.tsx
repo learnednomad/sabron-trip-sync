@@ -109,9 +109,14 @@ export const Input = React.forwardRef<NTextInput, NInputProps>((props, ref) => {
         onBlur={onBlur}
         onFocus={onFocus}
         {...inputProps}
+        accessible={true}
+        accessibilityLabel={label || inputProps.accessibilityLabel}
+        accessibilityState={{ disabled: Boolean(props.disabled) }}
+        accessibilityHint={error || inputProps.accessibilityHint}
         style={StyleSheet.flatten([
           { writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr' },
           { textAlign: I18nManager.isRTL ? 'right' : 'left' },
+          { minHeight: 44 }, // Ensure 44pt minimum height
           inputProps.style,
         ])}
       />
@@ -119,6 +124,9 @@ export const Input = React.forwardRef<NTextInput, NInputProps>((props, ref) => {
         <Text
           testID={testID ? `${testID}-error` : undefined}
           className="text-sm text-danger-400 dark:text-danger-600"
+          accessible={true}
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
         >
           {error}
         </Text>

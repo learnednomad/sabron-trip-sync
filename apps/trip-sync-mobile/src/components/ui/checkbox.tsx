@@ -12,7 +12,8 @@ import colors from '@/components/ui/colors';
 
 import { Text } from './text';
 
-const SIZE = 20;
+const SIZE = 20; // Visual size
+const TOUCH_SIZE = 44; // Minimum touch target (44pt)
 const WIDTH = 50;
 const HEIGHT = 28;
 const THUMB_HEIGHT = 22;
@@ -48,6 +49,7 @@ export const Root = ({
       className={`flex-row items-center ${className} ${
         disabled ? 'opacity-50' : ''
       }`}
+      style={{ minHeight: TOUCH_SIZE, minWidth: TOUCH_SIZE }} // 44pt minimum touch target
       accessibilityState={{ checked }}
       disabled={disabled}
       {...props}
@@ -206,7 +208,9 @@ export const SwitchIcon = ({ checked = false }: IconProps) => {
   const backgroundColor = checked ? colors.primary[300] : colors.charcoal[400];
 
   return (
-    <View className="w-[50px] justify-center">
+    <View className="w-[50px] justify-center" style={{ minHeight: TOUCH_SIZE }}>
+      {' '}
+      {/* 44pt touch target */}
       <View className="overflow-hidden rounded-full">
         <View
           style={{

@@ -46,7 +46,7 @@ const button = tv({
     },
     size: {
       default: {
-        container: 'h-10 px-4',
+        container: 'h-11 px-4', // 44pt minimum touch target
         label: 'text-base',
       },
       lg: {
@@ -54,11 +54,11 @@ const button = tv({
         label: 'text-xl',
       },
       sm: {
-        container: 'h-8 px-3',
+        container: 'h-11 px-3', // Maintained 44pt minimum even for small
         label: 'text-sm',
         indicator: 'h-2',
       },
-      icon: { container: 'size-9' },
+      icon: { container: 'size-11' }, // 44pt minimum for icon buttons
     },
     disabled: {
       true: {
@@ -119,6 +119,13 @@ export const Button = React.forwardRef<View, Props>(
         {...props}
         ref={ref}
         testID={testID}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={text || props.accessibilityLabel}
+        accessibilityState={{ disabled: disabled || loading }}
+        accessibilityHint={
+          loading ? 'Loading, please wait' : props.accessibilityHint
+        }
       >
         {props.children ? (
           props.children

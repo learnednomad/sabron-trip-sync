@@ -1,0 +1,36 @@
+# TripSync Mobile - Login Form Validation Test
+# This flow tests form validation scenarios
+
+appId: com.tripsyncmobile.development
+---
+- launchApp
+- assertVisible: "Welcome Back"
+
+# Test empty form submission
+- tapOn:
+    id: "login-button"
+- assertVisible: "Email is required"
+
+# Test invalid email format
+- tapOn:
+    id: "email-input" 
+- inputText: "invalid-email"
+- tapOn:
+    id: "password-input"
+- inputText: "test123"
+- tapOn:
+    id: "login-button"
+- assertVisible: "Invalid email format"
+
+# Test short password
+- tapOn:
+    id: "email-input"
+- clearInput
+- inputText: "test@example.com"
+- tapOn:
+    id: "password-input"
+- clearInput
+- inputText: "123"
+- tapOn:
+    id: "login-button"
+- assertVisible: "Password must be at least 6 characters"

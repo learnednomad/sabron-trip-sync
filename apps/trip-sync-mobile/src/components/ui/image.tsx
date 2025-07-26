@@ -20,6 +20,8 @@ export const Image = ({
       className={className}
       placeholder={placeholder}
       style={style}
+      accessible={true}
+      accessibilityRole="image"
       {...props}
     />
   );

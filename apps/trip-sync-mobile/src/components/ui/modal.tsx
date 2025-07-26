@@ -34,7 +34,7 @@ import type {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModal, useBottomSheet } from '@gorhom/bottom-sheet';
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Path, Svg } from 'react-native-svg';
 
@@ -104,6 +104,9 @@ export const Modal = React.forwardRef(
         backdropComponent={props.backdropComponent || renderBackdrop}
         enableDynamicSizing={false}
         handleComponent={renderHandleComponent}
+        accessible={true}
+        accessibilityLabel={title || 'Modal'}
+        accessibilityViewIsModal={true}
       />
     );
   }
@@ -123,6 +126,10 @@ const CustomBackdrop = ({ style }: BottomSheetBackdropProps) => {
       entering={FadeIn.duration(50)}
       exiting={FadeOut.duration(20)}
       style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.4)' }]}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel="Close modal"
+      accessibilityHint="Tap to dismiss the modal"
     />
   );
 };
@@ -179,9 +186,13 @@ const CloseButton = ({ close }: { close: () => void }) => {
       onPress={close}
       className="absolute right-3 top-3 size-[24px] items-center justify-center "
       hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-      accessibilityLabel="close modal"
+      accessibilityLabel="Close modal"
       accessibilityRole="button"
-      accessibilityHint="closes the modal"
+      accessibilityHint="Closes the modal"
+      accessible={true}
+      style={StyleSheet.flatten([
+        { minHeight: 44, minWidth: 44 }, // Ensure 44pt minimum touch target
+      ])}
     >
       <Svg
         className="fill-neutral-300 dark:fill-white"

@@ -1,0 +1,7 @@
+# Debug Screen Test - Check what's visible when app launches
+
+appId: com.tripsyncmobile.development
+---
+- launchApp
+- takeScreenshot: "app-launch"
+- assertVisible: ".*"  # Match any text to see what's on screen
