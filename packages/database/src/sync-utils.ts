@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 export interface SyncReport {
   table: string;
@@ -51,14 +51,14 @@ export class SyncVerifier {
       'report'
     ];
 
-    for (const table of tables) {
+    await Promise.all(tables.map(async (table) => {
       try {
         const report = await this.checkTableSync(table);
         reports.push(report);
       } catch (error) {
         errors.push(new Error(`Failed to check sync for table ${table}: ${error instanceof Error ? error.message : String(error)}`));
       }
-    }
+    }));
 
     const overall = reports.every(report => report.inSync) && errors.length === 0;
 
@@ -72,8 +72,8 @@ export class SyncVerifier {
 
   private async checkTableSync(table: string): Promise<SyncReport> {
     const [primaryCount, backupCount] = await Promise.all([
-      (this.primaryClient as any)[table].count(),
-      (this.backupClient as any)[table].count(),
+      (this.primaryClient as Record<string, { count: () => Promise<number> }>)[table].count(),
+      (this.backupClient as Record<string, { count: () => Promise<number> }>)[table].count(),
     ]);
 
     const difference = Math.abs(primaryCount - backupCount);
@@ -90,26 +90,26 @@ export class SyncVerifier {
   }
 
   async findSyncGaps(table: string, limit: number = 100): Promise<{
-    missingInBackup: any[];
-    missingInPrimary: any[];
+    missingInBackup: Record<string, unknown>[];
+    missingInPrimary: Record<string, unknown>[];
   }> {
-    const primaryRecords = await (this.primaryClient as any)[table].findMany({
+    const primaryRecords = await (this.primaryClient as Record<string, { findMany: (args: unknown) => Promise<unknown[]> }>)[table].findMany({
       select: { id: true, createdAt: true, updatedAt: true },
       take: limit,
       orderBy: { createdAt: 'desc' },
     });
 
-    const backupRecords = await (this.backupClient as any)[table].findMany({
+    const backupRecords = await (this.backupClient as Record<string, { findMany: (args: unknown) => Promise<unknown[]> }>)[table].findMany({
       select: { id: true, createdAt: true, updatedAt: true },
       take: limit,
       orderBy: { createdAt: 'desc' },
     });
 
-    const primaryIds = new Set(primaryRecords.map((r: any) => r.id));
-    const backupIds = new Set(backupRecords.map((r: any) => r.id));
+    const primaryIds = new Set(primaryRecords.map((r: Record<string, unknown>) => r.id));
+    const backupIds = new Set(backupRecords.map((r: Record<string, unknown>) => r.id));
 
-    const missingInBackup = primaryRecords.filter((r: any) => !backupIds.has(r.id));
-    const missingInPrimary = backupRecords.filter((r: any) => !primaryIds.has(r.id));
+    const missingInBackup = primaryRecords.filter((r: Record<string, unknown>) => !backupIds.has(r.id)) as Record<string, unknown>[];
+    const missingInPrimary = backupRecords.filter((r: Record<string, unknown>) => !primaryIds.has(r.id)) as Record<string, unknown>[];
 
     return {
       missingInBackup,
@@ -128,14 +128,14 @@ export class SyncVerifier {
       errors: [] as Error[],
     };
 
-    for (const id of recordIds) {
+    await Promise.all(recordIds.map(async (id) => {
       try {
-        const record = await (this.primaryClient as any)[table].findUnique({
+        const record = await (this.primaryClient as Record<string, { findUnique: (args: unknown) => Promise<unknown> }>)[table].findUnique({
           where: { id },
         });
 
         if (record) {
-          await (this.backupClient as any)[table].upsert({
+          await (this.backupClient as Record<string, { upsert: (args: unknown) => Promise<unknown> }>)[table].upsert({
             where: { id },
             update: record,
             create: record,
@@ -146,7 +146,7 @@ export class SyncVerifier {
         result.failed++;
         result.errors.push(new Error(`Failed to sync record ${id}: ${error instanceof Error ? error.message : String(error)}`));
       }
-    }
+    }));
 
     return result;
   }

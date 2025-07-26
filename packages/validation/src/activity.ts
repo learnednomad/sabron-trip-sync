@@ -1,4 +1,6 @@
 import { z } from 'zod';
+
+import { BookingStatusSchema } from './booking';
 import {
   IdSchema,
   TimestampSchema,
@@ -8,7 +10,6 @@ import {
   CoordinatesSchema,
 } from './common';
 import { sanitizeHtml } from './utils';
-import { BookingStatusSchema } from './booking';
 
 // Activity category
 export const ActivityCategorySchema = z.enum([

@@ -1,5 +1,5 @@
-import { DualWriteResult } from './dual-write';
-import { SyncStatus } from './sync-utils';
+import type { DualWriteResult } from './dual-write';
+import type { SyncStatus } from './sync-utils';
 
 export interface AlertConfig {
   webhook?: string;
@@ -162,7 +162,7 @@ export class DatabaseMonitor {
     }
   }
 
-  private async triggerAlert(type: string, details: Record<string, any>): Promise<void> {
+  private triggerAlert(type: string, details: Record<string, unknown>): void {
     if (!this.alertConfig.enabled) return;
 
     const alert = {
@@ -176,7 +176,7 @@ export class DatabaseMonitor {
     console.error('DATABASE ALERT:', alert);
 
     // Send to configured alert channels
-    const promises: Promise<any>[] = [];
+    const promises: Promise<unknown>[] = [];
 
     if (this.alertConfig.webhook) {
       promises.push(this.sendWebhookAlert(alert));
@@ -207,7 +207,7 @@ export class DatabaseMonitor {
     }
   }
 
-  private formatAlertMessage(type: string, details: Record<string, any>): string {
+  private formatAlertMessage(type: string, details: Record<string, unknown>): string {
     switch (type) {
       case 'HIGH_FAILURE_RATE':
         return `High failure rate detected for ${details.operation}: ${details.failureRate}% (threshold: ${details.threshold}%)`;
@@ -220,7 +220,7 @@ export class DatabaseMonitor {
     }
   }
 
-  private async sendWebhookAlert(alert: any): Promise<void> {
+  private async sendWebhookAlert(alert: Record<string, unknown>): Promise<void> {
     try {
       const response = await fetch(this.alertConfig.webhook!, {
         method: 'POST',
@@ -236,7 +236,7 @@ export class DatabaseMonitor {
     }
   }
 
-  private async sendSlackAlert(alert: any): Promise<void> {
+  private async sendSlackAlert(alert: Record<string, unknown>): Promise<void> {
     try {
       const slackPayload = {
         text: `🚨 Database Alert: ${alert.type}`,
@@ -274,9 +274,10 @@ export class DatabaseMonitor {
     }
   }
 
-  private async sendEmailAlert(alert: any): Promise<void> {
+  private sendEmailAlert(alert: Record<string, unknown>): void {
     // Email implementation would depend on your email service
     // This is a placeholder for email alert functionality
+    // eslint-disable-next-line no-console
     console.log('Email alert would be sent to:', this.alertConfig.email, alert);
   }
 

@@ -1,8 +1,10 @@
 // import { supabase } from './index';
 // import { faker } from '@faker-js/faker';
 
-async function seed() {
+function seed() {
+  // eslint-disable-next-line no-console
   console.log('Seeding functionality needs to be reimplemented for Supabase');
+  // eslint-disable-next-line no-console
   console.log('For now, this is a placeholder. Manual seeding via Supabase dashboard is recommended.');
   
   // TODO: Reimplement seeding using Supabase client instead of Prisma
@@ -23,6 +25,7 @@ seed()
     console.error('Seeding failed:', e);
     process.exit(1);
   })
-  .finally(async () => {
+  .finally(() => {
+    // eslint-disable-next-line no-console
     console.log('Seed process completed');
   });

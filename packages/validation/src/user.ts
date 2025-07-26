@@ -1,4 +1,6 @@
 import { z } from 'zod';
+
+import { UsernameSchema } from './auth';
 import {
   EmailSchema,
   PhoneNumberSchema,
@@ -8,9 +10,8 @@ import {
   CurrencySchema,
   AddressSchema,
 } from './common';
-import { UsernameSchema } from './auth';
-import { sanitizeHtml } from './utils';
 import { AccommodationTypeSchema } from './itinerary';
+import { sanitizeHtml } from './utils';
 
 // User preference schemas
 export const BudgetLevelSchema = z.enum(['budget', 'moderate', 'luxury', 'ultra-luxury']);

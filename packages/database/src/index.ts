@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+
 import type { Database } from './types';
 
 // Supabase configuration
@@ -27,7 +28,8 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>
     if (!_supabase) {
       _supabase = createSupabaseClient();
     }
-    return (_supabase as any)[prop];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (_supabase as any)[prop as string];
   }
 });
 
