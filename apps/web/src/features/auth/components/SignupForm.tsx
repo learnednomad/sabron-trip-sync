@@ -1,12 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input, Checkbox } from '@sabron/ui';
+import { Button, Input } from '@sabron/ui';
 import { RegisterSchema, type Register } from '@sabron/validation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { Checkbox } from '@/components/ui/checkbox';
 
 import { useAuth } from '@/providers/auth-provider';
 
@@ -18,6 +20,8 @@ export const SignupForm = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
@@ -98,8 +102,9 @@ export const SignupForm = () => {
       <div className="space-y-3">
         <div className="flex items-start">
           <Checkbox
-            {...register('acceptTerms')}
             id="acceptTerms"
+            checked={watch('acceptTerms')}
+            onCheckedChange={(checked) => setValue('acceptTerms', checked === true)}
             className="mt-0.5"
           />
           <label 
@@ -122,8 +127,9 @@ export const SignupForm = () => {
 
         <div className="flex items-start">
           <Checkbox
-            {...register('marketingConsent')}
             id="marketingConsent"
+            checked={watch('marketingConsent')}
+            onCheckedChange={(checked) => setValue('marketingConsent', checked === true)}
             className="mt-0.5"
           />
           <label 
