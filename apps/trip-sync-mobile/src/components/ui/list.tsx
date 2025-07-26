@@ -12,14 +12,19 @@ export const List = NFlashList;
 
 export const EmptyList = React.memo(({ isLoading }: Props) => {
   return (
-    <View className="min-h-[400px] flex-1 items-center justify-center">
+    <View
+      className="min-h-[400px] flex-1 items-center justify-center"
+      accessible={true}
+      accessibilityRole="text"
+      accessibilityLabel={isLoading ? 'Loading data' : 'No data available'}
+    >
       {!isLoading ? (
-        <View>
+        <View accessible={false}>
           <NoData />
           <Text className="pt-4 text-center">Sorry! No data found</Text>
         </View>
       ) : (
-        <ActivityIndicator />
+        <ActivityIndicator accessible={true} accessibilityLabel="Loading" />
       )}
     </View>
   );

@@ -8,7 +8,7 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useController } from 'react-hook-form';
-import { Platform, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Pressable, type PressableProps } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 import Svg, { Path } from 'react-native-svg';
@@ -124,6 +124,17 @@ const Option = React.memo(
       <Pressable
         className="flex-row items-center border-b border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
         {...props}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityState={{ selected }}
+        accessibilityHint={
+          selected ? 'Selected option' : 'Tap to select this option'
+        }
+        style={StyleSheet.flatten([
+          { minHeight: 44 }, // Ensure 44pt minimum touch target
+          props.style,
+        ])}
       >
         <Text className="flex-1 dark:text-neutral-100 ">{label}</Text>
         {selected && <Check />}
@@ -200,6 +211,18 @@ export const Select = (props: SelectProps) => {
           disabled={disabled}
           onPress={modal.present}
           testID={testID ? `${testID}-trigger` : undefined}
+          accessible={true}
+          accessibilityRole="combobox"
+          accessibilityLabel={label || 'Select an option'}
+          accessibilityValue={{ text: textValue }}
+          accessibilityState={{
+            disabled,
+            expanded: false, // This should be managed by modal state
+          }}
+          accessibilityHint="Double tap to open selection options"
+          style={StyleSheet.flatten([
+            { minHeight: 44 }, // Ensure 44pt minimum touch target
+          ])}
         >
           <View className="flex-1">
             <Text className={styles.inputValue()}>{textValue}</Text>
@@ -210,6 +233,9 @@ export const Select = (props: SelectProps) => {
           <Text
             testID={`${testID}-error`}
             className="text-sm text-danger-300 dark:text-danger-600"
+            accessible={true}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
           >
             {error}
           </Text>
