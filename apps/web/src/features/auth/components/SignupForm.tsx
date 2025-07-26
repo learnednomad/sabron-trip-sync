@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input } from '@sabron/ui';
+import { Button, Input, Checkbox } from '@sabron/ui';
 import { RegisterSchema, type Register } from '@sabron/validation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ import { useAuth } from '@/providers/auth-provider';
 
 export const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { signUp } = useAuth();
 
   const {
@@ -20,6 +21,10 @@ export const SignupForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
+    defaultValues: {
+      acceptTerms: false,
+      marketingConsent: false,
+    },
   });
 
   const onSubmit = async (data: Register) => {
@@ -37,6 +42,7 @@ export const SignupForm = () => {
         autoComplete="name"
         error={errors.name?.message}
         label="Full Name"
+        type="text"
       />
 
       <Input
@@ -68,23 +74,65 @@ export const SignupForm = () => {
         </button>
       </div>
 
-      <Input
-        {...register('confirmPassword')}
-        autoComplete="new-password"
-        error={errors.confirmPassword?.message}
-        label="Confirm Password"
-        type={showPassword ? 'text' : 'password'}
-      />
-
-      <div className="flex items-center">
-        <input
-          {...register('acceptTerms')}
-          className="size-4 rounded border-input text-primary focus:ring-primary"
-          type="checkbox"
+      <div className="relative">
+        <Input
+          {...register('confirmPassword')}
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          label="Confirm Password"
+          type={showConfirmPassword ? 'text' : 'password'}
         />
-        <label className="ml-2 block text-sm text-foreground" htmlFor="acceptTerms">
-          I accept the <Link className="text-primary hover:text-primary/80" href="/terms">Terms of Service</Link>
-        </label>
+        <button
+          className="absolute inset-y-0 right-0 top-1/2 flex -translate-y-1/2 items-center pr-3"
+          type="button"
+          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+        >
+          {showConfirmPassword ? (
+            <EyeOff className="size-5 text-muted-foreground" />
+          ) : (
+            <Eye className="size-5 text-muted-foreground" />
+          )}
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-start">
+          <Checkbox
+            {...register('acceptTerms')}
+            id="acceptTerms"
+            className="mt-0.5"
+          />
+          <label 
+            htmlFor="acceptTerms" 
+            className="ml-2 block text-sm text-foreground"
+          >
+            I agree to the{' '}
+            <Link className="text-primary hover:text-primary/80" href="/terms">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link className="text-primary hover:text-primary/80" href="/privacy">
+              Privacy Policy
+            </Link>
+          </label>
+        </div>
+        {errors.acceptTerms && (
+          <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
+        )}
+
+        <div className="flex items-start">
+          <Checkbox
+            {...register('marketingConsent')}
+            id="marketingConsent"
+            className="mt-0.5"
+          />
+          <label 
+            htmlFor="marketingConsent" 
+            className="ml-2 block text-sm text-foreground"
+          >
+            I want to receive updates and marketing communications
+          </label>
+        </div>
       </div>
 
       <Button
@@ -93,7 +141,7 @@ export const SignupForm = () => {
         loading={isSubmitting}
         type="submit"
       >
-        {isSubmitting ? 'Creating Account...' : 'Create Account'}
+        {isSubmitting ? 'Creating account...' : 'Create account'}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
@@ -104,4 +152,4 @@ export const SignupForm = () => {
       </p>
     </form>
   );
-}
+};
