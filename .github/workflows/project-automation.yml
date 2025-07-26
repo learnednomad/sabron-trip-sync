@@ -1,0 +1,357 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited, labeled, unlabeled]
+  pull_request:
+    types: [opened, closed, reopened, labeled, unlabeled, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  project-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add to Project and Update Epic Progress
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const projectId = 'PVT_kwHOAPiRE84A9zBn'; // Sabron Trip Sync Development project
+            
+            // Get the item (issue or PR)
+            const item = context.payload.issue || context.payload.pull_request;
+            if (!item) {
+              console.log('No issue or PR found in payload');
+              return;
+            }
+            
+            const itemType = context.payload.issue ? 'Issue' : 'PullRequest';
+            const itemNumber = item.number;
+            const itemLabels = item.labels?.map(label => label.name) || [];
+            
+            console.log(`🎯 Processing ${itemType.toLowerCase()} #${itemNumber}: ${item.title}`);
+            console.log(`Labels: ${itemLabels.join(', ')}`);
+            console.log(`Event: ${context.eventName}, Action: ${context.payload.action}`);
+            
+            // Define relevant labels for project inclusion
+            const relevantLabels = [
+              'feature:auth', 'feature:itinerary', 'feature:visa', 'feature:cultural',
+              'feature:expense', 'feature:social', 'feature:maps', 'feature:booking', 
+              'feature:safety', 'feature:offline', 'feature:analytics', 'bug', 
+              'enhancement', 'security', 'ci-cd', 'documentation'
+            ];
+            
+            const hasRelevantLabel = relevantLabels.some(label => itemLabels.includes(label));
+            
+            // Task 1: Add to project if it has relevant labels
+            if (hasRelevantLabel) {
+              await addToProject();
+            }
+            
+            // Task 2: Set priority field if priority label exists
+            const priorityLabel = itemLabels.find(label => label.name.startsWith('priority:'));
+            if (priorityLabel && hasRelevantLabel) {
+              await setPriorityField(priorityLabel);
+            }
+            
+            // Task 3: Update epic progress if this is a child item
+            await updateEpicProgress();
+            
+            // Function to add item to project
+            async function addToProject() {
+              try {
+                console.log('📋 Checking if item should be added to project...');
+                
+                // Check if item is already in project
+                const checkQuery = `
+                  query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      ${itemType.toLowerCase()}(number: $number) {
+                        id
+                        projectItems(first: 10) {
+                          nodes {
+                            id
+                            project {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const checkResponse = await github.graphql(checkQuery, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  number: itemNumber
+                });
+                
+                const itemNode = checkResponse.repository[itemType.toLowerCase()];
+                const existingProjectItem = itemNode.projectItems.nodes.find(
+                  projectItem => projectItem.project.id === projectId
+                );
+                
+                if (existingProjectItem) {
+                  console.log(`✅ Item already exists in project: ${existingProjectItem.id}`);
+                  return existingProjectItem.id;
+                }
+                
+                // Add item to project
+                const addMutation = `
+                  mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemById(input: {
+                      projectId: $projectId
+                      contentId: $contentId
+                    }) {
+                      item {
+                        id
+                      }
+                    }
+                  }
+                `;
+                
+                const addResponse = await github.graphql(addMutation, {
+                  projectId: projectId,
+                  contentId: itemNode.id
+                });
+                
+                const newItemId = addResponse.addProjectV2ItemById.item.id;
+                console.log(`🚀 Successfully added item to project: ${newItemId}`);
+                return newItemId;
+                
+              } catch (error) {
+                console.error('❌ Error adding item to project:', error);
+                return null;
+              }
+            }
+            
+            // Function to set priority field
+            async function setPriorityField(priorityLabel) {
+              try {
+                const priority = priorityLabel.name.replace('priority:', '').toLowerCase();
+                console.log(`🏷️ Setting priority to: ${priority}`);
+                
+                // Get project item ID
+                const findItemQuery = `
+                  query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      ${itemType.toLowerCase()}(number: $number) {
+                        projectItems(first: 10) {
+                          nodes {
+                            id
+                            project {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const itemResponse = await github.graphql(findItemQuery, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  number: itemNumber
+                });
+                
+                const projectItems = itemResponse.repository[itemType.toLowerCase()].projectItems.nodes;
+                const targetItem = projectItems.find(item => item.project.id === projectId);
+                
+                if (!targetItem) {
+                  console.log('⚠️ Item not found in target project for priority setting');
+                  return;
+                }
+                
+                // Get project fields
+                const fieldsQuery = `
+                  query($projectId: ID!) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        fields(first: 20) {
+                          nodes {
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              name
+                              options {
+                                id
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const fieldsResponse = await github.graphql(fieldsQuery, {
+                  projectId: projectId
+                });
+                
+                const priorityField = fieldsResponse.node.fields.nodes.find(field => 
+                  field.name && field.name.toLowerCase().includes('priority')
+                );
+                
+                if (!priorityField) {
+                  console.log('⚠️ Priority field not found in project');
+                  return;
+                }
+                
+                const priorityOption = priorityField.options.find(option => 
+                  option.name.toLowerCase() === priority
+                );
+                
+                if (!priorityOption) {
+                  console.log(`⚠️ Priority option '${priority}' not found in project`);
+                  console.log('Available options:', priorityField.options.map(opt => opt.name).join(', '));
+                  return;
+                }
+                
+                // Update the project item field
+                const updateMutation = `
+                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: $projectId
+                      itemId: $itemId
+                      fieldId: $fieldId
+                      value: $value
+                    }) {
+                      projectV2Item {
+                        id
+                      }
+                    }
+                  }
+                `;
+                
+                await github.graphql(updateMutation, {
+                  projectId: projectId,
+                  itemId: targetItem.id,
+                  fieldId: priorityField.id,
+                  value: {
+                    singleSelectOptionId: priorityOption.id
+                  }
+                });
+                
+                console.log(`✅ Set priority to: ${priority}`);
+                
+              } catch (error) {
+                console.error('❌ Error setting priority:', error);
+              }
+            }
+            
+            // Function to update epic progress
+            async function updateEpicProgress() {
+              try {
+                console.log('📈 Checking for epic progress updates...');
+                
+                // Look for parent EPIC references in the body
+                const body = item.body || '';
+                const epicMatch = body.match(/\*\*Parent EPIC\*\*:\s*#(\d+)|(?:Epic|EPIC):\s*#(\d+)|(?:Closes|Fixes|Resolves)\s+#(\d+)/i);
+                
+                if (!epicMatch) {
+                  console.log('No parent EPIC found in item body');
+                  return;
+                }
+                
+                const epicNumber = parseInt(epicMatch[1] || epicMatch[2] || epicMatch[3]);
+                const childItemType = context.payload.issue ? 'issue' : 'PR';
+                const isClosed = item.state === 'closed';
+                const isDraft = context.payload.pull_request?.draft || false;
+                
+                console.log(`Found parent epic #${epicNumber} for child ${childItemType} #${itemNumber}`);
+                
+                // Get the epic issue
+                const { data: epic } = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: epicNumber
+                });
+                
+                // Update checkbox in epic body
+                let updatedBody = epic.body || '';
+                
+                // Pattern to match checkbox items that reference this issue/PR
+                const checkboxPattern = new RegExp(
+                  `(- \\[[ x]\\].*?#${itemNumber}(?:\\s|$|\\)))`,
+                  'gim'
+                );
+                
+                // Skip draft PRs for completion tracking
+                const shouldMarkComplete = isClosed && !isDraft;
+                
+                if (checkboxPattern.test(updatedBody)) {
+                  // Update existing checkbox
+                  updatedBody = updatedBody.replace(checkboxPattern, (match) => {
+                    return match.replace(/- \[[ x]\]/, shouldMarkComplete ? '- [x]' : '- [ ]');
+                  });
+                  console.log(`Updated existing checkbox for ${childItemType} #${itemNumber}`);
+                } else {
+                  // Add new checkbox if not found
+                  const checkboxLine = `- [${shouldMarkComplete ? 'x' : ' '}] ${item.title} #${itemNumber}`;
+                  
+                  if (updatedBody.trim()) {
+                    updatedBody += `\n${checkboxLine}`;
+                  } else {
+                    updatedBody = checkboxLine;
+                  }
+                  console.log(`Added new checkbox for ${childItemType} #${itemNumber}`);
+                }
+                
+                // Update the epic issue
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: epicNumber,
+                  body: updatedBody
+                });
+                
+                // Add progress comment to epic
+                const action = shouldMarkComplete ? 'completed' : (isClosed ? 'closed' : 'updated');
+                const statusEmoji = shouldMarkComplete ? '✅' : isClosed ? '🔄' : '📝';
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: epicNumber,
+                  body: `${statusEmoji} **Automated Progress Update**\n\nChild ${childItemType} #${itemNumber} has been ${action}. Epic progress updated automatically.${isDraft ? '\n\n*Note: Draft PRs are not marked as completed until ready for review.*' : ''}`
+                });
+                
+                console.log(`✅ Epic #${epicNumber} progress updated successfully`);
+                
+              } catch (error) {
+                console.error('❌ Error updating epic progress:', error);
+                
+                // Try to notify on the child item if epic update fails
+                try {
+                  const errorMessage = `⚠️ **Epic Update Failed**\n\nFailed to update parent epic. Please manually update the epic progress.\n\nError: ${error.message}`;
+                  
+                  if (context.payload.issue) {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: itemNumber,
+                      body: errorMessage
+                    });
+                  } else if (context.payload.pull_request) {
+                    await github.rest.pulls.createReview({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      pull_number: itemNumber,
+                      body: errorMessage,
+                      event: 'COMMENT'
+                    });
+                  }
+                } catch (commentError) {
+                  console.error('Failed to create error notification:', commentError);
+                }
+              }
+            }

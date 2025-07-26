@@ -158,11 +158,6 @@ Apps and packages reference each other using `workspace:*` protocol in the monor
 - Test API endpoints and database operations
 - Run `pnpm test:ci` to ensure coverage requirements
 
-### Database Operations
-- Always run `pnpm db:generate` after schema changes
-- Use `pnpm db:migrate` for development migrations
-- Production migrations use `prisma migrate deploy`
-- Database schema located at `packages/database/prisma/schema.prisma`
 
 ## Project-Specific Notes
 
