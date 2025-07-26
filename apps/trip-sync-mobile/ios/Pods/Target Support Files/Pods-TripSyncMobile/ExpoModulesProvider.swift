@@ -8,12 +8,14 @@
 import ExpoModulesCore
 import Expo
 import ExpoAsset
+import ExpoBlur
 import EXConstants
 import ExpoCrypto
 import ExpoFileSystem
 import ExpoFont
 import ExpoImage
 import ExpoKeepAwake
+import ExpoLinearGradient
 import ExpoLinking
 import ExpoLocalization
 import ExpoHead
@@ -32,6 +34,7 @@ public class ExpoModulesProvider: ModulesProvider {
     return [
       ExpoFetchModule.self,
       AssetModule.self,
+      BlurViewModule.self,
       ConstantsModule.self,
       CryptoModule.self,
       FileSystemModule.self,
@@ -40,6 +43,7 @@ public class ExpoModulesProvider: ModulesProvider {
       FontUtilsModule.self,
       ImageModule.self,
       KeepAwakeModule.self,
+      LinearGradientModule.self,
       ExpoLinkingModule.self,
       LocalizationModule.self,
       ExpoHeadModule.self,
@@ -58,6 +62,7 @@ public class ExpoModulesProvider: ModulesProvider {
     return [
       ExpoFetchModule.self,
       AssetModule.self,
+      BlurViewModule.self,
       ConstantsModule.self,
       CryptoModule.self,
       FileSystemModule.self,
@@ -66,6 +71,7 @@ public class ExpoModulesProvider: ModulesProvider {
       FontUtilsModule.self,
       ImageModule.self,
       KeepAwakeModule.self,
+      LinearGradientModule.self,
       ExpoLinkingModule.self,
       LocalizationModule.self,
       ExpoHeadModule.self,

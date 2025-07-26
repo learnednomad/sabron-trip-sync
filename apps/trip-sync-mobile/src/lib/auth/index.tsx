@@ -1,4 +1,5 @@
 import type { Session, User } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 import { create } from 'zustand';
 
 import { supabase } from '../supabase';
@@ -10,7 +11,7 @@ interface AuthState {
   status: 'idle' | 'loading' | 'signIn' | 'signOut';
   error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
   signOut: () => Promise<void>;
   setSession: (session: Session | null) => void;
   hydrate: () => Promise<void>;
@@ -33,15 +34,33 @@ const createSignInMethod =
   };
 
 const createSignUpMethod =
-  (set: any, get: any) => async (email: string, password: string) => {
+  (set: any, get: any) => async (email: string, password: string, name?: string) => {
     set({ status: 'loading', error: null });
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    
+    // Create deep link for email verification
+    const redirectTo = Linking.createURL('/auth-callback');
+    
+    const { data, error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: redirectTo,
+      }
+    });
 
     if (error) {
       set({ error: error.message, status: 'signOut' });
       throw error;
     } else {
-      get().setSession(data.session);
+      // For email confirmation flow, don't set session immediately
+      // User will need to verify email first
+      if (!data.session && data.user && !data.user.email_confirmed_at) {
+        set({ status: 'signOut', error: null });
+        // Show success message that email verification is required
+      } else {
+        get().setSession(data.session);
+      }
     }
   };
 
@@ -105,6 +124,6 @@ export const useAuth = createSelectors(_useAuth);
 export const signOut = () => _useAuth.getState().signOut();
 export const signIn = (email: string, password: string) =>
   _useAuth.getState().signIn(email, password);
-export const signUp = (email: string, password: string) =>
-  _useAuth.getState().signUp(email, password);
+export const signUp = (email: string, password: string, name?: string) =>
+  _useAuth.getState().signUp(email, password, name);
 export const hydrateAuth = () => _useAuth.getState().hydrate();
