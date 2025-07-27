@@ -70,6 +70,9 @@ const createSignInWithProviderMethod =
     try {
       set({ status: 'loading', error: null });
 
+      // Check if user is already signed in to offer account linking
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
       // Use Supabase's OAuth with deep linking
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -78,13 +81,24 @@ const createSignInWithProviderMethod =
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+            // Pass current user ID for potential account linking
+            ...(currentUser && { state: `link_account:${currentUser.id}` }),
           },
         },
       });
 
       if (error) {
-        set({ error: error.message, status: 'signOut' });
-        throw error;
+        // Handle specific error cases for better UX
+        let errorMessage = error.message;
+        
+        if (error.message?.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please sign in with your password first, then link your social accounts from your profile settings.';
+        } else if (error.message?.includes('account_exists')) {
+          errorMessage = 'An account with this email already exists. Please sign in with your password to link your accounts.';
+        }
+        
+        set({ error: errorMessage, status: 'signOut' });
+        throw new Error(errorMessage);
       }
 
       // For mobile OAuth, Supabase should handle the session automatically
