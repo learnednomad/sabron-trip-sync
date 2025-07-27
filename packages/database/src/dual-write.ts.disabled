@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 export interface DualWriteConfig {
   primaryRetries: number;
@@ -48,7 +48,7 @@ export class DualWriteManager {
     operationBackup: (client: PrismaClient) => Promise<T>
   ): Promise<DualWriteResult<T>> {
     const result: DualWriteResult<T> = {
-      primaryResult: null as any,
+      primaryResult: null as T,
       primarySuccess: false,
       backupSuccess: false,
       errors: {},
@@ -100,6 +100,7 @@ export class DualWriteManager {
 
     for (let i = 0; i <= retries; i++) {
       try {
+        // eslint-disable-next-line no-await-in-loop
         return await Promise.race([
           operation(),
           new Promise<never>((_, reject) =>
@@ -109,7 +110,8 @@ export class DualWriteManager {
       } catch (error) {
         lastError = error as Error;
         if (i < retries) {
-          // Exponential backoff
+          // Exponential backoff - note: this is intentionally sequential for retry logic
+          // eslint-disable-next-line no-await-in-loop
           await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
         }
       }
@@ -119,92 +121,92 @@ export class DualWriteManager {
   }
 
   // Helper methods for common operations
-  async create<T>(
+  create<T>(
     model: string,
-    data: any,
-    include?: any
+    data: Record<string, unknown>,
+    include?: Record<string, unknown>
   ): Promise<DualWriteResult<T>> {
     return this.executeWithDualWrite(
-      (client) => (client as any)[model].create({ data, include }),
-      (client) => (client as any)[model].create({ data, include })
+      (client) => (client as Record<string, { create: (args: unknown) => Promise<T> }>)[model].create({ data, include }),
+      (client) => (client as Record<string, { create: (args: unknown) => Promise<T> }>)[model].create({ data, include })
     );
   }
 
-  async update<T>(
+  update<T>(
     model: string,
-    where: any,
-    data: any,
-    include?: any
+    where: Record<string, unknown>,
+    data: Record<string, unknown>,
+    include?: Record<string, unknown>
   ): Promise<DualWriteResult<T>> {
     return this.executeWithDualWrite(
-      (client) => (client as any)[model].update({ where, data, include }),
-      (client) => (client as any)[model].update({ where, data, include })
+      (client) => (client as Record<string, { update: (args: unknown) => Promise<T> }>)[model].update({ where, data, include }),
+      (client) => (client as Record<string, { update: (args: unknown) => Promise<T> }>)[model].update({ where, data, include })
     );
   }
 
-  async delete<T>(
+  delete<T>(
     model: string,
-    where: any
+    where: Record<string, unknown>
   ): Promise<DualWriteResult<T>> {
     return this.executeWithDualWrite(
-      (client) => (client as any)[model].delete({ where }),
-      (client) => (client as any)[model].delete({ where })
+      (client) => (client as Record<string, { delete: (args: unknown) => Promise<T> }>)[model].delete({ where }),
+      (client) => (client as Record<string, { delete: (args: unknown) => Promise<T> }>)[model].delete({ where })
     );
   }
 
-  async upsert<T>(
+  upsert<T>(
     model: string,
-    where: any,
-    update: any,
-    create: any,
-    include?: any
+    where: Record<string, unknown>,
+    update: Record<string, unknown>,
+    create: Record<string, unknown>,
+    include?: Record<string, unknown>
   ): Promise<DualWriteResult<T>> {
     return this.executeWithDualWrite(
-      (client) => (client as any)[model].upsert({ where, update, create, include }),
-      (client) => (client as any)[model].upsert({ where, update, create, include })
+      (client) => (client as Record<string, { upsert: (args: unknown) => Promise<T> }>)[model].upsert({ where, update, create, include }),
+      (client) => (client as Record<string, { upsert: (args: unknown) => Promise<T> }>)[model].upsert({ where, update, create, include })
     );
   }
 
   // Read operations (only from primary)
-  async findUnique<T>(
+  findUnique<T>(
     model: string,
-    where: any,
-    include?: any
+    where: Record<string, unknown>,
+    include?: Record<string, unknown>
   ): Promise<T> {
-    return (this.primaryClient as any)[model].findUnique({ where, include });
+    return (this.primaryClient as Record<string, { findUnique: (args: unknown) => Promise<T> }>)[model].findUnique({ where, include });
   }
 
-  async findMany<T>(
+  findMany<T>(
     model: string,
-    options: any = {}
+    options: Record<string, unknown> = {}
   ): Promise<T[]> {
-    return (this.primaryClient as any)[model].findMany(options);
+    return (this.primaryClient as Record<string, { findMany: (args: unknown) => Promise<T[]> }>)[model].findMany(options);
   }
 
-  async findFirst<T>(
+  findFirst<T>(
     model: string,
-    options: any = {}
+    options: Record<string, unknown> = {}
   ): Promise<T | null> {
-    return (this.primaryClient as any)[model].findFirst(options);
+    return (this.primaryClient as Record<string, { findFirst: (args: unknown) => Promise<T | null> }>)[model].findFirst(options);
   }
 
-  async count(
+  count(
     model: string,
-    where?: any
+    where?: Record<string, unknown>
   ): Promise<number> {
-    return (this.primaryClient as any)[model].count({ where });
+    return (this.primaryClient as Record<string, { count: (args: unknown) => Promise<number> }>)[model].count({ where });
   }
 
   // Transaction support
-  async transaction<T>(
-    operations: ((client: PrismaClient) => Promise<any>)[],
-    operationsBackup: ((client: PrismaClient) => Promise<any>)[]
+  transaction<T>(
+    operations: ((client: PrismaClient) => Promise<unknown>)[],
+    operationsBackup: ((client: PrismaClient) => Promise<unknown>)[]
   ): Promise<DualWriteResult<T[]>> {
     return this.executeWithDualWrite(
-      (client) => client.$transaction(async (tx: any) => {
+      (client) => client.$transaction((tx: PrismaClient) => {
         return Promise.all(operations.map(op => op(tx)));
       }),
-      (client) => client.$transaction(async (tx: any) => {
+      (client) => client.$transaction((tx: PrismaClient) => {
         return Promise.all(operationsBackup.map(op => op(tx)));
       })
     );

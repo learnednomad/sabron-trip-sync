@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
+import type { EmailOtpType } from '@supabase/supabase-js';
 
 import { SafeAreaView, Text, View } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
@@ -12,11 +13,43 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the access_token and refresh_token from the URL params
+        const tokenHash = params.token_hash as string;
+        const type = params.type as EmailOtpType;
         const accessToken = params.access_token as string;
         const refreshToken = params.refresh_token as string;
 
-        if (accessToken && refreshToken) {
+        // Handle EmailOtpType verification (preferred method)
+        if (tokenHash && type) {
+          const { error } = await supabase.auth.verifyOtp({
+            type,
+            token_hash: tokenHash,
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          const message = type === 'signup' 
+            ? 'Email verified successfully! You can now access your account.'
+            : type === 'recovery'
+            ? 'Password reset verification successful. You can now set a new password.'
+            : 'Email verification successful!';
+
+          const destination = type === 'recovery' ? '/reset-password' : '/(tabs)';
+
+          Alert.alert(
+            'Verification Successful!',
+            message,
+            [
+              {
+                text: 'Continue',
+                onPress: () => router.replace(destination),
+              },
+            ]
+          );
+        }
+        // Fallback to legacy token method
+        else if (accessToken && refreshToken) {
           // Set the session using the tokens
           const { error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -29,34 +62,34 @@ export default function AuthCallback() {
 
           Alert.alert(
             'Email Verified!',
-            'Your email has been successfully verified. You can now log in.',
+            'Your email has been successfully verified. You can now access your account.',
             [
               {
-                text: 'OK',
-                onPress: () => router.replace('/login'),
+                text: 'Continue',
+                onPress: () => router.replace('/(tabs)'),
               },
             ]
           );
         } else {
-          // Handle error case
           Alert.alert(
             'Verification Failed',
-            'Unable to verify your email. Please try again.',
+            'Unable to verify your email. Please try again or contact support.',
             [
               {
-                text: 'OK',
+                text: 'Back to Login',
                 onPress: () => router.replace('/login'),
               },
             ]
           );
         }
       } catch (error: any) {
+        console.error('Auth callback error:', error);
         Alert.alert(
-          'Error',
-          error.message || 'An error occurred during verification.',
+          'Verification Error',
+          error.message || 'An error occurred during verification. Please try again.',
           [
             {
-              text: 'OK',
+              text: 'Back to Login',
               onPress: () => router.replace('/login'),
             },
           ]

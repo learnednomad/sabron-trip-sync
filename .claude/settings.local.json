@@ -88,7 +88,18 @@
       "Bash(gh pr create:*)",
       "Bash(gh run list:*)",
       "mcp__multi-ai-collab__grok_debug",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "mcp__ios-simulator__ui_type",
+      "mcp__ios-simulator__ui_tap",
+      "mcp__ios-simulator__ui_view",
+      "mcp__ios-simulator__ui_swipe",
+      "mcp__ios-simulator__ui_describe_all",
+      "mcp__firecrawl__firecrawl_search",
+      "Bash(npx expo install:*)",
+      "mcp__multi-ai-collab__ask_openai",
+      "mcp__multi-ai-collab__ask_grok"
     ],
     "deny": []
   },

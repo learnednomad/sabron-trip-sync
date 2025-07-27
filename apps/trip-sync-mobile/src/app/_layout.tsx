@@ -67,6 +67,10 @@ export default function RootLayout() {
               name="register"
               options={{ headerShown: false, presentation: 'modal' }}
             />
+            <Stack.Screen
+              name="auth-callback"
+              options={{ headerShown: false, presentation: 'modal' }}
+            />
           </>
         ) : (
           <>
@@ -74,6 +78,10 @@ export default function RootLayout() {
             <Stack.Screen name="register" options={{ headerShown: false }} />
             <Stack.Screen name="onboarding" options={{ headerShown: false }} />
             <Stack.Screen name="(app)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="auth-callback"
+              options={{ headerShown: false }}
+            />
           </>
         )}
       </Stack>

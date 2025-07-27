@@ -45,7 +45,7 @@ with_node \
   --no-warnings \
   --eval "require(require.resolve('expo-modules-autolinking', { paths: [require.resolve('expo/package.json')] }))(process.argv.slice(1))" \
   generate-modules-provider  \
-  --target "/Users/saninabil/WebstormProjects/sabron-trip-sync-repo/sabron-trip-sync/apps/trip-sync-mobile/ios/Pods/Target Support Files/Pods-TripSyncMobile/ExpoModulesProvider.swift" \
-  --entitlement "/Users/saninabil/WebstormProjects/sabron-trip-sync-repo/sabron-trip-sync/apps/trip-sync-mobile/ios/TripSyncMobile/TripSyncMobile.entitlements" \
+  --target "/Users/saninabil/WebstormProjects/sabron-trip-sync/apps/trip-sync-mobile/ios/Pods/Target Support Files/Pods-TripSyncMobile/ExpoModulesProvider.swift" \
+  --entitlement "/Users/saninabil/WebstormProjects/sabron-trip-sync/apps/trip-sync-mobile/ios/TripSyncMobile/TripSyncMobile.entitlements" \
   --platform "apple" \
-  --packages "expo" "expo-asset" "expo-constants" "expo-crypto" "expo-dev-launcher" "expo-dev-menu" "expo-file-system" "expo-font" "expo-image" "expo-keep-awake" "expo-linking" "expo-localization" "expo-router" "expo-secure-store" "expo-splash-screen" "expo-system-ui"
+  --packages "expo" "expo-asset" "expo-blur" "expo-constants" "expo-crypto" "expo-dev-launcher" "expo-dev-menu" "expo-file-system" "expo-font" "expo-image" "expo-keep-awake" "expo-linear-gradient" "expo-linking" "expo-localization" "expo-router" "expo-secure-store" "expo-splash-screen" "expo-system-ui"
