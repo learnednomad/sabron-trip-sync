@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useAuth } from '@/providers/auth-provider';
+import { SocialLoginGroup } from './SocialLoginGroup';
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -89,6 +90,8 @@ export const LoginForm = () => {
       >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
+
+      <SocialLoginGroup disabled={isSubmitting} />
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
