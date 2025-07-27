@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { Checkbox } from '@/components/ui/checkbox';
 
 import { useAuth } from '@/providers/auth-provider';
+import { SocialLoginGroup } from './SocialLoginGroup';
 
 export const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +27,6 @@ export const SignupForm = () => {
   } = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      acceptTerms: false,
       marketingConsent: false,
     },
   });
@@ -104,7 +104,7 @@ export const SignupForm = () => {
           <Checkbox
             id="acceptTerms"
             checked={watch('acceptTerms')}
-            onCheckedChange={(checked) => setValue('acceptTerms', checked === true)}
+            onCheckedChange={(checked) => setValue('acceptTerms', checked as true)}
             className="mt-0.5"
           />
           <label 
@@ -149,6 +149,8 @@ export const SignupForm = () => {
       >
         {isSubmitting ? 'Creating account...' : 'Create account'}
       </Button>
+
+      <SocialLoginGroup disabled={isSubmitting} />
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}

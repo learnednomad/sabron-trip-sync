@@ -99,6 +99,8 @@
       "mcp__firecrawl__firecrawl_search",
       "Bash(npx expo install:*)",
       "mcp__multi-ai-collab__ask_openai",
+      "mcp__multi-ai-collab__ask_grok",
+      "Bash(gh issue view:*)",
       "mcp__multi-ai-collab__ask_grok"
     ],
     "deny": []
