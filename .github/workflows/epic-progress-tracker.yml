@@ -46,7 +46,7 @@ jobs:
               });
               
               // Find and update checkbox for this issue
-              let updatedBody = epic.body;
+              let updatedBody = epic.body || '';
               
               // Pattern to match checkbox items that reference this issue/PR
               const checkboxPattern = new RegExp(
@@ -67,7 +67,13 @@ jobs:
               } else {
                 // Add new checkbox if not found
                 const checkboxLine = `- [${shouldMarkComplete ? 'x' : ' '}] ${childItem.title} #${childItemNumber}`;
-                updatedBody += `\n${checkboxLine}`;
+                
+                // Add to existing body with proper formatting
+                if (updatedBody.trim()) {
+                  updatedBody += `\n${checkboxLine}`;
+                } else {
+                  updatedBody = checkboxLine;
+                }
                 console.log(`Added new checkbox for ${childItemType} #${childItemNumber} in epic #${epicNumber}`);
               }
               
@@ -94,20 +100,24 @@ jobs:
               
               // Create a comment on the child issue/PR if epic update fails
               const itemNumber = childItemNumber;
-              if (context.payload.issue) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: itemNumber,
-                  body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`
-                });
-              } else if (context.payload.pull_request) {
-                await github.rest.pulls.createReview({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: itemNumber,
-                  body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`,
-                  event: 'COMMENT'
-                });
+              try {
+                if (context.payload.issue) {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: itemNumber,
+                    body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`
+                  });
+                } else if (context.payload.pull_request) {
+                  await github.rest.pulls.createReview({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: itemNumber,
+                    body: `⚠️ **Epic Update Failed**\n\nFailed to update parent epic #${epicNumber}. Please manually update the epic progress.\n\nError: ${error.message}`,
+                    event: 'COMMENT'
+                  });
+                }
+              } catch (commentError) {
+                console.error('Failed to create error comment:', commentError);
               }
             }

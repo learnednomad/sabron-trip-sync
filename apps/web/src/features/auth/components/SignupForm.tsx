@@ -26,6 +26,7 @@ export const SignupForm = () => {
   } = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
+      acceptTerms: false,
       marketingConsent: false,
     },
   });
@@ -102,8 +103,13 @@ export const SignupForm = () => {
         <div className="flex items-start">
           <Checkbox
             id="acceptTerms"
+<<<<<<< HEAD
             checked={watch('acceptTerms') === true}
             onCheckedChange={(checked) => setValue('acceptTerms', checked as true)}
+=======
+            checked={watch('acceptTerms')}
+            onCheckedChange={(checked) => setValue('acceptTerms', checked === true)}
+>>>>>>> origin/development
             className="mt-0.5"
           />
           <label 
