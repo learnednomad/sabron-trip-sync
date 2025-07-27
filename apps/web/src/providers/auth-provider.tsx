@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { User } from '@supabase/supabase-js';
+import type { User, Provider } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
+  signInWithProvider: (provider: Provider) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -133,6 +134,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const signInWithProvider = async (provider: Provider) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      // The OAuth flow will redirect to the provider, so we don't need to do anything else here
+      // The callback will handle the session creation
+    } catch (error: any) {
+      // Handle specific error cases
+      if (error.message?.includes('Email link is invalid or has expired')) {
+        toast.error('The authentication link has expired. Please try again.');
+      } else if (error.message?.includes('User already registered')) {
+        toast.error('An account with this email already exists. Please sign in instead.');
+      } else {
+        toast.error(error.message || `Failed to sign in with ${provider}`);
+      }
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -140,6 +171,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         signIn,
         signUp,
+        signInWithProvider,
         signOut,
         resetPassword,
         updatePassword,
