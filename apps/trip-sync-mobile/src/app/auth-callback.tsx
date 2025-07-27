@@ -50,6 +50,7 @@ export default function AuthCallback() {
         }
         // Fallback to legacy token method
         else if (accessToken && refreshToken) {
+          // Set the session using the tokens
           const { error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
