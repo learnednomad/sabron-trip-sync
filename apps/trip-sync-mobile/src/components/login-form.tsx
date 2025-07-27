@@ -6,7 +6,13 @@ import { Platform, ScrollView } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import * as z from 'zod';
 
-import { Button, ControlledInput, Text, View } from '@/components/ui';
+import {
+  Button,
+  ControlledInput,
+  SocialLoginCompact,
+  Text,
+  View,
+} from '@/components/ui';
 import { signInWithProvider } from '@/lib/auth';
 
 const schema = z.object({
@@ -44,12 +50,32 @@ const LoginHeader = () => (
 );
 
 const SocialLoginButtons = ({ isLoading }: { isLoading: boolean }) => {
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+  const [socialLoading, setSocialLoading] = React.useState<{
+    google: boolean;
+    apple: boolean;
+  }>({ google: false, apple: false });
+
+  const handleGoogleLogin = async () => {
     try {
-      await signInWithProvider(provider);
+      setSocialLoading((prev) => ({ ...prev, google: true }));
+      await signInWithProvider('google');
     } catch (error) {
-      console.error(`${provider} login failed:`, error);
+      console.error('Google login failed:', error);
       // Error handling is already done in the auth store
+    } finally {
+      setSocialLoading((prev) => ({ ...prev, google: false }));
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    try {
+      setSocialLoading((prev) => ({ ...prev, apple: true }));
+      await signInWithProvider('apple');
+    } catch (error) {
+      console.error('Apple login failed:', error);
+      // Error handling is already done in the auth store
+    } finally {
+      setSocialLoading((prev) => ({ ...prev, apple: false }));
     }
   };
 
@@ -57,25 +83,18 @@ const SocialLoginButtons = ({ isLoading }: { isLoading: boolean }) => {
     <>
       <View className="my-8 flex-row items-center">
         <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-        <Text className="px-4 text-sm text-gray-500 dark:text-gray-400">OR</Text>
+        <Text className="px-4 text-sm text-gray-500 dark:text-gray-400">
+          OR
+        </Text>
         <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
       </View>
-      <View className="space-y-3">
-        <Button
-          label="Continue with Google"
-          variant="outline"
-          className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
-          disabled={isLoading}
-          onPress={() => handleSocialLogin('google')}
-        />
-        <Button
-          label="Continue with Apple"
-          variant="outline"
-          className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
-          disabled={isLoading}
-          onPress={() => handleSocialLogin('apple')}
-        />
-      </View>
+      <SocialLoginCompact
+        loading={socialLoading}
+        disabled={isLoading}
+        onGooglePress={handleGoogleLogin}
+        onApplePress={handleAppleLogin}
+        testID="social-login-compact"
+      />
     </>
   );
 };

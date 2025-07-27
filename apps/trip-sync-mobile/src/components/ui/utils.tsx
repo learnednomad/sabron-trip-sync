@@ -53,3 +53,6 @@ export const extractError = (data: unknown): string => {
   }
   return 'Something went wrong ';
 };
+
+// Re-export contrast checking utilities
+export * from './utils/contrast-checker';

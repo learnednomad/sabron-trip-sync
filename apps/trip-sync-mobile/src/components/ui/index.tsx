@@ -11,6 +11,8 @@ export * from './list';
 export * from './modal';
 export * from './progress-bar';
 export * from './select';
+export * from './social-login-button';
+export * from './social-login-compact';
 export * from './text';
 export * from './utils';
 
