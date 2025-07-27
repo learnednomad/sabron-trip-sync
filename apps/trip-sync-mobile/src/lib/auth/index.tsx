@@ -1,4 +1,4 @@
-import type { Session, User } from '@supabase/supabase-js';
+import type { Session, User, Provider } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
 import { create } from 'zustand';
 
@@ -12,6 +12,7 @@ interface AuthState {
   error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name?: string) => Promise<void>;
+  signInWithProvider: (provider: Provider) => Promise<void>;
   signOut: () => Promise<void>;
   setSession: (session: Session | null) => void;
   hydrate: () => Promise<void>;
@@ -64,6 +65,38 @@ const createSignUpMethod =
     }
   };
 
+const createSignInWithProviderMethod = 
+  (set: any, get: any) => async (provider: Provider) => {
+    try {
+      set({ status: 'loading', error: null });
+
+      // Use Supabase's OAuth with deep linking
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: Linking.createURL('/auth-callback'),
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        set({ error: error.message, status: 'signOut' });
+        throw error;
+      }
+
+      // For mobile OAuth, Supabase should handle the session automatically
+      // The auth state listener will pick up the session change
+      console.log('OAuth flow initiated for provider:', provider);
+    } catch (error: any) {
+      const errorMessage = error.message || 'Social login failed';
+      set({ error: errorMessage, status: 'signOut' });
+      throw error;
+    }
+  };
+
 const createSignOutMethod = (set: any, get: any) => async () => {
   set({ status: 'loading', error: null });
   const { error } = await supabase.auth.signOut();
@@ -108,6 +141,7 @@ const _useAuth = create<AuthState>((set, get) => ({
 
   signIn: createSignInMethod(set, get),
   signUp: createSignUpMethod(set, get),
+  signInWithProvider: createSignInWithProviderMethod(set, get),
   signOut: createSignOutMethod(set, get),
   hydrate: createHydrateMethod(set, get),
 }));
@@ -126,4 +160,6 @@ export const signIn = (email: string, password: string) =>
   _useAuth.getState().signIn(email, password);
 export const signUp = (email: string, password: string, name?: string) =>
   _useAuth.getState().signUp(email, password, name);
+export const signInWithProvider = (provider: Provider) =>
+  _useAuth.getState().signInWithProvider(provider);
 export const hydrateAuth = () => _useAuth.getState().hydrate();

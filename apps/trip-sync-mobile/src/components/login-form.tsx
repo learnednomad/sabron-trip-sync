@@ -7,6 +7,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import * as z from 'zod';
 
 import { Button, ControlledInput, Text, View } from '@/components/ui';
+import { signInWithProvider } from '@/lib/auth';
 
 const schema = z.object({
   email: z
@@ -42,29 +43,42 @@ const LoginHeader = () => (
   </View>
 );
 
-const SocialLoginButtons = ({ isLoading }: { isLoading: boolean }) => (
-  <>
-    <View className="my-8 flex-row items-center">
-      <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-      <Text className="px-4 text-sm text-gray-500 dark:text-gray-400">OR</Text>
-      <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-    </View>
-    <View className="space-y-3">
-      <Button
-        label="Continue with Google"
-        variant="outline"
-        className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
-        disabled={isLoading}
-      />
-      <Button
-        label="Continue with Apple"
-        variant="outline"
-        className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
-        disabled={isLoading}
-      />
-    </View>
-  </>
-);
+const SocialLoginButtons = ({ isLoading }: { isLoading: boolean }) => {
+  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+    try {
+      await signInWithProvider(provider);
+    } catch (error) {
+      console.error(`${provider} login failed:`, error);
+      // Error handling is already done in the auth store
+    }
+  };
+
+  return (
+    <>
+      <View className="my-8 flex-row items-center">
+        <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        <Text className="px-4 text-sm text-gray-500 dark:text-gray-400">OR</Text>
+        <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+      </View>
+      <View className="space-y-3">
+        <Button
+          label="Continue with Google"
+          variant="outline"
+          className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
+          disabled={isLoading}
+          onPress={() => handleSocialLogin('google')}
+        />
+        <Button
+          label="Continue with Apple"
+          variant="outline"
+          className="h-14 rounded-2xl border-gray-300 dark:border-gray-600"
+          disabled={isLoading}
+          onPress={() => handleSocialLogin('apple')}
+        />
+      </View>
+    </>
+  );
+};
 
 export const LoginForm = ({
   onSubmit = () => {},
