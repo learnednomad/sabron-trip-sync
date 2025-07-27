@@ -1,399 +1,321 @@
 import type {
   UserWithProfile,
-  ItineraryWithDetails,
-  ActivityWithDetails,
-  ExpenseWithSplits,
   UserRow,
   ItineraryRow,
   ActivityRow,
   ExpenseRow,
-  AccommodationRow,
-  TransportationRow,
-  BudgetRow,
-  CollaboratorRow,
-  TravelerRow,
   UserProfileRow,
   UserPreferencesRow,
   UserSettingsRow,
 } from './helpers';
 
-// Import application types for mapping
-import type {
-  User,
-  Itinerary,
-  Activity,
-  Transaction as Expense,
-  Accommodation,
-  Transportation,
-  Budget,
-  Collaborator,
-  Traveler,
-  UserProfile,
-  UserPreferences,
-  UserSettings,
-} from '@sabron/types';
-
 /**
- * Type mappers to convert between database types and application types
- * These provide a clean abstraction layer between the database schema and application logic
+ * Simple type mappers to convert between database types and basic application formats
+ * These provide minimal transformation and avoid complex type mapping issues
  */
 
-// User type mappers
-export function mapUserRowToUser(userRow: UserRow): User {
+// Simple interface for basic user data (avoiding conflicts with @sabron/types)
+export interface SimpleUser {
+  id: string;
+  email: string;
+  username?: string;
+  name: string;
+  profilePictureUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastActivityAt?: string;
+  isVerified: boolean;
+  isActive: boolean;
+  timezone?: string;
+}
+
+export interface SimpleUserProfile {
+  userId: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  gender?: string;
+  website?: string;
+  socialMedia?: Record<string, unknown>;
+}
+
+export interface SimpleUserPreferences {
+  userId: string;
+  language?: string;
+  currency?: string;
+  timezone?: string;
+  dateFormat?: string;
+  measurementUnit?: string;
+  theme?: string;
+  timeFormat?: string;
+}
+
+export interface SimpleUserSettings {
+  userId: string;
+  accessibility?: Record<string, unknown>;
+  privacy?: Record<string, unknown>;
+  security?: Record<string, unknown>;
+  dataSharing?: Record<string, unknown>;
+}
+
+// User mappers
+export function mapUserRowToSimpleUser(userRow: UserRow): SimpleUser {
   return {
     id: userRow.id,
     email: userRow.email,
     username: userRow.username || undefined,
-    name: userRow.name || '',
-    avatar: userRow.avatar_url ? { id: userRow.id, url: userRow.avatar_url } : undefined,
-    createdAt: userRow.created_at,
-    updatedAt: userRow.updated_at,
-    lastActiveAt: userRow.last_active_at || undefined,
+    name: userRow.name,
+    profilePictureUrl: userRow.profile_picture_url || undefined,
+    createdAt: userRow.created_at || new Date().toISOString(),
+    updatedAt: userRow.updated_at || new Date().toISOString(),
+    lastActivityAt: userRow.last_activity_at || undefined,
     isVerified: userRow.is_verified || false,
-    role: userRow.role as 'user' | 'admin' | 'moderator',
-    status: userRow.status as 'active' | 'inactive' | 'suspended',
-    timeZone: userRow.timezone || 'UTC',
+    isActive: userRow.is_active || true,
+    timezone: userRow.timezone || undefined,
   };
 }
 
-export function mapUserWithProfileToUser(userWithProfile: UserWithProfile): User & {
-  profile?: UserProfile;
-  preferences?: UserPreferences;
-  settings?: UserSettings;
+export function mapUserWithProfileToSimpleUser(userWithProfile: UserWithProfile): SimpleUser & {
+  profile?: SimpleUserProfile;
+  preferences?: SimpleUserPreferences;
+  settings?: SimpleUserSettings;
 } {
-  const baseUser = mapUserRowToUser(userWithProfile);
+  const baseUser = mapUserRowToSimpleUser(userWithProfile);
   
   return {
     ...baseUser,
-    profile: userWithProfile.user_profiles ? mapUserProfileRowToUserProfile(userWithProfile.user_profiles) : undefined,
-    preferences: userWithProfile.user_preferences ? mapUserPreferencesRowToUserPreferences(userWithProfile.user_preferences) : undefined,
-    settings: userWithProfile.user_settings ? mapUserSettingsRowToUserSettings(userWithProfile.user_settings) : undefined,
+    profile: userWithProfile.user_profiles ? mapUserProfileRowToSimpleProfile(userWithProfile.user_profiles) : undefined,
+    preferences: userWithProfile.user_preferences ? mapUserPreferencesRowToSimplePreferences(userWithProfile.user_preferences) : undefined,
+    settings: userWithProfile.user_settings ? mapUserSettingsRowToSimpleSettings(userWithProfile.user_settings) : undefined,
   };
 }
 
 // User profile mappers
-export function mapUserProfileRowToUserProfile(profileRow: UserProfileRow): UserProfile {
+export function mapUserProfileRowToSimpleProfile(profileRow: UserProfileRow): SimpleUserProfile {
   return {
     userId: profileRow.user_id,
-    firstName: profileRow.first_name || '',
-    lastName: profileRow.last_name || '',
-    dateOfBirth: profileRow.date_of_birth || undefined,
+    firstName: profileRow.first_name || undefined,
+    lastName: profileRow.last_name || undefined,
+    displayName: profileRow.display_name || undefined,
     gender: profileRow.gender || undefined,
-    bio: profileRow.bio || undefined,
-    location: profileRow.location || undefined,
     website: profileRow.website || undefined,
-    socialLinks: (profileRow.social_links as Record<string, string>) || {},
-    isPublic: profileRow.is_public || false,
-    profileCompleteness: profileRow.profile_completeness || 0,
+    socialMedia: profileRow.social_media as Record<string, unknown> || undefined,
   };
 }
 
 // User preferences mappers
-export function mapUserPreferencesRowToUserPreferences(preferencesRow: UserPreferencesRow): UserPreferences {
+export function mapUserPreferencesRowToSimplePreferences(preferencesRow: UserPreferencesRow): SimpleUserPreferences {
   return {
     userId: preferencesRow.user_id,
-    language: preferencesRow.language || 'en',
-    currency: preferencesRow.currency || 'USD',
-    timeZone: preferencesRow.timezone || 'UTC',
-    dateFormat: preferencesRow.date_format || 'MM/DD/YYYY',
-    temperatureUnit: preferencesRow.temperature_unit as 'celsius' | 'fahrenheit' || 'celsius',
-    distanceUnit: preferencesRow.distance_unit as 'metric' | 'imperial' || 'metric',
-    notifications: (preferencesRow.notifications as Record<string, boolean>) || {},
-    privacy: (preferencesRow.privacy as Record<string, boolean>) || {},
-    accessibility: (preferencesRow.accessibility as Record<string, boolean>) || {},
-    travelPreferences: (preferencesRow.travel_preferences as Record<string, unknown>) || {},
+    language: preferencesRow.language || undefined,
+    currency: preferencesRow.currency || undefined,
+    timezone: preferencesRow.timezone || undefined,
+    dateFormat: preferencesRow.date_format || undefined,
+    measurementUnit: preferencesRow.measurement_unit || undefined,
+    theme: preferencesRow.theme || undefined,
+    timeFormat: preferencesRow.time_format || undefined,
   };
 }
 
 // User settings mappers
-export function mapUserSettingsRowToUserSettings(settingsRow: UserSettingsRow): UserSettings {
+export function mapUserSettingsRowToSimpleSettings(settingsRow: UserSettingsRow): SimpleUserSettings {
   return {
     userId: settingsRow.user_id,
-    theme: settingsRow.theme as 'light' | 'dark' | 'system' || 'system',
-    emailNotifications: settingsRow.email_notifications || true,
-    pushNotifications: settingsRow.push_notifications || true,
-    smsNotifications: settingsRow.sms_notifications || false,
-    marketingEmails: settingsRow.marketing_emails || false,
-    dataSharing: settingsRow.data_sharing || false,
-    twoFactorEnabled: settingsRow.two_factor_enabled || false,
-    sessionTimeout: settingsRow.session_timeout || 30,
-    autoSave: settingsRow.auto_save || true,
-    defaultVisibility: settingsRow.default_visibility as 'public' | 'private' | 'shared' || 'private',
+    accessibility: settingsRow.accessibility as Record<string, unknown> || undefined,
+    privacy: settingsRow.privacy as Record<string, unknown> || undefined,
+    security: settingsRow.security as Record<string, unknown> || undefined,
+    dataSharing: settingsRow.data_sharing as Record<string, unknown> || undefined,
   };
 }
 
-// Itinerary type mappers
-export function mapItineraryRowToItinerary(itineraryRow: ItineraryRow): Itinerary {
-  return {
-    id: itineraryRow.id,
-    userId: itineraryRow.user_id,
-    title: itineraryRow.title,
-    description: itineraryRow.description || undefined,
-    coverImage: itineraryRow.cover_image_url ? {
-      id: itineraryRow.id,
-      url: itineraryRow.cover_image_url,
-    } : undefined,
-    destinations: (itineraryRow.destinations as any[]) || [],
-    startDate: itineraryRow.start_date,
-    endDate: itineraryRow.end_date,
-    duration: Math.ceil((new Date(itineraryRow.end_date).getTime() - new Date(itineraryRow.start_date).getTime()) / (1000 * 60 * 60 * 24)),
-    status: itineraryRow.status as 'draft' | 'planned' | 'active' | 'completed' | 'cancelled',
-    visibility: itineraryRow.visibility as 'public' | 'private' | 'shared',
-    tags: (itineraryRow.tags as string[]) || [],
-    travelers: [],
-    activities: [],
-    collaborators: [],
-    transportation: [],
-    accommodations: [],
-    notes: itineraryRow.notes || undefined,
-    customFields: (itineraryRow.custom_fields as Record<string, unknown>) || {},
-    isTemplate: itineraryRow.is_template || false,
-    templateCategory: itineraryRow.template_category || undefined,
-    version: itineraryRow.version || 1,
-    createdAt: itineraryRow.created_at,
-    updatedAt: itineraryRow.updated_at,
-  };
-}
-
-export function mapItineraryWithDetailsToItinerary(itineraryWithDetails: ItineraryWithDetails): Itinerary {
-  const baseItinerary = mapItineraryRowToItinerary(itineraryWithDetails);
-  
-  return {
-    ...baseItinerary,
-    activities: itineraryWithDetails.activities?.map(mapActivityRowToActivity) || [],
-    accommodations: itineraryWithDetails.accommodations?.map(mapAccommodationRowToAccommodation) || [],
-    transportation: itineraryWithDetails.transportation?.map(mapTransportationRowToTransportation) || [],
-    travelers: itineraryWithDetails.travelers?.map(mapTravelerRowToTraveler) || [],
-    collaborators: itineraryWithDetails.collaborators?.map(collab => mapCollaboratorRowToCollaborator(collab)) || [],
-    budget: itineraryWithDetails.budgets ? mapBudgetRowToBudget(itineraryWithDetails.budgets) : undefined,
-  };
-}
-
-// Activity type mappers
-export function mapActivityRowToActivity(activityRow: ActivityRow): Activity {
-  return {
-    id: activityRow.id,
-    itineraryId: activityRow.itinerary_id,
-    title: activityRow.title,
-    description: activityRow.description || undefined,
-    category: activityRow.category || 'other',
-    startTime: activityRow.start_time,
-    endTime: activityRow.end_time || activityRow.start_time,
-    duration: activityRow.duration || 60,
-    location: activityRow.location || undefined,
-    coordinates: activityRow.latitude && activityRow.longitude ? {
-      latitude: activityRow.latitude,
-      longitude: activityRow.longitude,
-    } : undefined,
-    cost: activityRow.cost ? {
-      amount: activityRow.cost,
-      currency: activityRow.currency || 'USD',
-    } : undefined,
-    bookingUrl: activityRow.booking_url || undefined,
-    bookingReference: activityRow.booking_reference || undefined,
-    notes: activityRow.notes || undefined,
-    tags: (activityRow.tags as string[]) || [],
-    isBookmarked: activityRow.is_bookmarked || false,
-    isCompleted: activityRow.is_completed || false,
-    reminder: activityRow.reminder_time || undefined,
-    createdAt: activityRow.created_at,
-    updatedAt: activityRow.updated_at,
-  };
-}
-
-// Expense type mappers
-export function mapExpenseRowToExpense(expenseRow: ExpenseRow): Expense {
-  return {
-    id: expenseRow.id,
-    itineraryId: expenseRow.itinerary_id || undefined,
-    activityId: expenseRow.activity_id || undefined,
-    userId: expenseRow.user_id,
-    amount: {
-      amount: expenseRow.amount,
-      currency: expenseRow.currency,
-    },
-    description: expenseRow.description,
-    category: expenseRow.category || 'other',
-    subcategory: expenseRow.subcategory || undefined,
-    date: expenseRow.date,
-    vendor: expenseRow.vendor || undefined,
-    paymentMethod: expenseRow.payment_method || undefined,
-    receipt: expenseRow.receipt_url ? {
-      id: expenseRow.id,
-      url: expenseRow.receipt_url,
-    } : undefined,
-    notes: expenseRow.notes || undefined,
-    tags: (expenseRow.tags as string[]) || [],
-    isReimbursable: expenseRow.is_reimbursable || false,
-    isReimbursed: expenseRow.is_reimbursed || false,
-    createdAt: expenseRow.created_at,
-    updatedAt: expenseRow.updated_at,
-  };
-}
-
-// Accommodation type mappers
-export function mapAccommodationRowToAccommodation(accommodationRow: AccommodationRow): Accommodation {
-  return {
-    id: accommodationRow.id,
-    name: accommodationRow.name,
-    type: accommodationRow.type as any,
-    address: accommodationRow.address,
-    checkIn: accommodationRow.check_in,
-    checkOut: accommodationRow.check_out,
-    confirmationNumber: accommodationRow.confirmation_number || undefined,
-    cost: accommodationRow.cost ? {
-      amount: accommodationRow.cost,
-      currency: accommodationRow.currency || 'USD',
-    } : undefined,
-    amenities: (accommodationRow.amenities as string[]) || [],
-    notes: accommodationRow.notes || undefined,
-    contact: accommodationRow.contact_info ? accommodationRow.contact_info as any : undefined,
-    documents: [],
-  };
-}
-
-// Transportation type mappers
-export function mapTransportationRowToTransportation(transportationRow: TransportationRow): Transportation {
-  return {
-    id: transportationRow.id,
-    type: transportationRow.type as any,
-    from: transportationRow.from_location,
-    to: transportationRow.to_location,
-    departure: transportationRow.departure_time,
-    arrival: transportationRow.arrival_time,
-    carrier: transportationRow.carrier || undefined,
-    bookingReference: transportationRow.booking_reference || undefined,
-    cost: transportationRow.cost ? {
-      amount: transportationRow.cost,
-      currency: transportationRow.currency || 'USD',
-    } : undefined,
-    notes: transportationRow.notes || undefined,
-    documents: [],
-  };
-}
-
-// Budget type mappers
-export function mapBudgetRowToBudget(budgetRow: BudgetRow): Budget {
-  return {
-    total: {
-      amount: budgetRow.total_amount,
-      currency: budgetRow.currency,
-    },
-    spent: budgetRow.spent_amount ? {
-      amount: budgetRow.spent_amount,
-      currency: budgetRow.currency,
-    } : undefined,
-    categories: (budgetRow.categories as any[]) || [],
-    currency: budgetRow.currency,
-    exchangeRates: (budgetRow.exchange_rates as Record<string, number>) || {},
-  };
-}
-
-// Collaborator type mappers
-export function mapCollaboratorRowToCollaborator(collaboratorRow: CollaboratorRow & { users?: UserRow }): Collaborator {
-  return {
-    userId: collaboratorRow.user_id,
-    user: collaboratorRow.users ? mapUserRowToUser(collaboratorRow.users) : undefined,
-    role: collaboratorRow.role as any,
-    permissions: (collaboratorRow.permissions as string[]) || [],
-    invitedBy: collaboratorRow.invited_by,
-    joinedAt: collaboratorRow.joined_at || collaboratorRow.created_at,
-    lastActiveAt: collaboratorRow.last_active_at || undefined,
-  };
-}
-
-// Traveler type mappers
-export function mapTravelerRowToTraveler(travelerRow: TravelerRow): Traveler {
-  return {
-    userId: travelerRow.user_id || undefined,
-    name: travelerRow.name,
-    email: travelerRow.email || undefined,
-    role: travelerRow.role as any,
-    status: travelerRow.status as any,
-    joinedAt: travelerRow.joined_at || travelerRow.created_at,
-    preferences: travelerRow.preferences ? travelerRow.preferences as any : undefined,
-  };
-}
-
-// Reverse mappers (Application types to Database types)
-export function mapUserToUserInsert(user: Partial<User>): Partial<UserRow> {
+// Reverse mappers (Simple types to Database types)
+export function mapSimpleUserToUserInsert(user: Partial<SimpleUser>): Partial<UserRow> {
   return {
     id: user.id,
     email: user.email,
     username: user.username,
     name: user.name,
-    avatar_url: user.avatar?.url,
+    profile_picture_url: user.profilePictureUrl,
     is_verified: user.isVerified,
-    role: user.role,
-    status: user.status,
-    timezone: user.timeZone,
+    is_active: user.isActive,
+    timezone: user.timezone,
   };
 }
 
-export function mapItineraryToItineraryInsert(itinerary: Partial<Itinerary>): Partial<ItineraryRow> {
+export function mapSimpleUserProfileToInsert(profile: Partial<SimpleUserProfile>) {
   return {
-    id: itinerary.id,
-    user_id: itinerary.userId,
-    title: itinerary.title,
-    description: itinerary.description,
-    cover_image_url: itinerary.coverImage?.url,
-    destinations: itinerary.destinations as any,
-    start_date: itinerary.startDate,
-    end_date: itinerary.endDate,
-    status: itinerary.status,
-    visibility: itinerary.visibility,
-    tags: itinerary.tags,
-    notes: itinerary.notes,
-    custom_fields: itinerary.customFields,
-    is_template: itinerary.isTemplate,
-    template_category: itinerary.templateCategory,
-    version: itinerary.version,
+    user_id: profile.userId,
+    first_name: profile.firstName,
+    last_name: profile.lastName,
+    display_name: profile.displayName,
+    gender: profile.gender,
+    website: profile.website,
+    social_media: profile.socialMedia,
   };
 }
 
-export function mapActivityToActivityInsert(activity: Partial<Activity>): Partial<ActivityRow> {
+export function mapSimpleUserPreferencesToInsert(preferences: Partial<SimpleUserPreferences>) {
   return {
-    id: activity.id,
-    itinerary_id: activity.itineraryId,
-    title: activity.title,
-    description: activity.description,
-    category: activity.category,
-    start_time: activity.startTime,
-    end_time: activity.endTime,
-    duration: activity.duration,
-    location: activity.location,
-    latitude: activity.coordinates?.latitude,
-    longitude: activity.coordinates?.longitude,
-    cost: activity.cost?.amount,
-    currency: activity.cost?.currency,
-    booking_url: activity.bookingUrl,
-    booking_reference: activity.bookingReference,
-    notes: activity.notes,
-    tags: activity.tags,
-    is_bookmarked: activity.isBookmarked,
-    is_completed: activity.isCompleted,
-    reminder_time: activity.reminder,
+    user_id: preferences.userId,
+    language: preferences.language,
+    currency: preferences.currency,
+    timezone: preferences.timezone,
+    date_format: preferences.dateFormat,
+    measurement_unit: preferences.measurementUnit,
+    theme: preferences.theme,
+    time_format: preferences.timeFormat,
   };
 }
 
-export function mapExpenseToExpenseInsert(expense: Partial<Expense>): Partial<ExpenseRow> {
+export function mapSimpleUserSettingsToInsert(settings: Partial<SimpleUserSettings>) {
   return {
-    id: expense.id,
-    itinerary_id: expense.itineraryId,
-    activity_id: expense.activityId,
-    user_id: expense.userId,
-    amount: expense.amount?.amount,
-    currency: expense.amount?.currency || 'USD',
-    description: expense.description,
-    category: expense.category,
-    subcategory: expense.subcategory,
-    date: expense.date,
-    vendor: expense.vendor,
-    payment_method: expense.paymentMethod,
-    receipt_url: expense.receipt?.url,
-    notes: expense.notes,
-    tags: expense.tags,
-    is_reimbursable: expense.isReimbursable,
-    is_reimbursed: expense.isReimbursed,
+    user_id: settings.userId,
+    accessibility: settings.accessibility,
+    privacy: settings.privacy,
+    security: settings.security,
+    data_sharing: settings.dataSharing,
+  };
+}
+
+// Simple itinerary mapper
+export interface SimpleItinerary {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  coverImageUrl?: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  status?: string;
+  visibility?: string;
+  tags: string[];
+  budget?: number;
+  currency?: string;
+  groupSize?: number;
+  travelStyle?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function mapItineraryRowToSimple(itineraryRow: ItineraryRow): SimpleItinerary {
+  return {
+    id: itineraryRow.id,
+    userId: itineraryRow.user_id,
+    title: itineraryRow.title,
+    description: itineraryRow.description || undefined,
+    coverImageUrl: itineraryRow.cover_image_url || undefined,
+    destination: itineraryRow.destination,
+    startDate: itineraryRow.start_date,
+    endDate: itineraryRow.end_date,
+    status: itineraryRow.status || undefined,
+    visibility: itineraryRow.visibility || undefined,
+    tags: (itineraryRow.tags as string[]) || [],
+    budget: itineraryRow.budget || undefined,
+    currency: itineraryRow.currency || undefined,
+    groupSize: itineraryRow.group_size || undefined,
+    travelStyle: itineraryRow.travel_style || undefined,
+    metadata: (itineraryRow.metadata as Record<string, unknown>) || undefined,
+    createdAt: itineraryRow.created_at || new Date().toISOString(),
+    updatedAt: itineraryRow.updated_at || new Date().toISOString(),
+  };
+}
+
+// Simple activity mapper
+export interface SimpleActivity {
+  id: string;
+  itineraryId: string;
+  title: string;
+  description?: string;
+  category?: string;
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  location?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  cost?: number;
+  currency?: string;
+  bookingUrl?: string;
+  confirmationNumber?: string;
+  notes?: string;
+  photos: string[];
+  rating?: number;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function mapActivityRowToSimple(activityRow: ActivityRow): SimpleActivity {
+  return {
+    id: activityRow.id,
+    itineraryId: activityRow.itinerary_id,
+    title: activityRow.title,
+    description: activityRow.description || undefined,
+    category: activityRow.category || undefined,
+    startTime: activityRow.start_time || undefined,
+    endTime: activityRow.end_time || undefined,
+    durationMinutes: activityRow.duration_minutes || undefined,
+    location: activityRow.location || undefined,
+    address: activityRow.address || undefined,
+    latitude: activityRow.latitude || undefined,
+    longitude: activityRow.longitude || undefined,
+    cost: activityRow.cost || undefined,
+    currency: activityRow.currency || undefined,
+    bookingUrl: activityRow.booking_url || undefined,
+    confirmationNumber: activityRow.confirmation_number || undefined,
+    notes: activityRow.notes || undefined,
+    photos: (activityRow.photos as string[]) || [],
+    rating: activityRow.rating || undefined,
+    metadata: (activityRow.metadata as Record<string, unknown>) || undefined,
+    createdAt: activityRow.created_at || new Date().toISOString(),
+    updatedAt: activityRow.updated_at || new Date().toISOString(),
+  };
+}
+
+// Simple expense mapper
+export interface SimpleExpense {
+  id: string;
+  itineraryId?: string;
+  activityId?: string;
+  userId: string;
+  amount: number;
+  currency?: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  merchantName?: string;
+  paymentMethod?: string;
+  receipt?: Record<string, unknown>;
+  notes?: string;
+  tags: string[];
+  isBusinessExpense?: boolean;
+  isRecurring?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function mapExpenseRowToSimple(expenseRow: ExpenseRow): SimpleExpense {
+  return {
+    id: expenseRow.id,
+    itineraryId: expenseRow.itinerary_id || undefined,
+    activityId: expenseRow.activity_id || undefined,
+    userId: expenseRow.user_id,
+    amount: expenseRow.amount,
+    currency: expenseRow.currency || undefined,
+    description: expenseRow.description,
+    category: expenseRow.category,
+    subcategory: expenseRow.subcategory || undefined,
+    merchantName: expenseRow.merchant_name || undefined,
+    paymentMethod: expenseRow.payment_method || undefined,
+    receipt: expenseRow.receipt as Record<string, unknown> || undefined,
+    notes: expenseRow.notes || undefined,
+    tags: (expenseRow.tags as string[]) || [],
+    isBusinessExpense: expenseRow.is_business_expense || false,
+    isRecurring: expenseRow.is_recurring || false,
+    createdAt: expenseRow.created_at || new Date().toISOString(),
+    updatedAt: expenseRow.updated_at || new Date().toISOString(),
   };
 }

@@ -1,25 +1,19 @@
 import { supabase } from './index';
-import type {
-  User,
-  Itinerary,
-  Activity,
-  Transaction as Expense,
-  UserProfile,
-  UserPreferences,
-  UserSettings,
-} from '@sabron/types';
 
 import {
-  mapUserWithProfileToUser,
-  mapUserRowToUser,
-  mapItineraryWithDetailsToItinerary,
-  mapItineraryRowToItinerary,
-  mapActivityRowToActivity,
-  mapExpenseRowToExpense,
-  mapUserToUserInsert,
-  mapItineraryToItineraryInsert,
-  mapActivityToActivityInsert,
-  mapExpenseToExpenseInsert,
+  mapUserWithProfileToSimpleUser,
+  mapUserRowToSimpleUser,
+  mapItineraryRowToSimple,
+  mapActivityRowToSimple,
+  mapExpenseRowToSimple,
+  mapSimpleUserToUserInsert,
+  type SimpleUser,
+  type SimpleUserProfile,
+  type SimpleUserPreferences,
+  type SimpleUserSettings,
+  type SimpleItinerary,
+  type SimpleActivity,
+  type SimpleExpense,
 } from './mappers';
 
 import type {
@@ -45,7 +39,7 @@ import type {
 
 // User service
 export const userService = {
-  async getById(id: string): Promise<FetchSingleResult<User>> {
+  async getById(id: string): Promise<FetchSingleResult<SimpleUser>> {
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -53,12 +47,12 @@ export const userService = {
       .single();
     
     return {
-      data: data ? mapUserRowToUser(data) : null,
+      data: data ? mapUserRowToSimpleUser(data) : null,
       error,
     };
   },
 
-  async getByEmail(email: string): Promise<FetchSingleResult<User>> {
+  async getByEmail(email: string): Promise<FetchSingleResult<SimpleUser>> {
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -66,15 +60,15 @@ export const userService = {
       .single();
     
     return {
-      data: data ? mapUserRowToUser(data) : null,
+      data: data ? mapUserRowToSimpleUser(data) : null,
       error,
     };
   },
 
-  async getWithProfile(id: string): Promise<FetchSingleResult<User & {
-    profile?: UserProfile;
-    preferences?: UserPreferences;
-    settings?: UserSettings;
+  async getWithProfile(id: string): Promise<FetchSingleResult<SimpleUser & {
+    profile?: SimpleUserProfile;
+    preferences?: SimpleUserPreferences;
+    settings?: SimpleUserSettings;
   }>> {
     const { data, error } = await supabase
       .from('users')
@@ -89,13 +83,13 @@ export const userService = {
       .single();
     
     return {
-      data: data ? mapUserWithProfileToUser(data as any) : null,
+      data: data ? mapUserWithProfileToSimpleUser(data as any) : null,
       error,
     };
   },
 
-  async create(userData: Partial<User>): Promise<CreateResult<User>> {
-    const insertData = mapUserToUserInsert(userData) as UserInsert;
+  async create(userData: Partial<SimpleUser>): Promise<CreateResult<SimpleUser>> {
+    const insertData = mapSimpleUserToUserInsert(userData) as UserInsert;
     
     const { data, error } = await supabase
       .from('users')
@@ -104,13 +98,13 @@ export const userService = {
       .single();
     
     return {
-      data: data ? mapUserRowToUser(data) : null,
+      data: data ? mapUserRowToSimpleUser(data) : null,
       error,
     };
   },
 
-  async update(id: string, userData: Partial<User>): Promise<UpdateResult<User>> {
-    const updateData = mapUserToUserInsert(userData) as UserUpdate;
+  async update(id: string, userData: Partial<SimpleUser>): Promise<UpdateResult<SimpleUser>> {
+    const updateData = mapSimpleUserToUserInsert(userData) as UserUpdate;
     
     const { data, error } = await supabase
       .from('users')
@@ -120,7 +114,7 @@ export const userService = {
       .single();
     
     return {
-      data: data ? mapUserRowToUser(data) : null,
+      data: data ? mapUserRowToSimpleUser(data) : null,
       error,
     };
   },
@@ -134,7 +128,7 @@ export const userService = {
     return { data: { count: count || 0 }, error };
   },
 
-  async search(query: string, limit = 10): Promise<FetchResult<User>> {
+  async search(query: string, limit = 10): Promise<FetchResult<SimpleUser>> {
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -142,7 +136,7 @@ export const userService = {
       .limit(limit);
     
     return {
-      data: data ? data.map(mapUserRowToUser) : null,
+      data: data ? data.map(mapUserRowToSimpleUser) : null,
       error,
     };
   },
@@ -150,7 +144,7 @@ export const userService = {
 
 // Itinerary service
 export const itineraryService = {
-  async getById(id: string): Promise<FetchSingleResult<Itinerary>> {
+  async getById(id: string): Promise<FetchSingleResult<SimpleItinerary>> {
     const { data, error } = await supabase
       .from('itineraries')
       .select('*')
@@ -158,33 +152,42 @@ export const itineraryService = {
       .single();
     
     return {
-      data: data ? mapItineraryRowToItinerary(data) : null,
+      data: data ? mapItineraryRowToSimple(data) : null,
       error,
     };
   },
 
-  async getWithDetails(id: string): Promise<FetchSingleResult<Itinerary>> {
+  async getWithDetails(id: string): Promise<FetchSingleResult<SimpleItinerary & {
+    activities?: SimpleActivity[];
+    collaborators?: any[];
+  }>> {
     const { data, error } = await supabase
       .from('itineraries')
       .select(`
         *,
         activities (*),
-        accommodations (*),
-        transportation (*),
-        budgets (*),
-        collaborators (*, users (*)),
-        travelers (*)
+        collaborators (*, users (*))
       `)
       .eq('id', id)
       .single();
     
+    if (error || !data) {
+      return { data: null, error };
+    }
+
+    const baseItinerary = mapItineraryRowToSimple(data);
+    
     return {
-      data: data ? mapItineraryWithDetailsToItinerary(data as any) : null,
-      error,
+      data: {
+        ...baseItinerary,
+        activities: data.activities ? data.activities.map((activity: any) => mapActivityRowToSimple(activity)) : undefined,
+        collaborators: data.collaborators || undefined,
+      },
+      error: null,
     };
   },
 
-  async getByUserId(userId: string, limit = 20): Promise<FetchResult<Itinerary>> {
+  async getByUserId(userId: string, limit = 20): Promise<FetchResult<SimpleItinerary>> {
     const { data, error } = await supabase
       .from('itineraries')
       .select('*')
@@ -193,13 +196,29 @@ export const itineraryService = {
       .limit(limit);
     
     return {
-      data: data ? data.map(mapItineraryRowToItinerary) : null,
+      data: data ? data.map(mapItineraryRowToSimple) : null,
       error,
     };
   },
 
-  async create(itineraryData: Partial<Itinerary>): Promise<CreateResult<Itinerary>> {
-    const insertData = mapItineraryToItineraryInsert(itineraryData) as ItineraryInsert;
+  async create(itineraryData: Partial<SimpleItinerary>): Promise<CreateResult<SimpleItinerary>> {
+    const insertData = {
+      user_id: itineraryData.userId,
+      title: itineraryData.title,
+      description: itineraryData.description,
+      cover_image_url: itineraryData.coverImageUrl,
+      destination: itineraryData.destination,
+      start_date: itineraryData.startDate,
+      end_date: itineraryData.endDate,
+      status: itineraryData.status,
+      visibility: itineraryData.visibility,
+      tags: itineraryData.tags,
+      budget: itineraryData.budget,
+      currency: itineraryData.currency,
+      group_size: itineraryData.groupSize,
+      travel_style: itineraryData.travelStyle,
+      metadata: itineraryData.metadata,
+    } as ItineraryInsert;
     
     const { data, error } = await supabase
       .from('itineraries')
@@ -208,13 +227,28 @@ export const itineraryService = {
       .single();
     
     return {
-      data: data ? mapItineraryRowToItinerary(data) : null,
+      data: data ? mapItineraryRowToSimple(data) : null,
       error,
     };
   },
 
-  async update(id: string, itineraryData: Partial<Itinerary>): Promise<UpdateResult<Itinerary>> {
-    const updateData = mapItineraryToItineraryInsert(itineraryData) as ItineraryUpdate;
+  async update(id: string, itineraryData: Partial<SimpleItinerary>): Promise<UpdateResult<SimpleItinerary>> {
+    const updateData = {
+      title: itineraryData.title,
+      description: itineraryData.description,
+      cover_image_url: itineraryData.coverImageUrl,
+      destination: itineraryData.destination,
+      start_date: itineraryData.startDate,
+      end_date: itineraryData.endDate,
+      status: itineraryData.status,
+      visibility: itineraryData.visibility,
+      tags: itineraryData.tags,
+      budget: itineraryData.budget,
+      currency: itineraryData.currency,
+      group_size: itineraryData.groupSize,
+      travel_style: itineraryData.travelStyle,
+      metadata: itineraryData.metadata,
+    } as ItineraryUpdate;
     
     const { data, error } = await supabase
       .from('itineraries')
@@ -224,7 +258,7 @@ export const itineraryService = {
       .single();
     
     return {
-      data: data ? mapItineraryRowToItinerary(data) : null,
+      data: data ? mapItineraryRowToSimple(data) : null,
       error,
     };
   },
@@ -238,7 +272,7 @@ export const itineraryService = {
     return { data: { count: count || 0 }, error };
   },
 
-  async getShared(shareToken: string): Promise<FetchSingleResult<Itinerary>> {
+  async getShared(shareToken: string): Promise<FetchSingleResult<SimpleItinerary>> {
     const { data, error } = await supabase
       .from('itineraries')
       .select('*')
@@ -246,21 +280,21 @@ export const itineraryService = {
       .single();
     
     return {
-      data: data ? mapItineraryRowToItinerary(data) : null,
+      data: data ? mapItineraryRowToSimple(data) : null,
       error,
     };
   },
 
-  async search(query: string, limit = 10): Promise<FetchResult<Itinerary>> {
+  async search(query: string, limit = 10): Promise<FetchResult<SimpleItinerary>> {
     const { data, error } = await supabase
       .from('itineraries')
       .select('*')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%,destination.ilike.%${query}%`)
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
       .eq('visibility', 'public')
       .limit(limit);
     
     return {
-      data: data ? data.map(mapItineraryRowToItinerary) : null,
+      data: data ? data.map(mapItineraryRowToSimple) : null,
       error,
     };
   },
@@ -268,7 +302,7 @@ export const itineraryService = {
 
 // Activity service
 export const activityService = {
-  async getById(id: string): Promise<FetchSingleResult<Activity>> {
+  async getById(id: string): Promise<FetchSingleResult<SimpleActivity>> {
     const { data, error } = await supabase
       .from('activities')
       .select('*')
@@ -276,12 +310,12 @@ export const activityService = {
       .single();
     
     return {
-      data: data ? mapActivityRowToActivity(data) : null,
+      data: data ? mapActivityRowToSimple(data) : null,
       error,
     };
   },
 
-  async getByItineraryId(itineraryId: string): Promise<FetchResult<Activity>> {
+  async getByItineraryId(itineraryId: string): Promise<FetchResult<SimpleActivity>> {
     const { data, error } = await supabase
       .from('activities')
       .select('*')
@@ -289,13 +323,33 @@ export const activityService = {
       .order('start_time', { ascending: true });
     
     return {
-      data: data ? data.map(mapActivityRowToActivity) : null,
+      data: data ? data.map(mapActivityRowToSimple) : null,
       error,
     };
   },
 
-  async create(activityData: Partial<Activity>): Promise<CreateResult<Activity>> {
-    const insertData = mapActivityToActivityInsert(activityData) as ActivityInsert;
+  async create(activityData: Partial<SimpleActivity>): Promise<CreateResult<SimpleActivity>> {
+    const insertData = {
+      itinerary_id: activityData.itineraryId,
+      title: activityData.title,
+      description: activityData.description,
+      category: activityData.category,
+      start_time: activityData.startTime,
+      end_time: activityData.endTime,
+      duration_minutes: activityData.durationMinutes,
+      location: activityData.location,
+      address: activityData.address,
+      latitude: activityData.latitude,
+      longitude: activityData.longitude,
+      cost: activityData.cost,
+      currency: activityData.currency,
+      booking_url: activityData.bookingUrl,
+      confirmation_number: activityData.confirmationNumber,
+      notes: activityData.notes,
+      photos: activityData.photos,
+      rating: activityData.rating,
+      metadata: activityData.metadata,
+    } as ActivityInsert;
     
     const { data, error } = await supabase
       .from('activities')
@@ -304,13 +358,32 @@ export const activityService = {
       .single();
     
     return {
-      data: data ? mapActivityRowToActivity(data) : null,
+      data: data ? mapActivityRowToSimple(data) : null,
       error,
     };
   },
 
-  async update(id: string, activityData: Partial<Activity>): Promise<UpdateResult<Activity>> {
-    const updateData = mapActivityToActivityInsert(activityData) as ActivityUpdate;
+  async update(id: string, activityData: Partial<SimpleActivity>): Promise<UpdateResult<SimpleActivity>> {
+    const updateData = {
+      title: activityData.title,
+      description: activityData.description,
+      category: activityData.category,
+      start_time: activityData.startTime,
+      end_time: activityData.endTime,
+      duration_minutes: activityData.durationMinutes,
+      location: activityData.location,
+      address: activityData.address,
+      latitude: activityData.latitude,
+      longitude: activityData.longitude,
+      cost: activityData.cost,
+      currency: activityData.currency,
+      booking_url: activityData.bookingUrl,
+      confirmation_number: activityData.confirmationNumber,
+      notes: activityData.notes,
+      photos: activityData.photos,
+      rating: activityData.rating,
+      metadata: activityData.metadata,
+    } as ActivityUpdate;
     
     const { data, error } = await supabase
       .from('activities')
@@ -320,7 +393,7 @@ export const activityService = {
       .single();
     
     return {
-      data: data ? mapActivityRowToActivity(data) : null,
+      data: data ? mapActivityRowToSimple(data) : null,
       error,
     };
   },
@@ -334,7 +407,7 @@ export const activityService = {
     return { data: { count: count || 0 }, error };
   },
 
-  async getByLocation(latitude: number, longitude: number, radius = 5000): Promise<FetchResult<Activity>> {
+  async getByLocation(latitude: number, longitude: number, radius = 5000): Promise<FetchResult<SimpleActivity>> {
     // Note: This would require a PostGIS extension for proper geospatial queries
     // For now, using a simple bounding box approach
     const latDelta = radius / 111000; // Rough conversion: 1 degree ≈ 111km
@@ -351,7 +424,7 @@ export const activityService = {
       .not('longitude', 'is', null);
     
     return {
-      data: data ? data.map(mapActivityRowToActivity) : null,
+      data: data ? data.map(mapActivityRowToSimple) : null,
       error,
     };
   },
@@ -359,7 +432,7 @@ export const activityService = {
 
 // Expense service
 export const expenseService = {
-  async getById(id: string): Promise<FetchSingleResult<Expense>> {
+  async getById(id: string): Promise<FetchSingleResult<SimpleExpense>> {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -367,12 +440,12 @@ export const expenseService = {
       .single();
     
     return {
-      data: data ? mapExpenseRowToExpense(data) : null,
+      data: data ? mapExpenseRowToSimple(data) : null,
       error,
     };
   },
 
-  async getByItineraryId(itineraryId: string): Promise<FetchResult<Expense>> {
+  async getByItineraryId(itineraryId: string): Promise<FetchResult<SimpleExpense>> {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -380,12 +453,12 @@ export const expenseService = {
       .order('created_at', { ascending: false });
     
     return {
-      data: data ? data.map(mapExpenseRowToExpense) : null,
+      data: data ? data.map(mapExpenseRowToSimple) : null,
       error,
     };
   },
 
-  async getByUserId(userId: string, limit = 50): Promise<FetchResult<Expense>> {
+  async getByUserId(userId: string, limit = 50): Promise<FetchResult<SimpleExpense>> {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -394,13 +467,29 @@ export const expenseService = {
       .limit(limit);
     
     return {
-      data: data ? data.map(mapExpenseRowToExpense) : null,
+      data: data ? data.map(mapExpenseRowToSimple) : null,
       error,
     };
   },
 
-  async create(expenseData: Partial<Expense>): Promise<CreateResult<Expense>> {
-    const insertData = mapExpenseToExpenseInsert(expenseData) as ExpenseInsert;
+  async create(expenseData: Partial<SimpleExpense>): Promise<CreateResult<SimpleExpense>> {
+    const insertData = {
+      itinerary_id: expenseData.itineraryId,
+      activity_id: expenseData.activityId,
+      user_id: expenseData.userId,
+      amount: expenseData.amount,
+      currency: expenseData.currency,
+      description: expenseData.description,
+      category: expenseData.category,
+      subcategory: expenseData.subcategory,
+      merchant_name: expenseData.merchantName,
+      payment_method: expenseData.paymentMethod,
+      receipt: expenseData.receipt,
+      notes: expenseData.notes,
+      tags: expenseData.tags,
+      is_business_expense: expenseData.isBusinessExpense,
+      is_recurring: expenseData.isRecurring,
+    } as ExpenseInsert;
     
     const { data, error } = await supabase
       .from('expenses')
@@ -409,13 +498,26 @@ export const expenseService = {
       .single();
     
     return {
-      data: data ? mapExpenseRowToExpense(data) : null,
+      data: data ? mapExpenseRowToSimple(data) : null,
       error,
     };
   },
 
-  async update(id: string, expenseData: Partial<Expense>): Promise<UpdateResult<Expense>> {
-    const updateData = mapExpenseToExpenseInsert(expenseData) as ExpenseUpdate;
+  async update(id: string, expenseData: Partial<SimpleExpense>): Promise<UpdateResult<SimpleExpense>> {
+    const updateData = {
+      amount: expenseData.amount,
+      currency: expenseData.currency,
+      description: expenseData.description,
+      category: expenseData.category,
+      subcategory: expenseData.subcategory,
+      merchant_name: expenseData.merchantName,
+      payment_method: expenseData.paymentMethod,
+      receipt: expenseData.receipt,
+      notes: expenseData.notes,
+      tags: expenseData.tags,
+      is_business_expense: expenseData.isBusinessExpense,
+      is_recurring: expenseData.isRecurring,
+    } as ExpenseUpdate;
     
     const { data, error } = await supabase
       .from('expenses')
@@ -425,7 +527,7 @@ export const expenseService = {
       .single();
     
     return {
-      data: data ? mapExpenseRowToExpense(data) : null,
+      data: data ? mapExpenseRowToSimple(data) : null,
       error,
     };
   },
@@ -519,7 +621,7 @@ export const realtimeService = {
         if (payload.new) {
           callback({
             ...payload,
-            new: mapActivityRowToActivity(payload.new as any),
+            new: mapActivityRowToSimple(payload.new as any),
           });
         } else {
           callback(payload);
@@ -535,7 +637,7 @@ export const realtimeService = {
         if (payload.new) {
           callback({
             ...payload,
-            new: mapExpenseRowToExpense(payload.new as any),
+            new: mapExpenseRowToSimple(payload.new as any),
           });
         } else {
           callback(payload);
