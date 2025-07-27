@@ -14,6 +14,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,13 +77,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password,
         options: {
           data: { name },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?type=signup`,
         },
       });
 
       if (error) throw error;
 
-      toast.success('Account created successfully!');
+      toast.success('Account created successfully! Please check your email to verify your account.');
       router.push('/verify-email');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign up');
@@ -105,7 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const resetPassword = async (email: string) => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
       });
 
       if (error) throw error;
@@ -113,6 +114,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       toast.success('Check your email for the reset link');
     } catch (error: any) {
       toast.error(error.message || 'Failed to send reset email');
+      throw error;
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password,
+      });
+
+      if (error) throw error;
+
+      toast.success('Password updated successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update password');
       throw error;
     }
   };
@@ -126,6 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signUp,
         signOut,
         resetPassword,
+        updatePassword,
       }}
     >
       {children}
