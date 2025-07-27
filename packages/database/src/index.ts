@@ -34,4 +34,8 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>
 });
 
 // Export types
-export type { Database, Json } from './types';
+export type { Database, Json, Tables, TablesInsert, TablesUpdate } from './types';
+export * from './helpers';
+export * from './queries';
+export * from './mappers';
+export * from './service';
