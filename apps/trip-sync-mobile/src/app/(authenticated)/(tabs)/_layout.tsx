@@ -1,38 +1,39 @@
-import { Link, Redirect, SplashScreen, Tabs } from 'expo-router';
-import React, { useCallback, useEffect } from 'react';
+import { Link, Tabs } from 'expo-router';
+import React from 'react';
 
 import { Pressable, Text } from '@/components/ui';
 import {
   Feed as FeedIcon,
+  Home as HomeIcon,
   Settings as SettingsIcon,
   Style as StyleIcon,
 } from '@/components/ui/icons';
-import { useAuth, useIsFirstTime } from '@/lib';
 
-export default function TabLayout() {
-  const status = useAuth.use.status();
-  const [isFirstTime] = useIsFirstTime();
-  const hideSplash = useCallback(async () => {
-    await SplashScreen.hideAsync();
-  }, []);
-  useEffect(() => {
-    if (status !== 'idle') {
-      setTimeout(() => {
-        hideSplash();
-      }, 1000);
-    }
-  }, [hideSplash, status]);
-
-  if (isFirstTime) {
-    return <Redirect href="/onboarding" />;
-  }
-  if (status === 'signOut') {
-    return <Redirect href="/login" />;
-  }
+export default function TabsLayout() {
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#FF7B1A', // primary-600 from colors
+        tabBarInactiveTintColor: '#969696', // charcoal-400
+        tabBarStyle: {
+          backgroundColor: '#ffffff',
+          borderTopColor: '#F0EFEE', // neutral-200
+          borderTopWidth: 1,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
+        options={{
+          title: 'Home',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+          tabBarButtonTestID: 'home-tab',
+        }}
+      />
+
+      <Tabs.Screen
+        name="feed"
         options={{
           title: 'Feed',
           tabBarIcon: ({ color }) => <FeedIcon color={color} />,
@@ -50,6 +51,7 @@ export default function TabLayout() {
           tabBarButtonTestID: 'style-tab',
         }}
       />
+      
       <Tabs.Screen
         name="settings"
         options={{

@@ -18,7 +18,7 @@ import { useThemeConfig } from '@/lib/use-theme-config';
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: '(app)',
+  initialRouteName: '(authenticated)',
 };
 
 loadSelectedTheme();
@@ -51,39 +51,17 @@ export default function RootLayout() {
 
   return (
     <Providers>
-      <Stack>
-        {status === 'signIn' ? (
-          <>
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="onboarding"
-              options={{ headerShown: false, presentation: 'modal' }}
-            />
-            <Stack.Screen
-              name="login"
-              options={{ headerShown: false, presentation: 'modal' }}
-            />
-            <Stack.Screen
-              name="register"
-              options={{ headerShown: false, presentation: 'modal' }}
-            />
-            <Stack.Screen
-              name="auth-callback"
-              options={{ headerShown: false, presentation: 'modal' }}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="register" options={{ headerShown: false }} />
-            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="auth-callback"
-              options={{ headerShown: false }}
-            />
-          </>
-        )}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(authenticated)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen 
+          name="onboarding" 
+          options={{ presentation: 'modal' }} 
+        />
+        <Stack.Screen 
+          name="[...missing]" 
+          options={{ presentation: 'modal' }} 
+        />
       </Stack>
     </Providers>
   );

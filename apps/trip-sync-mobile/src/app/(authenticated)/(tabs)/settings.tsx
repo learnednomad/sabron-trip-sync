@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import type { Provider } from '@supabase/supabase-js';
 
-import { Item } from '@/components/settings/item';
-import { ItemsContainer } from '@/components/settings/items-container';
-import { LanguageItem } from '@/components/settings/language-item';
-import { ThemeItem } from '@/components/settings/theme-item';
+import { 
+  Item, 
+  ItemsContainer, 
+  LanguageItem, 
+  ThemeItem 
+} from '@/features/settings';
 import {
   colors,
   FocusAwareStatusBar,

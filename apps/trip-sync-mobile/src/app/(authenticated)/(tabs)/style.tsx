@@ -1,9 +1,6 @@
 import * as React from 'react';
 
-import { Buttons } from '@/components/buttons';
-import { Colors } from '@/components/colors';
-import { Inputs } from '@/components/inputs';
-import { Typography } from '@/components/typography';
+import { Buttons, Colors, Inputs, Typography } from '@/features/shared';
 import { FocusAwareStatusBar, SafeAreaView, ScrollView } from '@/components/ui';
 
 export default function Style() {

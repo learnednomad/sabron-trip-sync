@@ -2,8 +2,8 @@ import { Link } from 'expo-router';
 import React from 'react';
 import { Alert, SafeAreaView } from 'react-native';
 
-import type { LoginFormProps } from '@/components/login-form';
-import { LoginForm } from '@/components/login-form';
+import type { LoginFormProps } from '@/features/auth';
+import { LoginForm } from '@/features/auth';
 import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 import { useAuth } from '@/lib';
 

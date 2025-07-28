@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
-import { RegisterForm } from '../register-form';
+import { RegisterForm } from '@/features/auth';
 
 // Mock the UI components
 jest.mock('@/components/ui', () => ({

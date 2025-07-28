@@ -2,8 +2,8 @@ import React from 'react';
 
 import { cleanup, screen, setup, waitFor } from '@/lib/test-utils';
 
-import type { LoginFormProps } from './login-form';
-import { LoginForm } from './login-form';
+import type { LoginFormProps } from '@/features/auth';
+import { LoginForm } from '@/features/auth';
 
 afterEach(cleanup);
 

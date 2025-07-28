@@ -2,8 +2,8 @@ import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, SafeAreaView } from 'react-native';
 
-import type { RegisterFormProps } from '@/components/register-form';
-import { RegisterForm } from '@/components/register-form';
+import type { RegisterFormProps } from '@/features/auth';
+import { RegisterForm } from '@/features/auth';
 import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 import { useAuth } from '@/lib';
 

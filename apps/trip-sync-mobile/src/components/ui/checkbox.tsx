@@ -209,7 +209,6 @@ export const SwitchIcon = ({ checked = false }: IconProps) => {
 
   return (
     <View className="w-[50px] justify-center" style={{ minHeight: TOUCH_SIZE }}>
-      {' '}
       {/* 44pt touch target */}
       <View className="overflow-hidden rounded-full">
         <View
